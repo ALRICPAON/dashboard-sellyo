@@ -92,6 +92,12 @@
       - Bouton : ${cta}
       - Lien paiement : ${payment}`);
     });
+    document.getElementById("lang-switch")?.addEventListener("change", (e) => {
+  const lang = e.target.value;
+  alert("Langue changée en : " + lang);
+  // À terme : charger les traductions ici
+});
+
   </script>
 </body>
 </html>
