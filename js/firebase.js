@@ -15,12 +15,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 🔐 Enregistrement
+// 📝 Enregistrement (avec confirmation de mot de passe)
 if (document.getElementById("registerForm")) {
   document.getElementById("registerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = e.target[1].value;
-    const password = e.target[2].value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const confirm = document.getElementById("confirmPassword").value;
+
+    if (password !== confirm) {
+      alert("Les mots de passe ne correspondent pas.");
+      return;
+    }
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -30,6 +36,8 @@ if (document.getElementById("registerForm")) {
       alert("Erreur : " + error.message);
     }
   });
+}
+
 }
 
 // 🔐 Connexion
