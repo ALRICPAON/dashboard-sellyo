@@ -1,6 +1,6 @@
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { uploadCoverImage } from './upload-image.js';
+import { uploadCoverImage, uploadCustomVideo } from './upload-media.js';
 
 const auth = getAuth();
 const db = getFirestore();
