@@ -44,8 +44,9 @@ if (document.getElementById("registerForm")) {
 if (document.getElementById("loginForm")) {
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = e.target[0].value;
-    const password = e.target[1].value;
+    const email = document.getElementById("loginEmail").value;
+const password = document.getElementById("loginPassword").value;
+
 
     console.log("Tentative de connexion avec :", email, password);
 
