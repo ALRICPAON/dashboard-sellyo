@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard - Sellyo</title>
+  <title>Dashboard – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css">
   <script type="module" src="js/firebase-auth-check.js"></script>
 </head>
@@ -35,7 +35,7 @@
         <input type="text" id="tunnel-name" required><br><br>
 
         <label>Objectif du tunnel *</label><br>
-        <input type="text" id="tunnel-goal" required><br><br>
+        <input type="text" id="tunnel-goal"><br><br>
 
         <label>Type de contenu *</label><br>
         <select id="tunnel-type" required>
@@ -75,8 +75,8 @@
       </form>
     </div>
   </main>
-<script type="module" src="js/tunnel-submit.js"></script>
 
-  </script>
+  <!-- ⚠️ Important : script placé en bas pour éviter les problèmes DOM -->
+  <script type="module" src="js/tunnel-submit.js"></script>
 </body>
 </html>
