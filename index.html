@@ -7,12 +7,27 @@
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
+  <!-- Switch langue en haut à droite -->
+  <div class="lang-switch">
+    <button onclick="switchLang('fr')">FR</button>
+    <button onclick="switchLang('en')">EN</button>
+  </div>
+
   <div class="container">
+    <!-- Logo -->
     <img src="assets/logo.png" alt="Sellyo Logo" class="logo" />
 
+    <!-- Slogan -->
     <h1 class="headline">Crée ton tunnel de vente en 3 minutes</h1>
 
-    <div class="features">
+    <!-- Boutons -->
+    <div class="buttons">
+      <a href="register.html" class="btn">Créer un compte</a>
+      <a href="login.html" class="btn">Se connecter</a>
+    </div>
+
+    <!-- 4 blocs fonctionnalités -->
+    <div class="features row-4">
       <div class="feature">
         <img src="assets/landing.png" alt="Landing Page">
         <h3>Landing page instantanée</h3>
@@ -33,16 +48,6 @@
         <h3>Paiement intégré</h3>
         <p>Encaisse facilement, tout est déjà connecté.</p>
       </div>
-    </div>
-
-    <div class="buttons">
-      <a href="register.html" class="btn">Créer un compte</a>
-      <a href="login.html" class="btn">Se connecter</a>
-    </div>
-
-    <div class="lang-switch">
-      <button onclick="switchLang('fr')">FR</button>
-      <button onclick="switchLang('en')">EN</button>
     </div>
   </div>
 </body>
