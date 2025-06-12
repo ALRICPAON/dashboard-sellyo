@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+// ✅ Configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC2yzKA3kESPjgcFk6pojJQK4rNToywqJI",
   authDomain: "sellyo-3bbdb.firebaseapp.com",
@@ -37,6 +38,8 @@ if (document.getElementById("loginForm")) {
     e.preventDefault();
     const email = e.target[0].value;
     const password = e.target[1].value;
+
+    console.log("Tentative de connexion avec :", email, password);
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
