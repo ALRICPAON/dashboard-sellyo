@@ -7,28 +7,28 @@
   <script type="module" src="js/firebase-auth-check.js"></script>
 </head>
 <body>
- <header>
-  <img src="assets/logo.png" alt="Logo Sellyo" class="logo">
-  <nav style="display: flex; align-items: center;">
-    <ul>
-      <li><a href="#" id="create-tunnel">Créer un tunnel</a></li>
-      <li><a href="#" id="view-tunnels">Mes tunnels</a></li>
-      <li><a href="#" id="stats">Statistiques</a></li>
-      <li><a href="#" id="upgrade">Passer Premium</a></li>
-      <li><a href="#" id="logout">Déconnexion</a></li>
-    </ul>
-    <select id="lang-switch" style="margin-left: 1rem; background: #000; color: #fff; border: none; padding: 0.5rem;">
-      <option value="fr">FR</option>
-      <option value="en">EN</option>
-    </select>
-  </nav>
-</header>
+  <header>
+    <img src="assets/logo.png" alt="Logo Sellyo" class="logo">
+    <nav style="display: flex; align-items: center;">
+      <ul>
+        <li><a href="#" id="create-tunnel">Créer un tunnel</a></li>
+        <li><a href="#" id="view-tunnels">Mes tunnels</a></li>
+        <li><a href="#" id="stats">Statistiques</a></li>
+        <li><a href="#" id="upgrade">Passer Premium</a></li>
+        <li><a href="#" id="logout">Déconnexion</a></li>
+      </ul>
+      <select id="lang-switch" style="margin-left: 1rem; background: #000; color: #fff; border: none; padding: 0.5rem;">
+        <option value="fr">FR</option>
+        <option value="en">EN</option>
+      </select>
+    </nav>
+  </header>
 
   <main>
     <h1 id="welcome">Bienvenue 👋</h1>
     <div id="dashboard-content"></div>
 
-    <div id="create-tunnel-form" style="display: none;">
+    <div id="create-tunnel-form" style="display: none; background: #2a2a2a; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
       <h2>Créer un nouveau tunnel</h2>
       <form id="tunnel-form">
         <label>Nom du tunnel *</label><br>
@@ -63,17 +63,39 @@
         <label>URL du bouton de paiement</label><br>
         <input type="url" id="payment-url"><br><br>
 
+        <label>Utiliser un domaine personnalisé ?</label><br>
+        <input type="checkbox" id="use-custom-domain"><br><br>
+
+        <div id="custom-domain-field" style="display: none;">
+          <label>Nom de domaine (ex : tunnel.monsite.fr)</label><br>
+          <input type="text" id="custom-domain"><br><br>
+        </div>
+
         <button type="submit">Générer le tunnel</button>
       </form>
     </div>
   </main>
 
   <script>
+    // Langue switch (test)
+    document.getElementById("lang-switch")?.addEventListener("change", (e) => {
+      const lang = e.target.value;
+      alert("Langue changée en : " + lang);
+    });
+
+    // Affiche le formulaire quand on clique sur "Créer un tunnel"
     document.getElementById("create-tunnel").addEventListener("click", () => {
       document.getElementById("create-tunnel-form").style.display = "block";
       document.getElementById("dashboard-content").innerHTML = "";
     });
 
+    // Affiche le champ "domaine personnalisé" si la case est cochée
+    document.getElementById("use-custom-domain").addEventListener("change", function () {
+      const customField = document.getElementById("custom-domain-field");
+      customField.style.display = this.checked ? "block" : "none";
+    });
+
+    // Gère le formulaire
     document.getElementById("tunnel-form").addEventListener("submit", function(e) {
       e.preventDefault();
 
@@ -84,20 +106,17 @@
       const desc = document.getElementById("tunnel-desc").value;
       const cta = document.getElementById("cta-text").value;
       const payment = document.getElementById("payment-url").value;
+      const wantsCustomDomain = document.getElementById("use-custom-domain").checked;
+      const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
 
       alert(`Tunnel "${name}" généré avec :
       - Objectif : ${goal}
       - Type : ${type}
       - Secteur : ${sector}
       - Bouton : ${cta}
-      - Lien paiement : ${payment}`);
+      - Paiement : ${payment}
+      - Domaine personnalisé : ${customDomain || 'non'}`);
     });
-    document.getElementById("lang-switch")?.addEventListener("change", (e) => {
-  const lang = e.target.value;
-  alert("Langue changée en : " + lang);
-  // À terme : charger les traductions ici
-});
-
   </script>
 </body>
 </html>
