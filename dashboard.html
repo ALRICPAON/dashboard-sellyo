@@ -7,69 +7,87 @@
   <script type="module" src="js/firebase-auth-check.js"></script>
 </head>
 <body>
+  <header>
+    <img src="logo.png" alt="Logo Sellyo" class="logo">
+    <nav>
+      <ul>
+        <li><a href="#" id="create-tunnel">Créer un tunnel</a></li>
+        <li><a href="#" id="view-tunnels">Mes tunnels</a></li>
+        <li><a href="#" id="stats">Statistiques</a></li>
+        <li><a href="#" id="upgrade">Passer Premium</a></li>
+        <li><a href="#" id="logout">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<div id="create-tunnel-form" style="display: none;">
-  <h2>Créer un nouveau tunnel</h2>
-  <form id="tunnel-form">
-    <label>Nom du tunnel *</label><br>
-    <input type="text" id="tunnel-name" required><br><br>
+  <main>
+    <h1 id="welcome">Bienvenue 👋</h1>
+    <div id="dashboard-content"></div>
 
-    <label>Objectif du tunnel *</label><br>
-    <input type="text" id="tunnel-goal" required><br><br>
+    <div id="create-tunnel-form" style="display: none;">
+      <h2>Créer un nouveau tunnel</h2>
+      <form id="tunnel-form">
+        <label>Nom du tunnel *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
 
-    <label>Type de contenu *</label><br>
-    <select id="tunnel-type" required>
-      <option value="complet">Tunnel Complet</option>
-      <option value="landing">Landing page seule</option>
-      <option value="email">Email de relance</option>
-      <option value="video">Script vidéo</option>
-    </select><br><br>
+        <label>Objectif du tunnel *</label><br>
+        <input type="text" id="tunnel-goal" required><br><br>
 
-    <label>Secteur d’activité</label><br>
-    <input type="text" id="sector"><br><br>
+        <label>Type de contenu *</label><br>
+        <select id="tunnel-type" required>
+          <option value="complet">Tunnel Complet</option>
+          <option value="landing">Landing page seule</option>
+          <option value="email">Email de relance</option>
+          <option value="video">Script vidéo</option>
+        </select><br><br>
 
-    <label>Image de couverture</label><br>
-    <input type="file" id="cover-image" accept="image/*"><br><br>
+        <label>Secteur d’activité</label><br>
+        <input type="text" id="sector"><br><br>
 
-    <label>Vidéo à intégrer</label><br>
-    <input type="file" id="custom-video" accept="video/*"><br><br>
+        <label>Image de couverture</label><br>
+        <input type="file" id="cover-image" accept="image/*"><br><br>
 
-    <label>Description de l’offre *</label><br>
-    <textarea id="tunnel-desc" required></textarea><br><br>
+        <label>Vidéo à intégrer</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
 
-    <label>Texte du bouton *</label><br>
-    <input type="text" id="cta-text" required><br><br>
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
 
-    <label>URL du bouton de paiement</label><br>
-    <input type="url" id="payment-url"><br><br>
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
 
-    <button type="submit">Générer le tunnel</button>
-  </form>
-</div>
-<script>
-  document.getElementById("create-tunnel").addEventListener("click", () => {
-    document.getElementById("create-tunnel-form").style.display = "block";
-    document.getElementById("dashboard-content").innerHTML = "";
-  });
+        <label>URL du bouton de paiement</label><br>
+        <input type="url" id="payment-url"><br><br>
 
-  document.getElementById("tunnel-form").addEventListener("submit", function(e) {
-    e.preventDefault();
+        <button type="submit">Générer le tunnel</button>
+      </form>
+    </div>
+  </main>
 
-    const name = document.getElementById("tunnel-name").value;
-    const goal = document.getElementById("tunnel-goal").value;
-    const type = document.getElementById("tunnel-type").value;
-    const sector = document.getElementById("sector").value;
-    const desc = document.getElementById("tunnel-desc").value;
-    const cta = document.getElementById("cta-text").value;
-    const payment = document.getElementById("payment-url").value;
+  <script>
+    document.getElementById("create-tunnel").addEventListener("click", () => {
+      document.getElementById("create-tunnel-form").style.display = "block";
+      document.getElementById("dashboard-content").innerHTML = "";
+    });
 
-    alert(`Tunnel "${name}" généré avec :
-    - Objectif : ${goal}
-    - Type : ${type}
-    - Secteur : ${sector}
-    - Bouton : ${cta}
-    - Lien paiement : ${payment}`);
-  });
-</script>
+    document.getElementById("tunnel-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("tunnel-name").value;
+      const goal = document.getElementById("tunnel-goal").value;
+      const type = document.getElementById("tunnel-type").value;
+      const sector = document.getElementById("sector").value;
+      const desc = document.getElementById("tunnel-desc").value;
+      const cta = document.getElementById("cta-text").value;
+      const payment = document.getElementById("payment-url").value;
+
+      alert(`Tunnel "${name}" généré avec :
+      - Objectif : ${goal}
+      - Type : ${type}
+      - Secteur : ${sector}
+      - Bouton : ${cta}
+      - Lien paiement : ${payment}`);
+    });
+  </script>
 </body>
 </html>
