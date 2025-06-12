@@ -1,5 +1,12 @@
 // tunnel-submit.js
 
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
+
+const auth = getAuth();
+const db = getFirestore();
+
 document.addEventListener("DOMContentLoaded", () => {
   const createBtn = document.getElementById("create-tunnel");
   const formContainer = document.getElementById("create-tunnel-form");
@@ -10,58 +17,72 @@ document.addEventListener("DOMContentLoaded", () => {
       formContainer.style.display = "block";
       dashboardContent.innerHTML = "";
     });
-  } else {
-    console.warn("Un des éléments n'a pas été trouvé dans le DOM");
   }
 
-  const tunnelForm = document.getElementById("tunnel-form");
+  const customDomainCheckbox = document.getElementById("use-custom-domain");
+  const customDomainField = document.getElementById("custom-domain-field");
+  if (customDomainCheckbox && customDomainField) {
+    customDomainCheckbox.addEventListener("change", () => {
+      customDomainField.style.display = customDomainCheckbox.checked ? "block" : "none";
+    });
+  }
 
-  if (tunnelForm) {
-    tunnelForm.addEventListener("submit", async (e) => {
+  const form = document.getElementById("tunnel-form");
+  if (form) {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      const user = auth.currentUser;
+      if (!user) return alert("Utilisateur non connecté");
 
       const name = document.getElementById("tunnel-name").value;
       const goal = document.getElementById("tunnel-goal").value;
-      const content = document.getElementById("tunnel-content").value;
-      const domain = document.getElementById("custom-domain").value;
-      const image = document.getElementById("tunnel-image").files[0];
-      const video = document.getElementById("tunnel-video").files[0];
+      const type = document.getElementById("tunnel-type").value;
+      const sector = document.getElementById("sector").value;
+      const desc = document.getElementById("tunnel-desc").value;
+      const cta = document.getElementById("cta-text").value;
+      const payment = document.getElementById("payment-url").value;
+      const wantsCustomDomain = document.getElementById("use-custom-domain").checked;
+      const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
 
-      const user = firebase.auth().currentUser;
-      if (!user) return alert("Utilisateur non connecté");
+      const slug = name.toLowerCase().replaceAll(" ", "-");
 
-      const uid = user.uid;
+      const imageFile = document.getElementById("cover-image").files[0];
+      const videoFile = document.getElementById("custom-video").files[0];
 
-      const data = {
-        name,
-        goal,
-        content,
-        domain,
-        uid,
-        timestamp: new Date(),
-      };
+      let coverUrl = null;
+      let videoUrl = null;
 
-      const db = firebase.firestore();
-      const ref = await db.collection("tunnels").add(data);
+      try {
+        if (imageFile) {
+          coverUrl = await uploadCoverImage(imageFile, slug);
+        }
+        if (videoFile) {
+          videoUrl = await uploadCustomVideo(videoFile, slug);
+        }
 
-      const storage = firebase.storage();
-      const uploads = [];
+        await addDoc(collection(db, "tunnels"), {
+          userId: user.uid,
+          name,
+          goal,
+          type,
+          sector,
+          desc,
+          cta,
+          payment,
+          customDomain,
+          coverUrl,
+          videoUrl,
+          createdAt: new Date()
+        });
 
-      if (image) {
-        const imgRef = storage.ref(`tunnels/${ref.id}/image.jpg`);
-        uploads.push(imgRef.put(image));
+        alert("✅ Tunnel enregistré avec succès !");
+        form.reset();
+        customDomainField.style.display = "none";
+      } catch (err) {
+        console.error("Erreur enregistrement:", err);
+        alert("❌ Erreur lors de la sauvegarde du tunnel.");
       }
-
-      if (video) {
-        const vidRef = storage.ref(`tunnels/${ref.id}/video.mp4`);
-        uploads.push(vidRef.put(video));
-      }
-
-      await Promise.all(uploads);
-
-      alert("Tunnel enregistré avec succès !");
-      tunnelForm.reset();
-      formContainer.style.display = "none";
     });
   }
 });
