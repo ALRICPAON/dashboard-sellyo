@@ -1,26 +1,21 @@
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 
-const auth = getAuth();
-const storage = getStorage();
+// Ton vrai bucket
+const bucketURL = "gs://sellyo-3bbdb.firebasestorage.app";
 
 export async function uploadCoverImage(file, tunnelName) {
-  const user = auth.currentUser;
-  if (!user) throw new Error("Utilisateur non connecté");
+  const auth = getAuth();
+  const storage = getStorage();
 
-  console.log("Début upload image...");
-  console.log("Nom du fichier :", file.name);
-  console.log("Nom du tunnel :", tunnelName);
-
-  const storagePath = `tunnels/${user.uid}/${tunnelName}/cover.jpg`;
-  const storageRef = ref(storage, storagePath);
+  const storageRef = ref(storage, `${bucketURL}/tunnels/${auth.currentUser.uid}/${tunnelName}/cover.jpg`);
 
   try {
     const uploadResult = await uploadBytes(storageRef, file);
     console.log("✅ Upload image réussi :", uploadResult);
 
     const url = await getDownloadURL(storageRef);
-    console.log("✅ URL de l'image :", url);
+    console.log("🌐 URL de l'image :", url);
     return url;
   } catch (error) {
     console.error("❌ Erreur d'upload image :", error);
@@ -29,14 +24,13 @@ export async function uploadCoverImage(file, tunnelName) {
 }
 
 export async function uploadCustomVideo(file, tunnelName) {
+  const auth = getAuth();
+  const storage = getStorage();
   const user = auth.currentUser;
+
   if (!user) throw new Error("Utilisateur non connecté");
 
-  console.log("Début upload vidéo...");
-  console.log("Nom du fichier :", file.name);
-  console.log("Nom du tunnel :", tunnelName);
-
-  const storagePath = `tunnels/${user.uid}/${tunnelName}/video.mp4`;
+  const storagePath = `${bucketURL}/tunnels/${user.uid}/${tunnelName}/video.mp4`;
   const storageRef = ref(storage, storagePath);
 
   try {
@@ -44,7 +38,7 @@ export async function uploadCustomVideo(file, tunnelName) {
     console.log("🎥 Upload vidéo réussi :", uploadResult);
 
     const url = await getDownloadURL(storageRef);
-    console.log("🎥 URL de la vidéo :", url);
+    console.log("🌐 URL de la vidéo :", url);
     return url;
   } catch (error) {
     console.error("❌ Erreur d'upload vidéo :", error);
