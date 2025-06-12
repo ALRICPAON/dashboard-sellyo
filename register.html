@@ -1,18 +1,24 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Créer un compte</title>
-  <script src="js/firebase.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Créer un compte - Sellyo</title>
+  <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <h2>Créer un compte</h2>
-  <form id="registerForm">
-    <input type="text" placeholder="Nom" required />
-    <input type="email" placeholder="Email" required />
-    <input type="password" placeholder="Mot de passe" required />
-    <button type="submit">S'inscrire</button>
-  </form>
+  <div class="form-container">
+    <img src="assets/logo.png" alt="Logo Sellyo" class="logo" />
+
+    <h2>Créer un compte</h2>
+    <form id="registerForm">
+      <input type="text" placeholder="Nom complet" required />
+      <input type="email" placeholder="Adresse email" required />
+      <input type="password" placeholder="Mot de passe" required />
+      <button type="submit">S'inscrire</button>
+    </form>
+
+    <p class="form-link">Déjà inscrit ? <a href="login.html">Se connecter</a></p>
+  </div>
 </body>
 </html>
