@@ -5,27 +5,27 @@ import { uploadCoverImage, uploadCustomVideo } from './upload-media.js';
 const auth = getAuth();
 const db = getFirestore();
 
-document.getElementById("lang-switch").addEventListener("change", (e) => {
-  const lang = e.target.value;
-  alert("Langue changée en : " + lang);
-});
-
-document.getElementById("create-tunnel").addEventListener("click", () => {
+// Bouton "Créer un tunnel"
+document.getElementById("create-tunnel").addEventListener("click", (e) => {
+  e.preventDefault(); // Empêche le rechargement de page
   document.getElementById("create-tunnel-form").style.display = "block";
   document.getElementById("dashboard-content").innerHTML = "";
 });
 
+// Checkbox domaine personnalisé
 document.getElementById("use-custom-domain").addEventListener("change", function () {
   const customField = document.getElementById("custom-domain-field");
   customField.style.display = this.checked ? "block" : "none";
 });
 
+// Soumission du formulaire
 document.getElementById("tunnel-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const user = auth.currentUser;
-  if (!user) return alert("Utilisateur non connecté");
+  if (!user) return alert("🛑 Utilisateur non connecté");
 
+  // Récupère les champs
   const name = document.getElementById("tunnel-name").value;
   const goal = document.getElementById("tunnel-goal").value;
   const type = document.getElementById("tunnel-type").value;
@@ -36,7 +36,7 @@ document.getElementById("tunnel-form").addEventListener("submit", async function
   const wantsCustomDomain = document.getElementById("use-custom-domain").checked;
   const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
 
-  const tunnelSlug = name.toLowerCase().replaceAll(" ", "_");
+  const tunnelSlug = name.toLowerCase().replaceAll(" ", "-");
 
   // Upload image
   const file = document.getElementById("cover-image").files[0];
@@ -46,7 +46,7 @@ document.getElementById("tunnel-form").addEventListener("submit", async function
     try {
       coverUrl = await uploadCoverImage(file, tunnelSlug);
     } catch (err) {
-      console.error("Erreur upload image", err);
+      console.error("❌ Erreur upload image :", err);
     }
   }
 
@@ -58,7 +58,7 @@ document.getElementById("tunnel-form").addEventListener("submit", async function
     try {
       videoUrl = await uploadCustomVideo(videoFile, tunnelSlug);
     } catch (err) {
-      console.error("Erreur upload vidéo", err);
+      console.error("❌ Erreur upload vidéo :", err);
     }
   }
 
