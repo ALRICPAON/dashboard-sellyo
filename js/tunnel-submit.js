@@ -5,7 +5,7 @@ import { uploadCoverImage, uploadCustomVideo } from './upload-media.js';
 const auth = getAuth();
 const db = getFirestore();
 
-document.getElementById("lang-switch")?.addEventListener("change", (e) => {
+document.getElementById("lang-switch").addEventListener("change", (e) => {
   const lang = e.target.value;
   alert("Langue changée en : " + lang);
 });
@@ -36,17 +36,33 @@ document.getElementById("tunnel-form").addEventListener("submit", async function
   const wantsCustomDomain = document.getElementById("use-custom-domain").checked;
   const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
 
+  const tunnelSlug = name.toLowerCase().replaceAll(" ", "_");
+
+  // Upload image
   const file = document.getElementById("cover-image").files[0];
   let coverUrl = null;
 
   if (file) {
     try {
-      coverUrl = await uploadCoverImage(file, name.toLowerCase().replaceAll(" ", "_"));
+      coverUrl = await uploadCoverImage(file, tunnelSlug);
     } catch (err) {
       console.error("Erreur upload image", err);
     }
   }
 
+  // Upload vidéo
+  const videoFile = document.getElementById("custom-video").files[0];
+  let videoUrl = null;
+
+  if (videoFile) {
+    try {
+      videoUrl = await uploadCustomVideo(videoFile, tunnelSlug);
+    } catch (err) {
+      console.error("Erreur upload vidéo", err);
+    }
+  }
+
+  // Enregistrement Firestore
   try {
     await addDoc(collection(db, "tunnels"), {
       userId: user.uid,
@@ -59,14 +75,15 @@ document.getElementById("tunnel-form").addEventListener("submit", async function
       payment,
       customDomain,
       coverUrl,
+      videoUrl,
       createdAt: new Date()
     });
 
-    alert("Tunnel enregistré avec succès !");
+    alert("✅ Tunnel enregistré avec succès !");
     document.getElementById("tunnel-form").reset();
     document.getElementById("custom-domain-field").style.display = "none";
   } catch (err) {
     console.error(err);
-    alert("Erreur lors de la sauvegarde du tunnel.");
+    alert("❌ Erreur lors de la sauvegarde du tunnel.");
   }
 });
