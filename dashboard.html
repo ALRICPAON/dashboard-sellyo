@@ -46,3 +46,30 @@
     <button type="submit">Générer le tunnel</button>
   </form>
 </div>
+<script>
+  document.getElementById("create-tunnel").addEventListener("click", () => {
+    document.getElementById("create-tunnel-form").style.display = "block";
+    document.getElementById("dashboard-content").innerHTML = "";
+  });
+
+  document.getElementById("tunnel-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("tunnel-name").value;
+    const goal = document.getElementById("tunnel-goal").value;
+    const type = document.getElementById("tunnel-type").value;
+    const sector = document.getElementById("sector").value;
+    const desc = document.getElementById("tunnel-desc").value;
+    const cta = document.getElementById("cta-text").value;
+    const payment = document.getElementById("payment-url").value;
+
+    alert(`Tunnel "${name}" généré avec :
+    - Objectif : ${goal}
+    - Type : ${type}
+    - Secteur : ${sector}
+    - Bouton : ${cta}
+    - Lien paiement : ${payment}`);
+  });
+</script>
+</body>
+</html>
