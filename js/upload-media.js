@@ -1,18 +1,20 @@
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { app } from "./firebase-init.js"; // ← Importe ton app Firebase existante
+import { app } from "./firebase-init.js";
 
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-// Fonction d’upload d’image de couverture
+// ✅ Upload d'image de couverture
 export async function uploadCoverImage(file, tunnelName) {
   const user = auth.currentUser;
   if (!user) throw new Error("Utilisateur non connecté");
 
-  const storageRef = ref(storage, `tunnels/${user.uid}/${tunnelName}/cover.jpg`);
+  const storagePath = `tunnels/${user.uid}/${tunnelName}/cover.jpg`;
+  const storageRef = ref(storage, storagePath);
 
   try {
+    console.log("📦 Upload vers :", storageRef.fullPath); // 🪪 Log debug
     const uploadResult = await uploadBytes(storageRef, file);
     console.log("✅ Upload image réussi :", uploadResult);
 
@@ -25,14 +27,16 @@ export async function uploadCoverImage(file, tunnelName) {
   }
 }
 
-// Fonction d’upload de vidéo personnalisée
+// ✅ Upload de vidéo personnalisée
 export async function uploadCustomVideo(file, tunnelName) {
   const user = auth.currentUser;
   if (!user) throw new Error("Utilisateur non connecté");
 
-  const storageRef = ref(storage, `tunnels/${user.uid}/${tunnelName}/video.mp4`);
+  const storagePath = `tunnels/${user.uid}/${tunnelName}/video.mp4`;
+  const storageRef = ref(storage, storagePath);
 
   try {
+    console.log("📦 Upload vidéo vers :", storageRef.fullPath); // 🪪 Log debug
     const uploadResult = await uploadBytes(storageRef, file);
     console.log("🎥 Upload vidéo réussi :", uploadResult);
 
