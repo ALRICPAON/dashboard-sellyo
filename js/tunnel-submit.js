@@ -1,5 +1,6 @@
 // tunnel-submit.js
 
+import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
