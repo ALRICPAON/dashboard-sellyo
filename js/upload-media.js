@@ -10,7 +10,7 @@ export async function uploadCoverImage(file, tunnelName) {
   const user = auth.currentUser;
   if (!user) throw new Error("Utilisateur non connecté");
 
-  const storagePath = `tunnels/${user.uid}/${tunnelName}/cover.jpg`;
+ const storagePath = `test-cover.jpg`;
   const storageRef = ref(storage, storagePath);
 
   try {
