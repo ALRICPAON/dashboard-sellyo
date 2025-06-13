@@ -15,6 +15,7 @@ export async function uploadCoverImage(file, tunnelName) {
 
   try {
     console.log("📦 Upload image vers :", storageRef.fullPath);
+    console.log("🧪 Fichier reçu pour upload :", file);
     const uploadResult = await uploadBytes(storageRef, file);
     console.log("✅ Upload image réussi :", uploadResult);
 
