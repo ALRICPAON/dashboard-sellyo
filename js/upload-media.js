@@ -16,29 +16,3 @@ export async function uploadCoverImage(file, tunnelName) {
     }, 500);
   });
 }
-  try {
-    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
-
-    return new Promise((resolve, reject) => {
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log(`📤 Progression : ${progress.toFixed(0)}%`);
-        },
-        (error) => {
-          console.error("❌ Erreur upload :", error);
-          reject(error);
-        },
-        async () => {
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
-          console.log("✅ Upload terminé. URL :", url);
-          resolve(url);
-        }
-      );
-    });
-  } catch (e) {
-    console.error("❌ Exception upload :", e);
-    throw e;
-  }
-}
