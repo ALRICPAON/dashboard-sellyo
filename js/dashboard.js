@@ -13,17 +13,28 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 🔐 Check si utilisateur connecté
+// 🔐 Vérifie si l'utilisateur est connecté
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    document.getElementById("userEmail").textContent = "Connecté en tant que : " + user.email;
+    const userEmail = document.getElementById("userEmail");
+    if (userEmail) userEmail.textContent = "Connecté en tant que : " + user.email;
   } else {
     window.location.href = "login.html";
   }
 });
 
 // 🔓 Déconnexion
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await signOut(auth);
-  window.location.href = "login.html";
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Erreur déconnexion :", error);
+        alert("Erreur lors de la déconnexion");
+      }
+    });
+  }
 });
