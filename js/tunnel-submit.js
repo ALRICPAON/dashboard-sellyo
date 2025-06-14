@@ -1,6 +1,6 @@
-console.log("💡 Script tunnel-submit.js chargé !");
-// 🔁 On importe la config Firebase DEV
-import { app } from "./firebase-config-dev.js";
+// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs
+
+import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
@@ -8,7 +8,7 @@ import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Webhook Make pour génération automatique
+// 🔗 Webhook Make pour génération automatique
 const makeWebhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
 const createBtn = document.getElementById("create-tunnel");
@@ -90,11 +90,9 @@ if (form) {
 
       console.log("🗂️ Données prêtes à être envoyées :", tunnelData);
 
-      // 🔐 Ajout dans Firestore
       const docRef = await addDoc(collection(db, "tunnels"), tunnelData);
       console.log("✅ Tunnel ajouté dans Firestore, ID :", docRef.id);
 
-      // 🚀 Envoi des données vers Make
       const makeResponse = await fetch(makeWebhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -113,7 +111,6 @@ if (form) {
       alert("✅ Tunnel enregistré et génération en cours !");
       form.reset();
       customDomainField.style.display = "none";
-
     } catch (err) {
       console.error("❌ Erreur lors de la sauvegarde du tunnel :", err);
       alert("❌ Une erreur s'est produite pendant la création du tunnel.");
