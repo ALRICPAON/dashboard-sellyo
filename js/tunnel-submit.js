@@ -1,4 +1,7 @@
-import { app } from "./firebase-init.js";
+console.log("💡 Script tunnel-submit.js chargé !");
+
+// 🔁 On importe la config Firebase DEV
+import { app } from "./firebase-config-dev.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
@@ -6,6 +9,10 @@ import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Webhook Make pour génération automatique
+const makeWebhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+
+// 🎯 Ciblage des éléments
 const createBtn = document.getElementById("create-tunnel");
 const formContainer = document.getElementById("create-tunnel-form");
 const dashboardContent = document.getElementById("dashboard-content");
@@ -14,6 +21,7 @@ if (createBtn && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
     formContainer.style.display = "block";
     dashboardContent.innerHTML = "";
+    console.log("🧩 Formulaire affiché");
   });
 }
 
@@ -29,10 +37,16 @@ const form = document.getElementById("tunnel-form");
 if (form) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    console.log("🚀 Soumission du formulaire détectée");
 
     const user = auth.currentUser;
-    if (!user) return alert("Utilisateur non connecté");
+    if (!user) {
+      alert("Utilisateur non connecté");
+      console.warn("❌ Utilisateur non connecté");
+      return;
+    }
 
+    // 🔍 Récupération des champs
     const name = document.getElementById("tunnel-name").value;
     const goal = document.getElementById("tunnel-goal").value;
     const type = document.getElementById("tunnel-type").value;
@@ -44,7 +58,6 @@ if (form) {
     const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
 
     const slug = name.toLowerCase().replaceAll(" ", "-");
-
     const imageFile = document.getElementById("cover-image").files[0];
     const videoFile = document.getElementById("custom-video").files[0];
 
@@ -53,13 +66,17 @@ if (form) {
 
     try {
       if (imageFile) {
+        console.log("📸 Upload image en cours...");
         coverUrl = await uploadCoverImage(imageFile, slug);
+        console.log("✅ Image uploadée :", coverUrl);
       }
       if (videoFile) {
+        console.log("🎥 Upload vidéo en cours...");
         videoUrl = await uploadCustomVideo(videoFile, slug);
+        console.log("✅ Vidéo uploadée :", videoUrl);
       }
 
-      await addDoc(collection(db, "tunnels"), {
+      const tunnelData = {
         userId: user.uid,
         name,
         goal,
@@ -72,14 +89,37 @@ if (form) {
         coverUrl,
         videoUrl,
         createdAt: new Date()
+      };
+
+      console.log("🗂️ Données prêtes à être envoyées :", tunnelData);
+
+      // 🔐 Enregistrement dans Firestore
+      const docRef = await addDoc(collection(db, "tunnels"), tunnelData);
+      console.log("✅ Tunnel ajouté dans Firestore avec ID :", docRef.id);
+
+      // 📡 Envoi vers Make
+      const makeResponse = await fetch(makeWebhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...tunnelData,
+          email: user.email
+        })
       });
 
-      alert("✅ Tunnel enregistré avec succès !");
+      if (makeResponse.ok) {
+        console.log("✅ Données envoyées à Make avec succès !");
+      } else {
+        console.warn("⚠️ Erreur HTTP Make :", makeResponse.status);
+      }
+
+      alert("✅ Tunnel enregistré et génération en cours !");
       form.reset();
       customDomainField.style.display = "none";
+
     } catch (err) {
-      console.error("Erreur enregistrement:", err);
-      alert("❌ Erreur lors de la sauvegarde du tunnel.");
+      console.error("❌ Erreur complète :", err);
+      alert("❌ Une erreur est survenue pendant la création du tunnel.");
     }
   });
 }
