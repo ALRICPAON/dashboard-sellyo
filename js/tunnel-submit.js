@@ -9,14 +9,15 @@ import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Webhook Make pour génération automatique
+// Webhook Make
 const makeWebhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
-// 🎯 Ciblage des éléments
+// Boutons et conteneurs
 const createBtn = document.getElementById("create-tunnel");
 const formContainer = document.getElementById("create-tunnel-form");
 const dashboardContent = document.getElementById("dashboard-content");
 
+// 🔘 Affichage du formulaire
 if (createBtn && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
     formContainer.style.display = "block";
@@ -25,6 +26,7 @@ if (createBtn && formContainer && dashboardContent) {
   });
 }
 
+// 📦 Domaine personnalisé
 const customDomainCheckbox = document.getElementById("use-custom-domain");
 const customDomainField = document.getElementById("custom-domain-field");
 if (customDomainCheckbox && customDomainField) {
@@ -33,6 +35,7 @@ if (customDomainCheckbox && customDomainField) {
   });
 }
 
+// 📤 Soumission du formulaire
 const form = document.getElementById("tunnel-form");
 if (form) {
   form.addEventListener("submit", async (e) => {
@@ -46,7 +49,7 @@ if (form) {
       return;
     }
 
-    // 🔍 Récupération des champs
+    // Récupération des champs
     const name = document.getElementById("tunnel-name").value;
     const goal = document.getElementById("tunnel-goal").value;
     const type = document.getElementById("tunnel-type").value;
@@ -65,17 +68,21 @@ if (form) {
     let videoUrl = null;
 
     try {
+      // 📸 Upload image
       if (imageFile) {
         console.log("📸 Upload image en cours...");
         coverUrl = await uploadCoverImage(imageFile, slug);
         console.log("✅ Image uploadée :", coverUrl);
       }
+
+      // 🎥 Upload vidéo
       if (videoFile) {
         console.log("🎥 Upload vidéo en cours...");
         videoUrl = await uploadCustomVideo(videoFile, slug);
         console.log("✅ Vidéo uploadée :", videoUrl);
       }
 
+      // 📦 Construction des données
       const tunnelData = {
         userId: user.uid,
         name,
@@ -93,24 +100,21 @@ if (form) {
 
       console.log("🗂️ Données prêtes à être envoyées :", tunnelData);
 
-      // 🔐 Enregistrement dans Firestore
+      // 🔐 Firestore
       const docRef = await addDoc(collection(db, "tunnels"), tunnelData);
-      console.log("✅ Tunnel ajouté dans Firestore avec ID :", docRef.id);
+      console.log("✅ Tunnel ajouté à Firestore :", docRef.id);
 
-      // 📡 Envoi vers Make
-      const makeResponse = await fetch(makeWebhookURL, {
+      // 🚀 Envoi Make
+      const makeRes = await fetch(makeWebhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...tunnelData,
-          email: user.email
-        })
+        body: JSON.stringify({ ...tunnelData, email: user.email })
       });
 
-      if (makeResponse.ok) {
-        console.log("✅ Données envoyées à Make avec succès !");
+      if (makeRes.ok) {
+        console.log("✅ Données envoyées à Make !");
       } else {
-        console.warn("⚠️ Erreur HTTP Make :", makeResponse.status);
+        console.warn("⚠️ Problème lors de l'envoi à Make :", makeRes.status);
       }
 
       alert("✅ Tunnel enregistré et génération en cours !");
@@ -118,8 +122,8 @@ if (form) {
       customDomainField.style.display = "none";
 
     } catch (err) {
-      console.error("❌ Erreur complète :", err);
-      alert("❌ Une erreur est survenue pendant la création du tunnel.");
+      console.error("❌ Erreur globale :", err);
+      alert("❌ Une erreur s'est produite pendant la création du tunnel.");
     }
   });
 }
