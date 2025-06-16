@@ -1,4 +1,4 @@
-// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs
+// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Upload logo & couleur
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -91,15 +91,18 @@ if (form) {
     const cta = document.getElementById("cta-text").value;
     const payment = document.getElementById("payment-url").value;
     const price = generalPrice.value;
+    const mainColor = document.getElementById("main-color").value;
     const wantsCustomDomain = customDomainCheckbox.checked;
     const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
 
     const slug = name.toLowerCase().replaceAll(" ", "-");
     const imageFile = document.getElementById("cover-image").files[0];
     const videoFile = document.getElementById("custom-video").files[0];
+    const logoFile = document.getElementById("logo").files[0];
 
     let coverUrl = null;
     let videoUrl = null;
+    let logoUrl = null;
 
     try {
       if (imageFile) {
@@ -112,6 +115,11 @@ if (form) {
         videoUrl = await uploadCustomVideo(videoFile, slug);
         console.log("✅ Vidéo uploadée :", videoUrl);
       }
+      if (logoFile) {
+        console.log("💼 Upload logo en cours...");
+        logoUrl = await uploadCoverImage(logoFile, `${slug}-logo`);
+        console.log("✅ Logo uploadé :", logoUrl);
+      }
 
       const pages = [];
       if (type === "complet") {
@@ -119,8 +127,8 @@ if (form) {
           const title = form.querySelector(`[name='page-title-${i}']`).value;
           const description = form.querySelector(`[name='page-desc-${i}']`).value;
           const url = form.querySelector(`[name='page-url-${i}']`).value;
-          const price = form.querySelector(`[name='page-price-${i}']`).value;
-          pages.push({ title, description, url, price });
+          const pagePrice = form.querySelector(`[name='page-price-${i}']`).value;
+          pages.push({ title, description, url, price: pagePrice });
         }
       }
 
@@ -134,14 +142,16 @@ if (form) {
         cta,
         payment,
         price,
+        mainColor,
         customDomain,
         coverUrl,
         videoUrl,
+        logoUrl,
         pages,
         createdAt: new Date()
       };
 
-      console.log("🗂️ Données prêtes à être envoyées :", tunnelData);
+      console.log("📂 Données prêtes à être envoyées :", tunnelData);
 
       const docRef = await addDoc(collection(db, "tunnels"), tunnelData);
       console.log("✅ Tunnel ajouté dans Firestore, ID :", docRef.id);
