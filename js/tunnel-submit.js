@@ -1,4 +1,4 @@
-// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Upload logo & couleur
+// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -19,7 +19,7 @@ if (createBtn && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
     formContainer.style.display = "block";
     dashboardContent.innerHTML = "";
-    console.log("🧩 Formulaire affiché");
+    console.log("🪩 Formulaire affiché");
   });
 }
 
@@ -37,15 +37,15 @@ const tunnelPagesSection = document.getElementById("tunnel-pages-section");
 const tunnelPages = document.getElementById("tunnel-pages");
 const addPageBtn = document.getElementById("add-page");
 
+let pageCount = 0;
+const maxPages = 8;
+
 if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPages) {
   tunnelType.addEventListener("change", () => {
     const isFull = tunnelType.value === "complet";
     generalPrice.disabled = isFull;
     tunnelPagesSection.style.display = isFull ? "block" : "none";
   });
-
-  let pageCount = 0;
-  const maxPages = 8;
 
   addPageBtn.addEventListener("click", () => {
     if (pageCount >= maxPages) return;
@@ -91,18 +91,15 @@ if (form) {
     const cta = document.getElementById("cta-text").value;
     const payment = document.getElementById("payment-url").value;
     const price = generalPrice.value;
-    const mainColor = document.getElementById("main-color").value;
     const wantsCustomDomain = customDomainCheckbox.checked;
     const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
 
     const slug = name.toLowerCase().replaceAll(" ", "-");
     const imageFile = document.getElementById("cover-image").files[0];
     const videoFile = document.getElementById("custom-video").files[0];
-    const logoFile = document.getElementById("logo").files[0];
 
     let coverUrl = null;
     let videoUrl = null;
-    let logoUrl = null;
 
     try {
       if (imageFile) {
@@ -115,20 +112,18 @@ if (form) {
         videoUrl = await uploadCustomVideo(videoFile, slug);
         console.log("✅ Vidéo uploadée :", videoUrl);
       }
-      if (logoFile) {
-        console.log("💼 Upload logo en cours...");
-        logoUrl = await uploadCoverImage(logoFile, `${slug}-logo`);
-        console.log("✅ Logo uploadé :", logoUrl);
-      }
 
       const pages = [];
       if (type === "complet") {
         for (let i = 1; i <= pageCount; i++) {
-          const title = form.querySelector(`[name='page-title-${i}']`).value;
+          const titleEl = form.querySelector(`[name='page-title-${i}']`);
+          if (!titleEl) continue;
+
+          const title = titleEl.value;
           const description = form.querySelector(`[name='page-desc-${i}']`).value;
           const url = form.querySelector(`[name='page-url-${i}']`).value;
-          const pagePrice = form.querySelector(`[name='page-price-${i}']`).value;
-          pages.push({ title, description, url, price: pagePrice });
+          const price = form.querySelector(`[name='page-price-${i}']`).value;
+          pages.push({ title, description, url, price });
         }
       }
 
@@ -142,11 +137,9 @@ if (form) {
         cta,
         payment,
         price,
-        mainColor,
         customDomain,
         coverUrl,
         videoUrl,
-        logoUrl,
         pages,
         createdAt: new Date()
       };
