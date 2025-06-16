@@ -22,6 +22,8 @@ if (createBtn && formContainer && dashboardContent) {
   });
 }
 
+document.body.style.backgroundColor = "#111"; // Fond général en noir
+
 const customDomainCheckbox = document.getElementById("use-custom-domain");
 const customDomainField = document.getElementById("custom-domain-field");
 if (customDomainCheckbox && customDomainField) {
@@ -90,6 +92,10 @@ if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPage
 
 const form = document.getElementById("tunnel-form");
 if (form) {
+  form.style.backgroundColor = "#2e2e2e"; // Formulaire en gris foncé
+  form.style.padding = "2rem";
+  form.style.borderRadius = "10px";
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     console.log("🚀 Soumission du formulaire détectée");
