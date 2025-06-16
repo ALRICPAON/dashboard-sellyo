@@ -1,23 +1,33 @@
 {
-  "headline": "Create your sales funnel in 3 minutes",
-  "createAccount": "Create Account",
-  "login": "Login",
-  "features": [
-    {
-      "title": "Instant landing page",
-      "desc": "Create a professional page in seconds."
-    },
-    {
-      "title": "Automatic video script",
-      "desc": "An AI pitch ready to sell your offer."
-    },
-    {
-      "title": "Automated emails",
-      "desc": "AI-written sequences to convert leads."
-    },
-    {
-      "title": "Integrated payment",
-      "desc": "Start collecting payments instantly."
-    }
-  ]
+  "Créer un tunnel": "Create a tunnel",
+  "Mes tunnels": "My funnels",
+  "Statistiques": "Statistics",
+  "Passer Premium": "Upgrade to Premium",
+  "Déconnexion": "Log out",
+  "Créer un nouveau tunnel": "Create a new funnel",
+  "Nom du tunnel *": "Funnel name *",
+  "Objectif du tunnel *": "Funnel goal *",
+  "Type de contenu *": "Content type *",
+  "Tunnel Complet": "Complete funnel",
+  "Landing page seule": "Landing page only",
+  "Email de relance": "Follow-up email",
+  "Script vidéo": "Video script",
+  "Pages du tunnel": "Funnel pages",
+  "+ Ajouter une page": "+ Add a page",
+  "À qui s'adresse cette relance ?": "Who is this follow-up for?",
+  "À tous les contacts": "All contacts",
+  "Sélectionner un tunnel": "Select a funnel",
+  "Tunnel ciblé": "Targeted funnel",
+  "Secteur d’activité": "Industry",
+  "Prix global (si 1 produit)": "Global price (if 1 product)",
+  "Image de couverture": "Cover image",
+  "Vidéo à intégrer": "Video to include",
+  "Description de l’offre *": "Offer description *",
+  "Texte du bouton *": "Button text *",
+  "URL du bouton de paiement": "Payment button URL",
+  "Utiliser un domaine personnalisé ?": "Use a custom domain?",
+  "Nom de domaine (ex : tunnel.monsite.fr)": "Domain name (e.g., funnel.mysite.com)",
+  "Générer le tunnel": "Generate the funnel",
+  "welcome": "Welcome 👋",
+  "Langue du formulaire": "Form language"
 }
