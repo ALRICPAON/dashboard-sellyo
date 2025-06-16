@@ -1,191 +1,107 @@
-// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs + Mail targeting + UI tweaks
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script type="module" src="js/firebase-auth-check.js"></script>
+</head>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
 
-import { app } from "./firebase-init.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
+  <header>
+    <img src="assets/logo.png" alt="Logo Sellyo" class="logo" />
+    <nav style="display: flex; align-items: center;">
+      <ul>
+        <li><a href="#" id="create-tunnel">Créer un tunnel</a></li>
+        <li><a href="#" id="view-tunnels">Mes tunnels</a></li>
+        <li><a href="#" id="stats">Statistiques</a></li>
+        <li><a href="#" id="upgrade">Passer Premium</a></li>
+        <li><a href="#" id="logout">Déconnexion</a></li>
+      </ul>
+      <select id="lang-switch" style="margin-left: 1rem; background: #000; color: #fff; border: none; padding: 0.5rem;">
+        <option value="fr">FR</option>
+        <option value="en">EN</option>
+      </select>
+    </nav>
+  </header>
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+  <main>
+    <h1 id="welcome">Bienvenue 👋</h1>
+    <div id="dashboard-content"></div>
 
-const makeWebhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+    <div id="create-tunnel-form" style="display: none; max-width: 700px; width: 100%; margin: auto;">
+      <form id="tunnel-form" style="background: #2e2e2e; padding: 2rem; border-radius: 10px;">
 
-const createBtn = document.getElementById("create-tunnel");
-const formContainer = document.getElementById("create-tunnel-form");
-const dashboardContent = document.getElementById("dashboard-content");
+        <h2>Créer un nouveau tunnel</h2>
 
-if (createBtn && formContainer && dashboardContent) {
-  createBtn.addEventListener("click", () => {
-    formContainer.style.display = "block";
-    dashboardContent.innerHTML = "";
-    console.log("🪩 Formulaire affiché");
-  });
-}
+        <label>Nom du tunnel *</label><br />
+        <input type="text" id="tunnel-name" required /><br /><br />
 
-document.body.style.backgroundColor = "#111"; // Fond général en noir
+        <label>Objectif du tunnel *</label><br />
+        <input type="text" id="tunnel-goal" /><br /><br />
 
-const customDomainCheckbox = document.getElementById("use-custom-domain");
-const customDomainField = document.getElementById("custom-domain-field");
-if (customDomainCheckbox && customDomainField) {
-  customDomainCheckbox.addEventListener("change", () => {
-    customDomainField.style.display = customDomainCheckbox.checked ? "block" : "none";
-  });
-}
+        <label>Type de contenu *</label><br />
+        <select id="tunnel-type" required>
+          <option value="">-- Choisir un type --</option>
+          <option value="complet">Tunnel Complet</option>
+          <option value="landing">Landing page seule</option>
+          <option value="email">Email de relance</option>
+          <option value="video">Script vidéo</option>
+        </select><br /><br />
 
-const tunnelType = document.getElementById("tunnel-type");
-const generalPrice = document.getElementById("general-price");
-const tunnelPagesSection = document.getElementById("tunnel-pages-section");
-const tunnelPages = document.getElementById("tunnel-pages");
-const addPageBtn = document.getElementById("add-page");
-const emailTargetingField = document.getElementById("email-targeting-field");
-const tunnelSelectContainer = document.getElementById("tunnel-select-container");
-const tunnelSelect = document.getElementById("tunnel-select");
+        <label>Secteur d’activité</label><br />
+        <input type="text" id="sector" /><br /><br />
 
-let pageCount = 0;
-const maxPages = 8;
+        <label>Image de couverture</label><br />
+        <input type="file" id="cover-image" accept="image/*" /><br /><br />
 
-if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPages) {
-  tunnelType.addEventListener("change", async () => {
-    const value = tunnelType.value;
-    const isFull = value === "complet";
-    const isEmail = value === "email";
+        <label>Vidéo à intégrer</label><br />
+        <input type="file" id="custom-video" accept="video/*" /><br /><br />
 
-    generalPrice.disabled = isFull;
-    tunnelPagesSection.style.display = isFull ? "block" : "none";
-    emailTargetingField.style.display = isEmail ? "block" : "none";
+        <label>Description de l’offre *</label><br />
+        <textarea id="tunnel-desc" required></textarea><br /><br />
 
-    if (isEmail && auth.currentUser) {
-      const q = query(collection(db, "tunnels"), where("userId", "==", auth.currentUser.uid));
-      const querySnapshot = await getDocs(q);
-      tunnelSelect.innerHTML = "";
-      querySnapshot.forEach(doc => {
-        const option = document.createElement("option");
-        option.value = doc.id;
-        option.textContent = doc.data().name;
-        tunnelSelect.appendChild(option);
-      });
-    }
-  });
+        <label>Texte du bouton *</label><br />
+        <input type="text" id="cta-text" required /><br /><br />
 
-  addPageBtn.addEventListener("click", () => {
-    if (pageCount >= maxPages) return;
-    pageCount++;
+        <label>Prix (€)</label><br />
+        <input type="number" id="general-price" step="0.01" /><br /><br />
 
-    const pageDiv = document.createElement("div");
-    pageDiv.style.marginBottom = "20px";
-    pageDiv.innerHTML = `
-      <h4>Page ${pageCount}</h4>
-      <label>Titre *</label><br>
-      <input type="text" name="page-title-${pageCount}" required><br><br>
-      <label>Description *</label><br>
-      <textarea name="page-desc-${pageCount}" required></textarea><br><br>
-      <label>Image</label><br>
-      <input type="file" name="page-img-${pageCount}" accept="image/*"><br><br>
-      <label>URL produit</label><br>
-      <input type="url" name="page-url-${pageCount}"><br><br>
-      <label>Prix (€)</label><br>
-      <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
-    `;
-    tunnelPages.appendChild(pageDiv);
-  });
-}
+        <label>URL du bouton de paiement</label><br />
+        <input type="url" id="payment-url" /><br /><br />
 
-const form = document.getElementById("tunnel-form");
-if (form) {
-  form.style.backgroundColor = "#2e2e2e"; // Formulaire en gris foncé
-  form.style.padding = "2rem";
-  form.style.borderRadius = "10px";
+        <label>Utiliser un domaine personnalisé ?</label>
+        <input type="checkbox" id="use-custom-domain" /><br /><br />
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    console.log("🚀 Soumission du formulaire détectée");
+        <div id="custom-domain-field" style="display: none;">
+          <label>Nom de domaine (ex : tunnel.monsite.fr)</label><br />
+          <input type="text" id="custom-domain" /><br /><br />
+        </div>
 
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Utilisateur non connecté");
-      console.warn("❌ Utilisateur non connecté");
-      return;
-    }
+        <!-- 📩 Email targeting -->
+        <div id="email-targeting-field" style="display: none;">
+          <p>Cible de la relance :</p>
+          <label><input type="radio" name="email-target" value="all" /> Tous mes tunnels</label><br />
+          <label><input type="radio" name="email-target" value="specific" /> Tunnel spécifique</label><br /><br />
+          <div id="tunnel-select-container">
+            <label for="tunnel-select">Choisir un tunnel</label><br />
+            <select id="tunnel-select"></select><br /><br />
+          </div>
+        </div>
 
-    const name = document.getElementById("tunnel-name").value;
-    const goal = document.getElementById("tunnel-goal").value;
-    const type = tunnelType.value;
-    const sector = document.getElementById("sector").value;
-    const desc = document.getElementById("tunnel-desc").value;
-    const cta = document.getElementById("cta-text").value;
-    const payment = document.getElementById("payment-url").value;
-    const price = generalPrice.value;
-    const wantsCustomDomain = customDomainCheckbox.checked;
-    const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
+        <!-- 📄 Tunnel pages -->
+        <div id="tunnel-pages-section" style="display: none;">
+          <h3>Pages du tunnel</h3>
+          <div id="tunnel-pages"></div>
+          <button type="button" id="add-page">Ajouter une page</button><br /><br />
+        </div>
 
-    const relanceCible = document.querySelector("input[name='email-target']:checked")?.value || null;
-    const tunnelTargetId = tunnelSelect.value || null;
+        <button type="submit">Générer le tunnel</button>
+      </form>
+    </div>
+  </main>
 
-    const slug = name.toLowerCase().replaceAll(" ", "-");
-    const imageFile = document.getElementById("cover-image").files[0];
-    const videoFile = document.getElementById("custom-video").files[0];
-
-    let coverUrl = null;
-    let videoUrl = null;
-
-    try {
-      if (imageFile) {
-        coverUrl = await uploadCoverImage(imageFile, slug);
-      }
-      if (videoFile) {
-        videoUrl = await uploadCustomVideo(videoFile, slug);
-      }
-
-      const pages = [];
-      if (type === "complet") {
-        for (let i = 1; i <= pageCount; i++) {
-          const titleEl = form.querySelector(`[name='page-title-${i}']`);
-          if (!titleEl) continue;
-          const title = titleEl.value;
-          const description = form.querySelector(`[name='page-desc-${i}']`).value;
-          const url = form.querySelector(`[name='page-url-${i}']`).value;
-          const price = form.querySelector(`[name='page-price-${i}']`).value;
-          pages.push({ title, description, url, price });
-        }
-      }
-
-      const tunnelData = {
-        userId: user.uid,
-        name,
-        goal,
-        type,
-        sector,
-        desc,
-        cta,
-        payment,
-        price,
-        customDomain,
-        coverUrl,
-        videoUrl,
-        pages,
-        relanceCible,
-        tunnelTargetId,
-        createdAt: new Date()
-      };
-
-      const docRef = await addDoc(collection(db, "tunnels"), tunnelData);
-
-      await fetch(makeWebhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...tunnelData, email: user.email })
-      });
-
-      alert("✅ Tunnel enregistré et génération en cours !");
-      form.reset();
-      customDomainField.style.display = "none";
-      tunnelPages.innerHTML = "";
-      tunnelPagesSection.style.display = "none";
-      emailTargetingField.style.display = "none";
-      pageCount = 0;
-    } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde du tunnel :", err);
-      alert("❌ Une erreur s'est produite pendant la création du tunnel.");
-    }
-  });
-}
+  <!-- Appel du script JS -->
+  <script type="module" src="js/dashboard-submit.js"></script>
+</body>
+</html>
