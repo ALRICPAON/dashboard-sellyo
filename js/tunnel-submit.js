@@ -1,14 +1,13 @@
-// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs
+// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs + Mail targeting + UI tweaks
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 🔗 Webhook Make pour génération automatique
 const makeWebhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
 const createBtn = document.getElementById("create-tunnel");
@@ -36,15 +35,34 @@ const generalPrice = document.getElementById("general-price");
 const tunnelPagesSection = document.getElementById("tunnel-pages-section");
 const tunnelPages = document.getElementById("tunnel-pages");
 const addPageBtn = document.getElementById("add-page");
+const emailTargetingField = document.getElementById("email-targeting-field");
+const tunnelSelectContainer = document.getElementById("tunnel-select-container");
+const tunnelSelect = document.getElementById("tunnel-select");
 
 let pageCount = 0;
 const maxPages = 8;
 
 if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPages) {
-  tunnelType.addEventListener("change", () => {
-    const isFull = tunnelType.value === "complet";
+  tunnelType.addEventListener("change", async () => {
+    const value = tunnelType.value;
+    const isFull = value === "complet";
+    const isEmail = value === "email";
+
     generalPrice.disabled = isFull;
     tunnelPagesSection.style.display = isFull ? "block" : "none";
+    emailTargetingField.style.display = isEmail ? "block" : "none";
+
+    if (isEmail && auth.currentUser) {
+      const q = query(collection(db, "tunnels"), where("userId", "==", auth.currentUser.uid));
+      const querySnapshot = await getDocs(q);
+      tunnelSelect.innerHTML = "";
+      querySnapshot.forEach(doc => {
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.textContent = doc.data().name;
+        tunnelSelect.appendChild(option);
+      });
+    }
   });
 
   addPageBtn.addEventListener("click", () => {
@@ -94,6 +112,9 @@ if (form) {
     const wantsCustomDomain = customDomainCheckbox.checked;
     const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
 
+    const relanceCible = document.querySelector("input[name='email-target']:checked")?.value || null;
+    const tunnelTargetId = tunnelSelect.value || null;
+
     const slug = name.toLowerCase().replaceAll(" ", "-");
     const imageFile = document.getElementById("cover-image").files[0];
     const videoFile = document.getElementById("custom-video").files[0];
@@ -103,14 +124,10 @@ if (form) {
 
     try {
       if (imageFile) {
-        console.log("📸 Upload image en cours...");
         coverUrl = await uploadCoverImage(imageFile, slug);
-        console.log("✅ Image uploadée :", coverUrl);
       }
       if (videoFile) {
-        console.log("🎥 Upload vidéo en cours...");
         videoUrl = await uploadCustomVideo(videoFile, slug);
-        console.log("✅ Vidéo uploadée :", videoUrl);
       }
 
       const pages = [];
@@ -118,7 +135,6 @@ if (form) {
         for (let i = 1; i <= pageCount; i++) {
           const titleEl = form.querySelector(`[name='page-title-${i}']`);
           if (!titleEl) continue;
-
           const title = titleEl.value;
           const description = form.querySelector(`[name='page-desc-${i}']`).value;
           const url = form.querySelector(`[name='page-url-${i}']`).value;
@@ -141,34 +157,25 @@ if (form) {
         coverUrl,
         videoUrl,
         pages,
+        relanceCible,
+        tunnelTargetId,
         createdAt: new Date()
       };
 
-      console.log("📂 Données prêtes à être envoyées :", tunnelData);
-
       const docRef = await addDoc(collection(db, "tunnels"), tunnelData);
-      console.log("✅ Tunnel ajouté dans Firestore, ID :", docRef.id);
 
-      const makeResponse = await fetch(makeWebhookURL, {
+      await fetch(makeWebhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...tunnelData,
-          email: user.email
-        })
+        body: JSON.stringify({ ...tunnelData, email: user.email })
       });
-
-      if (makeResponse.ok) {
-        console.log("✅ Données envoyées à Make avec succès !");
-      } else {
-        console.warn("⚠️ Erreur HTTP lors de l'appel Make :", makeResponse.status);
-      }
 
       alert("✅ Tunnel enregistré et génération en cours !");
       form.reset();
       customDomainField.style.display = "none";
       tunnelPages.innerHTML = "";
       tunnelPagesSection.style.display = "none";
+      emailTargetingField.style.display = "none";
       pageCount = 0;
     } catch (err) {
       console.error("❌ Erreur lors de la sauvegarde du tunnel :", err);
