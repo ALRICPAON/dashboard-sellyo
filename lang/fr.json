@@ -1,23 +1,33 @@
 {
-  "headline": "Crée ton tunnel de vente en 3 minutes",
-  "createAccount": "Créer un compte",
-  "login": "Se connecter",
-  "features": [
-    {
-      "title": "Landing page instantanée",
-      "desc": "Crée une page professionnelle sans effort."
-    },
-    {
-      "title": "Script vidéo automatique",
-      "desc": "Un pitch IA prêt à vendre ton offre."
-    },
-    {
-      "title": "Emails automatisés",
-      "desc": "Séquences générées pour convertir tes prospects."
-    },
-    {
-      "title": "Paiement intégré",
-      "desc": "Encaisse facilement, tout est déjà connecté."
-    }
-  ]
+  "Créer un tunnel": "Créer un tunnel",
+  "Mes tunnels": "Mes tunnels",
+  "Statistiques": "Statistiques",
+  "Passer Premium": "Passer Premium",
+  "Déconnexion": "Déconnexion",
+  "Créer un nouveau tunnel": "Créer un nouveau tunnel",
+  "Nom du tunnel *": "Nom du tunnel *",
+  "Objectif du tunnel *": "Objectif du tunnel *",
+  "Type de contenu *": "Type de contenu *",
+  "Tunnel Complet": "Tunnel Complet",
+  "Landing page seule": "Landing page seule",
+  "Email de relance": "Email de relance",
+  "Script vidéo": "Script vidéo",
+  "Pages du tunnel": "Pages du tunnel",
+  "+ Ajouter une page": "+ Ajouter une page",
+  "À qui s'adresse cette relance ?": "À qui s'adresse cette relance ?",
+  "À tous les contacts": "À tous les contacts",
+  "Sélectionner un tunnel": "Sélectionner un tunnel",
+  "Tunnel ciblé": "Tunnel ciblé",
+  "Secteur d’activité": "Secteur d’activité",
+  "Prix global (si 1 produit)": "Prix global (si 1 produit)",
+  "Image de couverture": "Image de couverture",
+  "Vidéo à intégrer": "Vidéo à intégrer",
+  "Description de l’offre *": "Description de l’offre *",
+  "Texte du bouton *": "Texte du bouton *",
+  "URL du bouton de paiement": "URL du bouton de paiement",
+  "Utiliser un domaine personnalisé ?": "Utiliser un domaine personnalisé ?",
+  "Nom de domaine (ex : tunnel.monsite.fr)": "Nom de domaine (ex : tunnel.monsite.fr)",
+  "Générer le tunnel": "Générer le tunnel",
+  "welcome": "Bienvenue 👋",
+  "Langue du formulaire": "Langue du formulaire"
 }
