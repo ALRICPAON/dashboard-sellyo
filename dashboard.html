@@ -46,6 +46,16 @@
           <option value="video">Script vidéo</option>
         </select><br><br>
 
+        <div id="email-targeting-field" style="display: none;">
+          <label>À qui s'adresse cette relance ?</label><br>
+          <input type="radio" name="email-target" value="general" checked> À tous les contacts<br>
+          <input type="radio" name="email-target" value="selection"> Sélectionner un tunnel<br><br>
+          <div id="tunnel-select-container">
+            <label for="tunnel-select">Tunnel ciblé</label><br>
+            <select id="tunnel-select"></select><br><br>
+          </div>
+        </div>
+
         <label>Secteur d’activité</label><br>
         <input type="text" id="sector"><br><br>
 
@@ -73,16 +83,6 @@
         <div id="custom-domain-field" style="display: none;">
           <label>Nom de domaine (ex : tunnel.monsite.fr)</label><br>
           <input type="text" id="custom-domain"><br><br>
-        </div>
-
-        <div id="email-targeting-field" style="display: none;">
-          <label>À qui s'adresse cette relance ?</label><br>
-          <input type="radio" name="email-target" value="general" checked> À tous les contacts<br>
-          <input type="radio" name="email-target" value="selection"> Sélectionner un tunnel<br><br>
-          <div id="tunnel-select-container">
-            <label for="tunnel-select">Tunnel ciblé</label><br>
-            <select id="tunnel-select"></select><br><br>
-          </div>
         </div>
 
         <div id="tunnel-pages-section" style="display: none;">
