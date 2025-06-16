@@ -37,14 +37,6 @@
         <label>Objectif du tunnel *</label><br>
         <input type="text" id="tunnel-goal"><br><br>
 
-        <label>Type de contenu *</label><br>
-        <select id="tunnel-type" required>
-          <option value="complet">Tunnel Complet</option>
-          <option value="landing">Landing page seule</option>
-          <option value="email">Email de relance</option>
-          <option value="video">Script vidéo</option>
-        </select><br><br>
-
         <label>Secteur d’activité</label><br>
         <input type="text" id="sector"><br><br>
 
@@ -83,6 +75,15 @@
         <div id="tunnel-pages-section" style="display: none;">
           <h3>Pages personnalisées du tunnel</h3>
           <div id="tunnel-pages"></div>
+          <label>Type de contenu *</label><br>
+          <select id="tunnel-type" required>
+            <option value="">-- Choisir un type --</option>
+            <option value="complet">Tunnel Complet</option>
+            <option value="landing">Landing page seule</option>
+            <option value="email">Email de relance</option>
+            <option value="video">Script vidéo</option>
+          </select><br><br>
+
           <button type="button" id="add-page">Ajouter une page</button><br><br>
         </div>
 
