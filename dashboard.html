@@ -46,6 +46,12 @@
           <option value="video">Script vidéo</option>
         </select><br><br>
 
+        <div id="tunnel-pages-section" style="display: none;">
+          <h3>Pages personnalisées du tunnel</h3>
+          <div id="tunnel-pages"></div>
+          <button type="button" id="add-page">Ajouter une page</button><br><br>
+        </div>
+
         <label>Secteur d’activité</label><br>
         <input type="text" id="sector"><br><br>
 
@@ -79,12 +85,6 @@
         <div id="custom-domain-field" style="display: none;">
           <label>Nom de domaine (ex : tunnel.monsite.fr)</label><br>
           <input type="text" id="custom-domain"><br><br>
-        </div>
-
-        <div id="tunnel-pages-section" style="display: none;">
-          <h3>Pages personnalisées du tunnel</h3>
-          <div id="tunnel-pages"></div>
-          <button type="button" id="add-page">Ajouter une page</button><br><br>
         </div>
 
         <button type="submit">Générer le tunnel</button>
