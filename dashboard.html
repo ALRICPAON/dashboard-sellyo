@@ -48,6 +48,15 @@
         <label>Secteur d’activité</label><br>
         <input type="text" id="sector"><br><br>
 
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
+
+        <label>Couleur principale</label><br>
+        <input type="color" id="main-color"><br><br>
+
+        <label>Prix de vente (€)</label><br>
+        <input type="number" id="general-price" step="0.01"><br><br>
+
         <label>Image de couverture</label><br>
         <input type="file" id="cover-image" accept="image/*"><br><br>
 
@@ -71,12 +80,17 @@
           <input type="text" id="custom-domain"><br><br>
         </div>
 
+        <div id="tunnel-pages-section" style="display: none;">
+          <h3>Pages personnalisées du tunnel</h3>
+          <div id="tunnel-pages"></div>
+          <button type="button" id="add-page">Ajouter une page</button><br><br>
+        </div>
+
         <button type="submit">Générer le tunnel</button>
       </form>
     </div>
   </main>
 
-  <!-- ⚠️ Important : script placé en bas pour éviter les problèmes DOM -->
   <script type="module" src="js/tunnel-submit.js"></script>
 </body>
 </html>
