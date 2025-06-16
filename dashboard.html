@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Dashboard – Sellyo</title>
-  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="dashboard.css">
   <script type="module" src="js/firebase-auth-check.js"></script>
 </head>
 <body style="background-color: #111; color: white; font-family: sans-serif;">
-
   <header>
-    <img src="assets/logo.png" alt="Logo Sellyo" class="logo" />
+    <img src="assets/logo.png" alt="Logo Sellyo" class="logo">
     <nav style="display: flex; align-items: center;">
       <ul>
         <li><a href="#" id="create-tunnel">Créer un tunnel</a></li>
@@ -29,71 +28,67 @@
     <h1 id="welcome">Bienvenue 👋</h1>
     <div id="dashboard-content"></div>
 
-    <div id="create-tunnel-form" style="display: none; max-width: 700px; width: 100%; margin: auto;">
-      <form id="tunnel-form" style="background: #2e2e2e; padding: 2rem; border-radius: 10px;">
+    <div id="create-tunnel-form" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
+      <h2>Créer un nouveau tunnel</h2>
+      <form id="tunnel-form">
+        <label>Nom du tunnel *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
 
-        <h2>Créer un nouveau tunnel</h2>
+        <label>Objectif du tunnel *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
 
-        <label>Nom du tunnel *</label><br />
-        <input type="text" id="tunnel-name" required /><br /><br />
-
-        <label>Objectif du tunnel *</label><br />
-        <input type="text" id="tunnel-goal" /><br /><br />
-
-        <label>Type de contenu *</label><br />
+        <label>Type de contenu *</label><br>
         <select id="tunnel-type" required>
-          <option value="">-- Choisir un type --</option>
+          <option value="" disabled selected>Choisir...</option>
           <option value="complet">Tunnel Complet</option>
           <option value="landing">Landing page seule</option>
           <option value="email">Email de relance</option>
           <option value="video">Script vidéo</option>
-        </select><br /><br />
+        </select><br><br>
 
-        <label>Secteur d’activité</label><br />
-        <input type="text" id="sector" /><br /><br />
+        <label>Secteur d’activité</label><br>
+        <input type="text" id="sector"><br><br>
 
-        <label>Image de couverture</label><br />
-        <input type="file" id="cover-image" accept="image/*" /><br /><br />
+        <label>Prix global (si 1 produit)</label><br>
+        <input type="number" id="general-price" step="0.01"><br><br>
 
-        <label>Vidéo à intégrer</label><br />
-        <input type="file" id="custom-video" accept="video/*" /><br /><br />
+        <label>Image de couverture</label><br>
+        <input type="file" id="cover-image" accept="image/*"><br><br>
 
-        <label>Description de l’offre *</label><br />
-        <textarea id="tunnel-desc" required></textarea><br /><br />
+        <label>Vidéo à intégrer</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
 
-        <label>Texte du bouton *</label><br />
-        <input type="text" id="cta-text" required /><br /><br />
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
 
-        <label>Prix (€)</label><br />
-        <input type="number" id="general-price" step="0.01" /><br /><br />
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
 
-        <label>URL du bouton de paiement</label><br />
-        <input type="url" id="payment-url" /><br /><br />
+        <label>URL du bouton de paiement</label><br>
+        <input type="url" id="payment-url"><br><br>
 
-        <label>Utiliser un domaine personnalisé ?</label>
-        <input type="checkbox" id="use-custom-domain" /><br /><br />
+        <label>Utiliser un domaine personnalisé ?</label><br>
+        <input type="checkbox" id="use-custom-domain"><br><br>
 
         <div id="custom-domain-field" style="display: none;">
-          <label>Nom de domaine (ex : tunnel.monsite.fr)</label><br />
-          <input type="text" id="custom-domain" /><br /><br />
+          <label>Nom de domaine (ex : tunnel.monsite.fr)</label><br>
+          <input type="text" id="custom-domain"><br><br>
         </div>
 
-        <!-- 📩 Email targeting -->
         <div id="email-targeting-field" style="display: none;">
-          <p>Cible de la relance :</p>
-          <label><input type="radio" name="email-target" value="all" /> Tous mes tunnels</label><br />
-          <label><input type="radio" name="email-target" value="specific" /> Tunnel spécifique</label><br /><br />
+          <label>À qui s'adresse cette relance ?</label><br>
+          <input type="radio" name="email-target" value="general" checked> À tous les contacts<br>
+          <input type="radio" name="email-target" value="selection"> Sélectionner un tunnel<br><br>
           <div id="tunnel-select-container">
-            <label for="tunnel-select">Choisir un tunnel</label><br />
-            <select id="tunnel-select"></select><br /><br />
+            <label for="tunnel-select">Tunnel ciblé</label><br>
+            <select id="tunnel-select"></select><br><br>
           </div>
         </div>
 
-        <!-- 📄 Tunnel pages -->
         <div id="tunnel-pages-section" style="display: none;">
           <h3>Pages du tunnel</h3>
           <div id="tunnel-pages"></div>
-          <button type="button" id="add-page">Ajouter une page</button><br /><br />
+          <button type="button" id="add-page">+ Ajouter une page</button><br><br>
         </div>
 
         <button type="submit">Générer le tunnel</button>
@@ -101,7 +96,6 @@
     </div>
   </main>
 
-  <!-- Appel du script JS -->
-  <script type="module" src="js/dashboard-submit.js"></script>
+  <script type="module" src="js/tunnel-submit.js"></script>
 </body>
 </html>
