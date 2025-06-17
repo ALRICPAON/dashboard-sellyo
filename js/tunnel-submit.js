@@ -32,6 +32,16 @@ if (customDomainCheckbox && customDomainField) {
   });
 }
 
+const customRedirectCheckbox = document.getElementById("custom-redirect-checkbox");
+const customRedirectField = document.getElementById("custom-redirect-field");
+const redirectURLInput = document.getElementById("redirectURL");
+
+if (customRedirectCheckbox && customRedirectField && redirectURLInput) {
+  customRedirectCheckbox.addEventListener("change", () => {
+    customRedirectField.style.display = customRedirectCheckbox.checked ? "block" : "none";
+  });
+}
+
 const tunnelType = document.getElementById("tunnel-type");
 const generalPrice = document.getElementById("general-price");
 const tunnelPagesSection = document.getElementById("tunnel-pages-section");
@@ -114,7 +124,6 @@ if (form) {
     const desc = document.getElementById("tunnel-desc").value;
     const cta = document.getElementById("cta-text").value;
     const payment = document.getElementById("payment-url").value;
-    const redirectURL = document.getElementById("redirectURL").value;
     const mainColor = document.getElementById("mainColor").value;
     const logoFile = document.getElementById("logo").files[0];
     const price = generalPrice.value;
@@ -127,6 +136,10 @@ if (form) {
     const slug = name.toLowerCase().replaceAll(" ", "-");
     const imageFile = document.getElementById("cover-image").files[0];
     const videoFile = document.getElementById("custom-video").files[0];
+
+    const redirectURL = customRedirectCheckbox.checked && redirectURLInput.value
+      ? redirectURLInput.value
+      : `https://sellyo-app.netlify.app/merci.html?from=${slug}`;
 
     let coverUrl = null;
     let videoUrl = null;
@@ -192,6 +205,7 @@ if (form) {
       tunnelPages.innerHTML = "";
       tunnelPagesSection.style.display = "none";
       emailTargetingField.style.display = "none";
+      customRedirectField.style.display = "none";
       pageCount = 0;
     } catch (err) {
       console.error("❌ Erreur lors de la sauvegarde du tunnel :", err);
