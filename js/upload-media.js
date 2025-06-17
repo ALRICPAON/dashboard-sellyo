@@ -13,12 +13,9 @@ export async function uploadCoverImage(file, tunnelName) {
   try {
     const path = `tunnels/${user.uid}/${tunnelName}/cover.jpg`;
     const storageRef = ref(storage, path);
-    const metadata = {
-      contentType: file.type || "image/jpeg",
-    };
+    const metadata = { contentType: file.type || "image/jpeg" };
 
     console.log("📤 Envoi de l'image vers :", storageRef.fullPath);
-
     const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
     return await new Promise((resolve, reject) => {
@@ -53,12 +50,9 @@ export async function uploadCustomVideo(file, tunnelName) {
   try {
     const path = `tunnels/${user.uid}/${tunnelName}/video.mp4`;
     const storageRef = ref(storage, path);
-    const metadata = {
-      contentType: file.type || "video/mp4",
-    };
+    const metadata = { contentType: file.type || "video/mp4" };
 
     console.log("📤 Envoi de la vidéo vers :", storageRef.fullPath);
-
     const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
     return await new Promise((resolve, reject) => {
@@ -82,5 +76,42 @@ export async function uploadCustomVideo(file, tunnelName) {
   } catch (e) {
     console.error("⚠️ Fallback vidéo : erreur durant l'upload", e);
     return "https://via.placeholder.com/600x400?text=Vidéo+error";
+  }
+}
+
+// ✅ Upload du logo du client
+export async function uploadLogo(file, tunnelName) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Utilisateur non connecté");
+
+  try {
+    const path = `tunnels/${user.uid}/${tunnelName}/logo.png`;
+    const storageRef = ref(storage, path);
+    const metadata = { contentType: file.type || "image/png" };
+
+    console.log("📤 Envoi du logo vers :", storageRef.fullPath);
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+    return await new Promise((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`📈 Progression upload logo : ${progress.toFixed(0)}%`);
+        },
+        (error) => {
+          console.error("❌ Erreur upload logo :", error);
+          reject(error);
+        },
+        async () => {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          console.log("✅ URL du logo :", url);
+          resolve(url);
+        }
+      );
+    });
+  } catch (e) {
+    console.error("⚠️ Fallback logo : erreur durant l'upload", e);
+    return "https://via.placeholder.com/200x100?text=Logo+error";
   }
 }
