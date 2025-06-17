@@ -18,27 +18,17 @@ if (createBtn && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
     formContainer.style.display = "block";
     dashboardContent.innerHTML = "";
-    console.log("�� Formulaire affiché");
+    console.log("📄 Formulaire affiché");
   });
 }
 
-document.body.style.backgroundColor = "#111"; // Fond général en noir
+document.body.style.backgroundColor = "#111";
 
 const customDomainCheckbox = document.getElementById("use-custom-domain");
 const customDomainField = document.getElementById("custom-domain-field");
 if (customDomainCheckbox && customDomainField) {
   customDomainCheckbox.addEventListener("change", () => {
     customDomainField.style.display = customDomainCheckbox.checked ? "block" : "none";
-  });
-}
-
-const customRedirectCheckbox = document.getElementById("custom-redirect-checkbox");
-const customRedirectField = document.getElementById("custom-redirect-field");
-const redirectURLInput = document.getElementById("redirectURL");
-
-if (customRedirectCheckbox && customRedirectField && redirectURLInput) {
-  customRedirectCheckbox.addEventListener("change", () => {
-    customRedirectField.style.display = customRedirectCheckbox.checked ? "block" : "none";
   });
 }
 
@@ -50,6 +40,8 @@ const addPageBtn = document.getElementById("add-page");
 const emailTargetingField = document.getElementById("email-targeting-field");
 const tunnelSelectContainer = document.getElementById("tunnel-select-container");
 const tunnelSelect = document.getElementById("tunnel-select");
+const clientEmailContainer = document.getElementById("client-email-container");
+const clientEmailInput = document.getElementById("client-email");
 
 let pageCount = 0;
 const maxPages = 8;
@@ -102,7 +94,7 @@ if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPage
 
 const form = document.getElementById("tunnel-form");
 if (form) {
-  form.style.backgroundColor = "#2e2e2e"; // Formulaire en gris foncé
+  form.style.backgroundColor = "#2e2e2e";
   form.style.padding = "2rem";
   form.style.borderRadius = "10px";
 
@@ -132,14 +124,13 @@ if (form) {
 
     const relanceCible = document.querySelector("input[name='email-target']:checked")?.value || null;
     const tunnelTargetId = tunnelSelect.value || null;
+    const clientTargetEmail = relanceCible === "client" ? clientEmailInput?.value || null : null;
 
     const slug = name.toLowerCase().replaceAll(" ", "-");
     const imageFile = document.getElementById("cover-image").files[0];
     const videoFile = document.getElementById("custom-video").files[0];
 
-    const redirectURL = customRedirectCheckbox.checked && redirectURLInput.value
-      ? redirectURLInput.value
-      : `https://sellyo-app.netlify.app/merci.html?from=${slug}`;
+    const redirectURL = `https://sellyo-app.netlify.app/merci.html?from=${slug}`;
 
     let coverUrl = null;
     let videoUrl = null;
@@ -188,6 +179,7 @@ if (form) {
         pages,
         relanceCible,
         tunnelTargetId,
+        clientTargetEmail,
         createdAt: new Date()
       };
 
@@ -205,7 +197,6 @@ if (form) {
       tunnelPages.innerHTML = "";
       tunnelPagesSection.style.display = "none";
       emailTargetingField.style.display = "none";
-      customRedirectField.style.display = "none";
       pageCount = 0;
     } catch (err) {
       console.error("❌ Erreur lors de la sauvegarde du tunnel :", err);
