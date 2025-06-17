@@ -61,10 +61,15 @@
         <div id="email-targeting-field" style="display: none;">
           <label>À qui s'adresse cette relance ?</label><br>
           <input type="radio" name="email-target" value="general" checked> À tous les contacts<br>
-          <input type="radio" name="email-target" value="selection"> Sélectionner un tunnel<br><br>
+          <input type="radio" name="email-target" value="selection"> Sélectionner un tunnel<br>
+          <input type="radio" name="email-target" value="client"> Un client spécifique<br><br>
           <div id="tunnel-select-container">
             <label for="tunnel-select">Tunnel ciblé</label><br>
             <select id="tunnel-select"></select><br><br>
+          </div>
+          <div id="client-email-container" style="display: none;">
+            <label>Email du client ciblé</label><br>
+            <input type="email" id="client-email"><br><br>
           </div>
         </div>
 
@@ -103,13 +108,7 @@
           <input type="text" id="custom-domain"><br><br>
         </div>
 
-        <label>URL de redirection personnalisée ?</label>
-        <input type="checkbox" id="custom-redirect-checkbox"><br><br>
-
-        <div id="custom-redirect-field" style="display: none;">
-          <label>URL de redirection après inscription</label><br>
-          <input type="url" id="redirectURL"><br><br>
-        </div>
+        <!-- Champ redirection supprimé car géré automatiquement -->
 
         <button type="submit">Générer le tunnel</button>
       </form>
