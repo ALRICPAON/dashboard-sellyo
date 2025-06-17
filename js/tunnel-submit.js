@@ -3,7 +3,7 @@
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { uploadCoverImage, uploadCustomVideo } from "./upload-media.js";
+import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -18,7 +18,7 @@ if (createBtn && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
     formContainer.style.display = "block";
     dashboardContent.innerHTML = "";
-    console.log("🪩 Formulaire affiché");
+    console.log("�� Formulaire affiché");
   });
 }
 
@@ -114,6 +114,9 @@ if (form) {
     const desc = document.getElementById("tunnel-desc").value;
     const cta = document.getElementById("cta-text").value;
     const payment = document.getElementById("payment-url").value;
+    const redirectURL = document.getElementById("redirectURL").value;
+    const mainColor = document.getElementById("mainColor").value;
+    const logoFile = document.getElementById("logo").files[0];
     const price = generalPrice.value;
     const wantsCustomDomain = customDomainCheckbox.checked;
     const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
@@ -127,6 +130,7 @@ if (form) {
 
     let coverUrl = null;
     let videoUrl = null;
+    let logoUrl = null;
 
     try {
       if (imageFile) {
@@ -134,6 +138,9 @@ if (form) {
       }
       if (videoFile) {
         videoUrl = await uploadCustomVideo(videoFile, slug);
+      }
+      if (logoFile) {
+        logoUrl = await uploadLogo(logoFile, slug);
       }
 
       const pages = [];
@@ -158,6 +165,9 @@ if (form) {
         desc,
         cta,
         payment,
+        redirectURL,
+        mainColor,
+        logoUrl,
         price,
         customDomain,
         coverUrl,
