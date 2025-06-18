@@ -1,4 +1,4 @@
-// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs + Mail targeting + UI tweaks
+// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs + Mail targeting + UI tweaks + Upload image pages personnalisées
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -156,7 +156,14 @@ if (form) {
           const description = form.querySelector(`[name='page-desc-${i}']`).value;
           const url = form.querySelector(`[name='page-url-${i}']`).value;
           const price = form.querySelector(`[name='page-price-${i}']`).value;
-          pages.push({ title, description, url, price });
+
+          const imageFile = form.querySelector(`[name='page-img-${i}']`).files[0];
+          let imageUrl = null;
+          if (imageFile) {
+            imageUrl = await uploadCoverImage(imageFile, `${slug}-page${i}`);
+          }
+
+          pages.push({ title, description, url, price, image: imageUrl });
         }
       }
 
