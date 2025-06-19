@@ -52,7 +52,15 @@ if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPage
     const isFull = value === "complet";
     const isEmail = value === "email";
 
-    generalPrice.disabled = isFull;
+    const fieldsToDisable = [
+      'tunnel-goal', 'sector', 'general-price', 'logo', 'mainColor',
+      'cover-image', 'custom-video', 'tunnel-desc', 'cta-text', 'payment-url', 'use-custom-domain', 'custom-domain'
+    ];
+    fieldsToDisable.forEach(id => {
+      const field = document.getElementById(id);
+      if (field) field.disabled = isFull;
+    });
+
     tunnelPagesSection.style.display = isFull ? "block" : "none";
     emailTargetingField.style.display = isEmail ? "block" : "none";
 
@@ -137,15 +145,9 @@ if (form) {
     let logoUrl = null;
 
     try {
-      if (imageFile) {
-        coverUrl = await uploadCoverImage(imageFile, slug);
-      }
-      if (videoFile) {
-        videoUrl = await uploadCustomVideo(videoFile, slug);
-      }
-      if (logoFile) {
-        logoUrl = await uploadLogo(logoFile, slug);
-      }
+      if (imageFile) coverUrl = await uploadCoverImage(imageFile, slug);
+      if (videoFile) videoUrl = await uploadCustomVideo(videoFile, slug);
+      if (logoFile) logoUrl = await uploadLogo(logoFile, slug);
 
       const pages = [];
       if (type === "complet") {
