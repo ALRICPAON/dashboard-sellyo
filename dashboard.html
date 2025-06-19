@@ -108,8 +108,23 @@
     </div>
 
     <!-- Formulaire pour Tunnel complet uniquement -->
-    <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; margin-top: 2rem;">
+    <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin-top: 2rem;">
       <h2>Tunnel Complet – Pages personnalisées</h2>
+      <label>Logo de la marque</label><br>
+      <input type="file" id="full-logo" accept="image/*"><br><br>
+
+      <label>Couleur de fond</label><br>
+      <input type="color" id="full-background-color" value="#121212"><br><br>
+
+      <label>Couleur du bouton</label><br>
+      <input type="color" id="full-button-color" value="#ff9900"><br><br>
+
+      <label>Vidéo principale</label><br>
+      <input type="file" id="full-video" accept="video/*"><br><br>
+
+      <label>URL globale (bouton final)</label><br>
+      <input type="url" id="full-main-url"><br><br>
+
       <div id="tunnel-pages-complet"></div>
       <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
       <button type="button" id="submit-full-tunnel">Générer le tunnel complet</button>
