@@ -28,6 +28,7 @@
     <h1 id="welcome">Bienvenue 👋</h1>
     <div id="dashboard-content"></div>
 
+    <!-- Formulaire principal -->
     <div id="create-tunnel-form" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
       <h2>Créer un nouveau tunnel</h2>
       <form id="tunnel-form">
@@ -51,12 +52,6 @@
           <option value="email">Email de relance</option>
           <option value="video">Script vidéo</option>
         </select><br><br>
-
-        <div id="tunnel-pages-section" style="display: none;">
-          <h3>Pages du tunnel</h3>
-          <div id="tunnel-pages"></div>
-          <button type="button" id="add-page">+ Ajouter une page</button><br><br>
-        </div>
 
         <div id="email-targeting-field" style="display: none;">
           <label>À qui s'adresse cette relance ?</label><br>
@@ -111,26 +106,16 @@
         <button type="submit">Générer le tunnel</button>
       </form>
     </div>
+
+    <!-- Formulaire pour Tunnel complet uniquement -->
+    <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; margin-top: 2rem;">
+      <h2>Tunnel Complet – Pages personnalisées</h2>
+      <div id="tunnel-pages-complet"></div>
+      <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
+      <button type="button" id="submit-full-tunnel">Générer le tunnel complet</button>
+    </div>
+
   </main>
-
   <script type="module" src="js/tunnel-submit.js"></script>
-  <script>
-    document.getElementById('tunnel-type').addEventListener('change', function () {
-      const type = this.value;
-      const fieldsToDisable = [
-        'tunnel-goal', 'sector', 'general-price', 'logo', 'mainColor',
-        'cover-image', 'custom-video', 'tunnel-desc', 'cta-text', 'payment-url', 'use-custom-domain', 'custom-domain'
-      ];
-
-      fieldsToDisable.forEach(id => {
-        const field = document.getElementById(id);
-        if (field) {
-          field.disabled = (type === 'complet');
-        }
-      });
-
-      document.getElementById('tunnel-pages-section').style.display = (type === 'complet') ? 'block' : 'none';
-    });
-  </script>
 </body>
 </html>
