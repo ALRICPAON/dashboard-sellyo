@@ -108,13 +108,29 @@
           <input type="text" id="custom-domain"><br><br>
         </div>
 
-        <!-- Champ redirection supprimé car géré automatiquement -->
-
         <button type="submit">Générer le tunnel</button>
       </form>
     </div>
   </main>
 
   <script type="module" src="js/tunnel-submit.js"></script>
+  <script>
+    document.getElementById('tunnel-type').addEventListener('change', function () {
+      const type = this.value;
+      const fieldsToDisable = [
+        'tunnel-goal', 'sector', 'general-price', 'logo', 'mainColor',
+        'cover-image', 'custom-video', 'tunnel-desc', 'cta-text', 'payment-url', 'use-custom-domain', 'custom-domain'
+      ];
+
+      fieldsToDisable.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+          field.disabled = (type === 'complet');
+        }
+      });
+
+      document.getElementById('tunnel-pages-section').style.display = (type === 'complet') ? 'block' : 'none';
+    });
+  </script>
 </body>
 </html>
