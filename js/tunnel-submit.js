@@ -1,4 +1,4 @@
-// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs + Mail targeting + UI tweaks + Upload image pages personnalisées
+// ✅ VERSION COMPLÈTE avec séparation du formulaire "tunnel complet" et les autres options (landing, email, script)
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -12,6 +12,7 @@ const makeWebhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58
 
 const createBtn = document.getElementById("create-tunnel");
 const formContainer = document.getElementById("create-tunnel-form");
+const formFull = document.getElementById("form-tunnel-complet");
 const dashboardContent = document.getElementById("dashboard-content");
 
 if (createBtn && formContainer && dashboardContent) {
@@ -24,42 +25,19 @@ if (createBtn && formContainer && dashboardContent) {
 
 document.body.style.backgroundColor = "#111";
 
-const customDomainCheckbox = document.getElementById("use-custom-domain");
-const customDomainField = document.getElementById("custom-domain-field");
-if (customDomainCheckbox && customDomainField) {
-  customDomainCheckbox.addEventListener("change", () => {
-    customDomainField.style.display = customDomainCheckbox.checked ? "block" : "none";
-  });
-}
-
 const tunnelType = document.getElementById("tunnel-type");
-const generalPrice = document.getElementById("general-price");
-const tunnelPagesSection = document.getElementById("tunnel-pages-section");
-const tunnelPages = document.getElementById("tunnel-pages");
-const addPageBtn = document.getElementById("add-page");
 const emailTargetingField = document.getElementById("email-targeting-field");
-const tunnelSelectContainer = document.getElementById("tunnel-select-container");
 const tunnelSelect = document.getElementById("tunnel-select");
-const clientEmailContainer = document.getElementById("client-email-container");
 const clientEmailInput = document.getElementById("client-email");
 
-let pageCount = 0;
-const maxPages = 8;
-
-if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPages) {
+if (tunnelType) {
   tunnelType.addEventListener("change", async () => {
     const value = tunnelType.value;
     const isFull = value === "complet";
     const isEmail = value === "email";
 
-    const fieldContainers = document.querySelectorAll("#tunnel-form > *");
-    fieldContainers.forEach(el => {
-      if (!el.closest("#tunnel-pages-section") && !el.closest("#email-targeting-field") && el.id !== "tunnel-type") {
-        el.style.display = isFull ? "none" : "block";
-      }
-    });
-
-    tunnelPagesSection.style.display = isFull ? "block" : "none";
+    document.getElementById("tunnel-form").style.display = isFull ? "none" : "block";
+    document.getElementById("form-tunnel-complet").style.display = isFull ? "block" : "none";
     emailTargetingField.style.display = isEmail ? "block" : "none";
 
     if (isEmail && auth.currentUser) {
@@ -74,8 +52,17 @@ if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPage
       });
     }
   });
+}
 
-  addPageBtn.addEventListener("click", () => {
+// Tunnel complet (formFull)
+let pageCount = 0;
+const maxPages = 8;
+const addPageFull = document.getElementById("add-page-full");
+const tunnelPagesFull = document.getElementById("tunnel-pages-complet");
+const submitFullTunnel = document.getElementById("submit-full-tunnel");
+
+if (addPageFull && tunnelPagesFull) {
+  addPageFull.addEventListener("click", () => {
     if (pageCount >= maxPages) return;
     pageCount++;
 
@@ -83,29 +70,69 @@ if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPage
     pageDiv.style.marginBottom = "20px";
     pageDiv.innerHTML = `
       <h4>Page ${pageCount}</h4>
-      <label>Nom du tunnel *</label><br>
+      <label>Titre *</label><br>
       <input type="text" name="page-title-${pageCount}" required><br><br>
-      <label>Objectif du tunnel *</label><br>
+      <label>Description *</label><br>
       <textarea name="page-desc-${pageCount}" required></textarea><br><br>
-      <label>Secteur d’activité</label><br>
-      <input type="text" name="page-sector-${pageCount}"><br><br>
       <label>Image</label><br>
       <input type="file" name="page-img-${pageCount}" accept="image/*"><br><br>
-      <label>Vidéo à intégrer</label><br>
-      <input type="file" name="page-video-${pageCount}" accept="video/*"><br><br>
-      <label>Couleur principale</label><br>
-      <input type="color" name="page-color-${pageCount}" value="#ff9900"><br><br>
-      <label>Logo de votre marque</label><br>
-      <input type="file" name="page-logo-${pageCount}" accept="image/*"><br><br>
-      <label>Description de l’offre *</label><br>
-      <textarea name="page-offer-${pageCount}" required></textarea><br><br>
-      <label>Texte du bouton *</label><br>
-      <input type="text" name="page-cta-${pageCount}" required><br><br>
-      <label>URL du bouton de paiement</label><br>
+      <label>URL produit</label><br>
       <input type="url" name="page-url-${pageCount}"><br><br>
       <label>Prix (€)</label><br>
       <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
     `;
-    tunnelPages.appendChild(pageDiv);
+    tunnelPagesFull.appendChild(pageDiv);
+  });
+}
+
+if (submitFullTunnel) {
+  submitFullTunnel.addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Utilisateur non connecté");
+      return;
+    }
+
+    const pages = [];
+    const form = document.getElementById("form-tunnel-complet");
+    for (let i = 1; i <= pageCount; i++) {
+      const title = form.querySelector(`[name='page-title-${i}']`)?.value || "";
+      const description = form.querySelector(`[name='page-desc-${i}']`)?.value || "";
+      const url = form.querySelector(`[name='page-url-${i}']`)?.value || "";
+      const price = form.querySelector(`[name='page-price-${i}']`)?.value || "";
+
+      const imageFile = form.querySelector(`[name='page-img-${i}']`)?.files[0];
+      let imageUrl = null;
+      if (imageFile) {
+        imageUrl = await uploadCoverImage(imageFile, `full-page-${i}`);
+      }
+
+      pages.push({ title, description, url, price, image: imageUrl });
+    }
+
+    const dataToSend = {
+      userId: user.uid,
+      name: "Tunnel complet personnalisé",
+      type: "complet",
+      pages,
+      email: user.email,
+      createdAt: new Date()
+    };
+
+    try {
+      await fetch(makeWebhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend)
+      });
+
+      alert("✅ Tunnel complet envoyé à Make !");
+      tunnelPagesFull.innerHTML = "";
+      form.style.display = "none";
+      pageCount = 0;
+    } catch (err) {
+      console.error("❌ Erreur lors de l'envoi :", err);
+      alert("Erreur lors de la génération du tunnel complet.");
+    }
   });
 }
