@@ -52,13 +52,11 @@ if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPage
     const isFull = value === "complet";
     const isEmail = value === "email";
 
-    const fieldsToDisable = [
-      'tunnel-goal', 'sector', 'general-price', 'logo', 'mainColor',
-      'cover-image', 'custom-video', 'tunnel-desc', 'cta-text', 'payment-url', 'use-custom-domain', 'custom-domain'
-    ];
-    fieldsToDisable.forEach(id => {
-      const field = document.getElementById(id);
-      if (field) field.disabled = isFull;
+    const fieldContainers = document.querySelectorAll("#tunnel-form > *");
+    fieldContainers.forEach(el => {
+      if (!el.closest("#tunnel-pages-section") && !el.closest("#email-targeting-field") && el.id !== "tunnel-type") {
+        el.style.display = isFull ? "none" : "block";
+      }
     });
 
     tunnelPagesSection.style.display = isFull ? "block" : "none";
@@ -85,131 +83,29 @@ if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPage
     pageDiv.style.marginBottom = "20px";
     pageDiv.innerHTML = `
       <h4>Page ${pageCount}</h4>
-      <label>Titre *</label><br>
+      <label>Nom du tunnel *</label><br>
       <input type="text" name="page-title-${pageCount}" required><br><br>
-      <label>Description *</label><br>
+      <label>Objectif du tunnel *</label><br>
       <textarea name="page-desc-${pageCount}" required></textarea><br><br>
+      <label>Secteur d’activité</label><br>
+      <input type="text" name="page-sector-${pageCount}"><br><br>
       <label>Image</label><br>
       <input type="file" name="page-img-${pageCount}" accept="image/*"><br><br>
-      <label>URL produit</label><br>
+      <label>Vidéo à intégrer</label><br>
+      <input type="file" name="page-video-${pageCount}" accept="video/*"><br><br>
+      <label>Couleur principale</label><br>
+      <input type="color" name="page-color-${pageCount}" value="#ff9900"><br><br>
+      <label>Logo de votre marque</label><br>
+      <input type="file" name="page-logo-${pageCount}" accept="image/*"><br><br>
+      <label>Description de l’offre *</label><br>
+      <textarea name="page-offer-${pageCount}" required></textarea><br><br>
+      <label>Texte du bouton *</label><br>
+      <input type="text" name="page-cta-${pageCount}" required><br><br>
+      <label>URL du bouton de paiement</label><br>
       <input type="url" name="page-url-${pageCount}"><br><br>
       <label>Prix (€)</label><br>
       <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
     `;
     tunnelPages.appendChild(pageDiv);
-  });
-}
-
-const form = document.getElementById("tunnel-form");
-if (form) {
-  form.style.backgroundColor = "#2e2e2e";
-  form.style.padding = "2rem";
-  form.style.borderRadius = "10px";
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    console.log("🚀 Soumission du formulaire détectée");
-
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Utilisateur non connecté");
-      console.warn("❌ Utilisateur non connecté");
-      return;
-    }
-
-    const name = document.getElementById("tunnel-name").value;
-    const goal = document.getElementById("tunnel-goal").value;
-    const type = tunnelType.value;
-    const sector = document.getElementById("sector").value;
-    const desc = document.getElementById("tunnel-desc").value;
-    const cta = document.getElementById("cta-text").value;
-    const payment = document.getElementById("payment-url").value;
-    const mainColor = document.getElementById("mainColor").value;
-    const logoFile = document.getElementById("logo").files[0];
-    const price = generalPrice.value;
-    const wantsCustomDomain = customDomainCheckbox.checked;
-    const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
-
-    const relanceCible = document.querySelector("input[name='email-target']:checked")?.value || null;
-    const tunnelTargetId = tunnelSelect.value || null;
-    const clientTargetEmail = relanceCible === "client" ? clientEmailInput?.value || null : null;
-
-    const slug = name.toLowerCase().replaceAll(" ", "-");
-    const imageFile = document.getElementById("cover-image").files[0];
-    const videoFile = document.getElementById("custom-video").files[0];
-
-    const redirectURL = `https://sellyo-app.netlify.app/merci.html?from=${slug}`;
-
-    let coverUrl = null;
-    let videoUrl = null;
-    let logoUrl = null;
-
-    try {
-      if (imageFile) coverUrl = await uploadCoverImage(imageFile, slug);
-      if (videoFile) videoUrl = await uploadCustomVideo(videoFile, slug);
-      if (logoFile) logoUrl = await uploadLogo(logoFile, slug);
-
-      const pages = [];
-      if (type === "complet") {
-        for (let i = 1; i <= pageCount; i++) {
-          const titleEl = form.querySelector(`[name='page-title-${i}']`);
-          if (!titleEl) continue;
-          const title = titleEl.value;
-          const description = form.querySelector(`[name='page-desc-${i}']`).value;
-          const url = form.querySelector(`[name='page-url-${i}']`).value;
-          const price = form.querySelector(`[name='page-price-${i}']`).value;
-
-          const imageFile = form.querySelector(`[name='page-img-${i}']`).files[0];
-          let imageUrl = null;
-          if (imageFile) {
-            imageUrl = await uploadCoverImage(imageFile, `${slug}-page${i}`);
-          }
-
-          pages.push({ title, description, url, price, image: imageUrl });
-        }
-      }
-
-      const tunnelData = {
-        userId: user.uid,
-        name,
-        goal,
-        type,
-        sector,
-        desc,
-        cta,
-        payment,
-        redirectURL,
-        mainColor,
-        logoUrl,
-        price,
-        customDomain,
-        coverUrl,
-        videoUrl,
-        pages,
-        relanceCible,
-        tunnelTargetId,
-        clientTargetEmail,
-        createdAt: new Date()
-      };
-
-      const docRef = await addDoc(collection(db, "tunnels"), tunnelData);
-
-      await fetch(makeWebhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...tunnelData, email: user.email })
-      });
-
-      alert("✅ Tunnel enregistré et génération en cours !");
-      form.reset();
-      customDomainField.style.display = "none";
-      tunnelPages.innerHTML = "";
-      tunnelPagesSection.style.display = "none";
-      emailTargetingField.style.display = "none";
-      pageCount = 0;
-    } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde du tunnel :", err);
-      alert("❌ Une erreur s'est produite pendant la création du tunnel.");
-    }
   });
 }
