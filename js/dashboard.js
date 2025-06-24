@@ -1,4 +1,4 @@
-// ✅ FICHIER dashboard.js – Affiche uniquement le conteneur du formulaire
+// ✅ FICHIER dashboard.js – Affiche le bloc formulaire au clic sur "Créer un tunnel"
 
 const createBtn = document.getElementById("create-tunnel");
 const formContainer = document.getElementById("create-tunnel-form");
@@ -8,6 +8,6 @@ if (createBtn && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
     formContainer.style.display = "block";
     dashboardContent.innerHTML = "";
-    console.log("🪩 Conteneur du formulaire affiché (le choix de type se fait ensuite)");
+    console.log("✅ Formulaire principal affiché !");
   });
 }
