@@ -1,4 +1,4 @@
-// ✅ VERSION DASHBOARD AVEC BOUTON + AFFICHAGE FORMULAIRE + ROUTAGE TYPE
+// ✅ VERSION DASHBOARD AVEC BOUTON FONCTIONNEL + FORMULAIRE UNIFIÉ + ROUTAGE TYPE
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -9,18 +9,17 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const createBtn = document.getElementById("create-tunnel");
-const formContainer = document.getElementById("create-tunnel-form");
+const form = document.getElementById("tunnel-form");
 const dashboardContent = document.getElementById("dashboard-content");
 
-if (createBtn && formContainer && dashboardContent) {
+if (createBtn && form && dashboardContent) {
   createBtn.addEventListener("click", () => {
-    formContainer.style.display = "block";
+    form.style.display = "block";
     dashboardContent.innerHTML = "";
     console.log("🪩 Formulaire affiché");
   });
 }
 
-const form = document.getElementById("tunnel-form");
 const typeField = document.getElementById("tunnel-type");
 const dynamicFieldsContainer = document.getElementById("form-content-fields");
 const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
