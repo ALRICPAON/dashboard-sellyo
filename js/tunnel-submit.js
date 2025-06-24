@@ -1,136 +1,122 @@
-// ✅ tunnel-submit.js mis à jour avec choix du type de contenu
-
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const makeWebhookURL = {
-  complet: "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp",
-  landing: "https://hook.eu2.make.com/YOUR_LANDING_WEBHOOK",
-  email: "https://hook.eu2.make.com/YOUR_EMAIL_WEBHOOK",
-  video: "https://hook.eu2.make.com/YOUR_VIDEO_WEBHOOK",
-};
+const form = document.getElementById("tunnel-form");
+const typeField = document.getElementById("tunnel-type");
+const dynamicFieldsContainer = document.getElementById("form-content-fields");
+const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
-const createBtn = document.getElementById("create-tunnel");
-const formContainer = document.getElementById("create-tunnel-form");
-const formFull = document.getElementById("form-tunnel-complet");
-const dashboardContent = document.getElementById("dashboard-content");
+if (form && typeField && dynamicFieldsContainer) {
+  typeField.addEventListener("change", () => {
+    const selected = typeField.value;
+    dynamicFieldsContainer.innerHTML = "";
 
-if (createBtn && formContainer && dashboardContent) {
-  createBtn.addEventListener("click", () => {
-    formContainer.style.display = "block";
-    dashboardContent.innerHTML = "";
-    console.log("📄 Formulaire affiché");
-  });
-}
+    if (selected === "landing" || selected === "video") {
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom du contenu *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
 
-document.body.style.backgroundColor = "#111";
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
 
-const tunnelType = document.getElementById("tunnel-type");
-const emailTargetingField = document.getElementById("email-targeting-field");
-const tunnelSelect = document.getElementById("tunnel-select");
-const clientEmailInput = document.getElementById("client-email");
+        <label>Secteur</label><br>
+        <input type="text" id="sector"><br><br>
 
-if (tunnelType) {
-  tunnelType.addEventListener("change", async () => {
-    const value = tunnelType.value;
-    const isFull = value === "complet";
-    const isEmail = value === "email";
+        <label>Prix global</label><br>
+        <input type="number" id="general-price"><br><br>
 
-    document.getElementById("tunnel-form").style.display = isFull ? "none" : "block";
-    document.getElementById("form-tunnel-complet").style.display = isFull ? "block" : "none";
-    emailTargetingField.style.display = isEmail ? "block" : "none";
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
 
-    if (isEmail && auth.currentUser) {
-      const q = query(collection(db, "tunnels"), where("userId", "==", auth.currentUser.uid));
-      const querySnapshot = await getDocs(q);
-      tunnelSelect.innerHTML = "";
-      querySnapshot.forEach(doc => {
-        const option = document.createElement("option");
-        option.value = doc.id;
-        option.textContent = doc.data().name;
-        tunnelSelect.appendChild(option);
-      });
+        <label>Image de couverture</label><br>
+        <input type="file" id="cover-image" accept="image/*"><br><br>
+
+        <label>Vidéo</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
+
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
+
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
+
+        <label>URL du bouton de paiement</label><br>
+        <input type="url" id="payment-url"><br><br>
+      `;
+    } else if (selected === "email") {
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom de la campagne *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
+
+        <label>Message de relance *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
+
+        <label>URL bouton</label><br>
+        <input type="url" id="payment-url"><br><br>
+      `;
     }
   });
-}
 
-// Gestion tunnel complet
-let pageCount = 0;
-const maxPages = 8;
-const addPageFull = document.getElementById("add-page-full");
-const tunnelPagesFull = document.getElementById("tunnel-pages-complet");
-const submitFullTunnel = document.getElementById("submit-full-tunnel");
-
-if (addPageFull && tunnelPagesFull) {
-  addPageFull.addEventListener("click", () => {
-    if (pageCount >= maxPages) return;
-    pageCount++;
-    const pageDiv = document.createElement("div");
-    pageDiv.style.marginBottom = "20px";
-    pageDiv.innerHTML = `
-      <h4>Page ${pageCount}</h4>
-      <label>Titre *</label><br>
-      <input type="text" name="page-title-${pageCount}" required><br><br>
-      <label>Description *</label><br>
-      <textarea name="page-desc-${pageCount}" required></textarea><br><br>
-      <label>Image</label><br>
-      <input type="file" name="page-img-${pageCount}" accept="image/*"><br><br>
-      <label>URL produit</label><br>
-      <input type="url" name="page-url-${pageCount}"><br><br>
-      <label>Prix (€)</label><br>
-      <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
-    `;
-    tunnelPagesFull.appendChild(pageDiv);
-  });
-}
-
-if (submitFullTunnel) {
-  submitFullTunnel.addEventListener("click", async () => {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
     const user = auth.currentUser;
-    if (!user) return alert("Utilisateur non connecté");
+    if (!user) return alert("Non connecté");
 
-    const pages = [];
-    const form = document.getElementById("form-tunnel-complet");
-    for (let i = 1; i <= pageCount; i++) {
-      const title = form.querySelector(`[name='page-title-${i}']`)?.value || "";
-      const description = form.querySelector(`[name='page-desc-${i}']`)?.value || "";
-      const url = form.querySelector(`[name='page-url-${i}']`)?.value || "";
-      const price = form.querySelector(`[name='page-price-${i}']`)?.value || "";
-      const imageFile = form.querySelector(`[name='page-img-${i}']`)?.files[0];
-      let imageUrl = null;
-      if (imageFile) {
-        imageUrl = await uploadCoverImage(imageFile, `full-page-${i}`);
-      }
-      pages.push({ title, description, url, price, image: imageUrl });
-    }
+    const type = typeField.value;
+    if (!type) return alert("Sélectionnez un type de contenu");
 
-    const dataToSend = {
+    const name = document.getElementById("tunnel-name")?.value || "";
+    const goal = document.getElementById("tunnel-goal")?.value || "";
+    const sector = document.getElementById("sector")?.value || "";
+    const desc = document.getElementById("tunnel-desc")?.value || "";
+    const cta = document.getElementById("cta-text")?.value || "";
+    const price = document.getElementById("general-price")?.value || "";
+    const payment = document.getElementById("payment-url")?.value || "";
+    const mainColor = document.getElementById("mainColor")?.value || "#00ccff";
+    const backgroundColor = document.getElementById("backgroundColor")?.value || "#111";
+
+    const logoFile = document.getElementById("logo")?.files[0];
+    const coverFile = document.getElementById("cover-image")?.files[0];
+    const videoFile = document.getElementById("custom-video")?.files[0];
+
+    const logoUrl = logoFile ? await uploadLogo(logoFile) : null;
+    const coverUrl = coverFile ? await uploadCoverImage(coverFile) : null;
+    const videoUrl = videoFile ? await uploadCustomVideo(videoFile) : null;
+
+    const payload = {
       userId: user.uid,
-      name: "Tunnel complet personnalisé",
-      type: "complet",
-      pages,
-      email: user.email,
-      createdAt: new Date()
+      name,
+      goal,
+      sector,
+      desc,
+      cta,
+      payment,
+      type,
+      price,
+      mainColor,
+      backgroundColor,
+      logoUrl,
+      coverUrl,
+      videoUrl,
+      createdAt: new Date().toISOString()
     };
 
     try {
-      await fetch(makeWebhookURL.complet, {
+      await fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend)
+        body: JSON.stringify(payload)
       });
-      alert("✅ Tunnel complet envoyé à Make !");
-      tunnelPagesFull.innerHTML = "";
-      form.style.display = "none";
-      pageCount = 0;
+      alert("✅ Contenu envoyé à Make");
+      form.reset();
     } catch (err) {
-      console.error("❌ Erreur lors de l'envoi :", err);
-      alert("Erreur lors de la génération du tunnel complet.");
+      console.error("❌ Erreur d'envoi:", err);
+      alert("Erreur lors de l'envoi du contenu.");
     }
   });
 }
