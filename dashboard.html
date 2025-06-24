@@ -30,20 +30,8 @@
 
     <!-- Formulaire principal -->
     <div id="create-tunnel-form" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
-      <h2>Créer un nouveau tunnel</h2>
+      <h2>Créer un contenu</h2>
       <form id="tunnel-form">
-        <label for="lang-switch-form">Langue du formulaire</label><br>
-        <select id="lang-switch-form">
-          <option value="fr">FR</option>
-          <option value="en">EN</option>
-        </select><br><br>
-
-        <label>Nom du tunnel *</label><br>
-        <input type="text" id="tunnel-name" required><br><br>
-
-        <label>Objectif du tunnel *</label><br>
-        <input type="text" id="tunnel-goal"><br><br>
-
         <label>Type de contenu *</label><br>
         <select id="tunnel-type" required>
           <option value="" disabled selected>Choisir...</option>
@@ -52,6 +40,18 @@
           <option value="email">Email de relance</option>
           <option value="video">Script vidéo</option>
         </select><br><br>
+
+        <label for="lang-switch-form">Langue du formulaire</label><br>
+        <select id="lang-switch-form">
+          <option value="fr">FR</option>
+          <option value="en">EN</option>
+        </select><br><br>
+
+        <label>Nom du contenu *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
+
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
 
         <div id="email-targeting-field" style="display: none;">
           <label>À qui s'adresse cette relance ?</label><br>
@@ -86,7 +86,7 @@
         <label>Vidéo à intégrer</label><br>
         <input type="file" id="custom-video" accept="video/*"><br><br>
 
-        <label>Description de l’offre *</label><br>
+        <label>Description *</label><br>
         <textarea id="tunnel-desc" required></textarea><br><br>
 
         <label>Texte du bouton *</label><br>
@@ -103,7 +103,7 @@
           <input type="text" id="custom-domain"><br><br>
         </div>
 
-        <button type="submit">Générer le tunnel</button>
+        <button type="submit">Générer</button>
       </form>
     </div>
 
@@ -129,8 +129,8 @@
       <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
       <button type="button" id="submit-full-tunnel">Générer le tunnel complet</button>
     </div>
-
   </main>
+
   <script type="module" src="js/tunnel-submit.js"></script>
 </body>
 </html>
