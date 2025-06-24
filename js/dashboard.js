@@ -8,208 +8,137 @@ import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const makeWebhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+const form = document.getElementById("tunnel-form");
+const typeField = document.getElementById("tunnel-type");
+const dynamicFieldsContainer = document.getElementById("form-content-fields");
+const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
-const createBtn = document.getElementById("create-tunnel");
-const formContainer = document.getElementById("create-tunnel-form");
-const dashboardContent = document.getElementById("dashboard-content");
+if (form && typeField && dynamicFieldsContainer) {
+  typeField.addEventListener("change", async () => {
+    const selected = typeField.value;
+    dynamicFieldsContainer.innerHTML = "";
 
-if (createBtn && formContainer && dashboardContent) {
-  createBtn.addEventListener("click", () => {
-    formContainer.style.display = "block";
-    dashboardContent.innerHTML = "";
-    console.log("🪩 Formulaire affiché");
-  });
-}
+    if (selected === "landing" || selected === "video") {
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom du contenu *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
 
-document.body.style.backgroundColor = "#111"; // Fond général en noir
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
 
-const customDomainCheckbox = document.getElementById("use-custom-domain");
-const customDomainField = document.getElementById("custom-domain-field");
-if (customDomainCheckbox && customDomainField) {
-  customDomainCheckbox.addEventListener("change", () => {
-    customDomainField.style.display = customDomainCheckbox.checked ? "block" : "none";
-  });
-}
+        <label>Secteur</label><br>
+        <input type="text" id="sector"><br><br>
 
-const customRedirectCheckbox = document.getElementById("custom-redirect-checkbox");
-const customRedirectField = document.getElementById("custom-redirect-field");
-const redirectURLInput = document.getElementById("redirectURL");
+        <label>Prix global</label><br>
+        <input type="number" id="general-price"><br><br>
 
-if (customRedirectCheckbox && customRedirectField && redirectURLInput) {
-  customRedirectCheckbox.addEventListener("change", () => {
-    customRedirectField.style.display = customRedirectCheckbox.checked ? "block" : "none";
-  });
-}
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
 
-const tunnelType = document.getElementById("tunnel-type");
-const generalPrice = document.getElementById("general-price");
-const tunnelPagesSection = document.getElementById("tunnel-pages-section");
-const tunnelPages = document.getElementById("tunnel-pages");
-const addPageBtn = document.getElementById("add-page");
-const emailTargetingField = document.getElementById("email-targeting-field");
-const tunnelSelectContainer = document.getElementById("tunnel-select-container");
-const tunnelSelect = document.getElementById("tunnel-select");
+        <label>Image de couverture</label><br>
+        <input type="file" id="cover-image" accept="image/*"><br><br>
 
-let pageCount = 0;
-const maxPages = 8;
+        <label>Vidéo</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
 
-if (tunnelType && generalPrice && tunnelPagesSection && addPageBtn && tunnelPages) {
-  tunnelType.addEventListener("change", async () => {
-    const value = tunnelType.value;
-    const isFull = value === "complet";
-    const isEmail = value === "email";
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
 
-    generalPrice.disabled = isFull;
-    tunnelPagesSection.style.display = isFull ? "block" : "none";
-    emailTargetingField.style.display = isEmail ? "block" : "none";
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
 
-    if (isEmail && auth.currentUser) {
-      const q = query(collection(db, "tunnels"), where("userId", "==", auth.currentUser.uid));
-      const querySnapshot = await getDocs(q);
-      tunnelSelect.innerHTML = "";
-      querySnapshot.forEach(doc => {
-        const option = document.createElement("option");
-        option.value = doc.id;
-        option.textContent = doc.data().name;
-        tunnelSelect.appendChild(option);
-      });
+        <label>URL du bouton de paiement</label><br>
+        <input type="url" id="payment-url"><br><br>
+      `;
+    } else if (selected === "email") {
+      const tunnelSelect = document.createElement("select");
+      tunnelSelect.id = "tunnel-select";
+      tunnelSelect.required = true;
+
+      if (auth.currentUser) {
+        const q = query(collection(db, "tunnels"), where("userId", "==", auth.currentUser.uid));
+        const snapshot = await getDocs(q);
+        snapshot.forEach(doc => {
+          const opt = document.createElement("option");
+          opt.value = doc.id;
+          opt.textContent = doc.data().name;
+          tunnelSelect.appendChild(opt);
+        });
+      }
+
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom de la campagne *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
+
+        <label>Message de relance *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
+
+        <label>URL bouton</label><br>
+        <input type="url" id="payment-url"><br><br>
+
+        <label>Cibler un tunnel :</label><br>
+      `;
+      dynamicFieldsContainer.appendChild(tunnelSelect);
     }
   });
-
-  addPageBtn.addEventListener("click", () => {
-    if (pageCount >= maxPages) return;
-    pageCount++;
-
-    const pageDiv = document.createElement("div");
-    pageDiv.style.marginBottom = "20px";
-    pageDiv.innerHTML = `
-      <h4>Page ${pageCount}</h4>
-      <label>Titre *</label><br>
-      <input type="text" name="page-title-${pageCount}" required><br><br>
-      <label>Description *</label><br>
-      <textarea name="page-desc-${pageCount}" required></textarea><br><br>
-      <label>Image</label><br>
-      <input type="file" name="page-img-${pageCount}" accept="image/*"><br><br>
-      <label>URL produit</label><br>
-      <input type="url" name="page-url-${pageCount}"><br><br>
-      <label>Prix (€)</label><br>
-      <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
-    `;
-    tunnelPages.appendChild(pageDiv);
-  });
-}
-
-const form = document.getElementById("tunnel-form");
-if (form) {
-  form.style.backgroundColor = "#2e2e2e"; // Formulaire en gris foncé
-  form.style.padding = "2rem";
-  form.style.borderRadius = "10px";
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log("🚀 Soumission du formulaire détectée");
-
     const user = auth.currentUser;
-    if (!user) {
-      alert("Utilisateur non connecté");
-      console.warn("❌ Utilisateur non connecté");
-      return;
-    }
+    if (!user) return alert("Non connecté");
 
-    const name = document.getElementById("tunnel-name").value;
-    const goal = document.getElementById("tunnel-goal").value;
-    const type = tunnelType.value;
-    const sector = document.getElementById("sector").value;
-    const desc = document.getElementById("tunnel-desc").value;
-    const cta = document.getElementById("cta-text").value;
-    const payment = document.getElementById("payment-url").value;
-    const mainColor = document.getElementById("mainColor").value;
-    const logoFile = document.getElementById("logo").files[0];
-    const price = generalPrice.value;
-    const wantsCustomDomain = customDomainCheckbox.checked;
-    const customDomain = wantsCustomDomain ? document.getElementById("custom-domain").value : null;
+    const type = typeField.value;
+    if (!type) return alert("Sélectionnez un type de contenu");
 
-    const relanceCible = document.querySelector("input[name='email-target']:checked")?.value || null;
-    const tunnelTargetId = tunnelSelect.value || null;
+    const name = document.getElementById("tunnel-name")?.value || "";
+    const goal = document.getElementById("tunnel-goal")?.value || "";
+    const sector = document.getElementById("sector")?.value || "";
+    const desc = document.getElementById("tunnel-desc")?.value || "";
+    const cta = document.getElementById("cta-text")?.value || "";
+    const price = document.getElementById("general-price")?.value || "";
+    const payment = document.getElementById("payment-url")?.value || "";
+    const mainColor = document.getElementById("mainColor")?.value || "#00ccff";
+    const backgroundColor = document.getElementById("backgroundColor")?.value || "#111";
+    const tunnelTargetId = document.getElementById("tunnel-select")?.value || null;
 
-    const slug = name.toLowerCase().replaceAll(" ", "-");
-    const imageFile = document.getElementById("cover-image").files[0];
-    const videoFile = document.getElementById("custom-video").files[0];
+    const logoFile = document.getElementById("logo")?.files[0];
+    const coverFile = document.getElementById("cover-image")?.files[0];
+    const videoFile = document.getElementById("custom-video")?.files[0];
 
-    const redirectURL = customRedirectCheckbox.checked && redirectURLInput.value
-      ? redirectURLInput.value
-      : `https://sellyo-app.netlify.app/merci.html?from=${slug}`;
+    const logoUrl = logoFile ? await uploadLogo(logoFile) : null;
+    const coverUrl = coverFile ? await uploadCoverImage(coverFile) : null;
+    const videoUrl = videoFile ? await uploadCustomVideo(videoFile) : null;
 
-    let coverUrl = null;
-    let videoUrl = null;
-    let logoUrl = null;
+    const payload = {
+      userId: user.uid,
+      name,
+      goal,
+      sector,
+      desc,
+      cta,
+      payment,
+      type,
+      price,
+      mainColor,
+      backgroundColor,
+      logoUrl,
+      coverUrl,
+      videoUrl,
+      tunnelTargetId,
+      createdAt: new Date().toISOString()
+    };
 
     try {
-      if (imageFile) {
-        coverUrl = await uploadCoverImage(imageFile, slug);
-      }
-      if (videoFile) {
-        videoUrl = await uploadCustomVideo(videoFile, slug);
-      }
-      if (logoFile) {
-        logoUrl = await uploadLogo(logoFile, slug);
-      }
-
-      const pages = [];
-      if (type === "complet") {
-        for (let i = 1; i <= pageCount; i++) {
-          const titleEl = form.querySelector(`[name='page-title-${i}']`);
-          if (!titleEl) continue;
-          const title = titleEl.value;
-          const description = form.querySelector(`[name='page-desc-${i}']`).value;
-          const url = form.querySelector(`[name='page-url-${i}']`).value;
-          const price = form.querySelector(`[name='page-price-${i}']`).value;
-          pages.push({ title, description, url, price });
-        }
-      }
-
-      const tunnelData = {
-        userId: user.uid,
-        name,
-        goal,
-        type,
-        sector,
-        desc,
-        cta,
-        payment,
-        redirectURL,
-        mainColor,
-        logoUrl,
-        price,
-        customDomain,
-        coverUrl,
-        videoUrl,
-        pages,
-        relanceCible,
-        tunnelTargetId,
-        createdAt: new Date()
-      };
-
-      const docRef = await addDoc(collection(db, "tunnels"), tunnelData);
-
-      await fetch(makeWebhookURL, {
+      await fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...tunnelData, email: user.email })
+        body: JSON.stringify(payload)
       });
-
-      alert("✅ Tunnel enregistré et génération en cours !");
+      alert("✅ Contenu envoyé à Make");
       form.reset();
-      customDomainField.style.display = "none";
-      tunnelPages.innerHTML = "";
-      tunnelPagesSection.style.display = "none";
-      emailTargetingField.style.display = "none";
-      customRedirectField.style.display = "none";
-      pageCount = 0;
     } catch (err) {
-      console.error("❌ Erreur lors de la sauvegarde du tunnel :", err);
-      alert("❌ Une erreur s'est produite pendant la création du tunnel.");
+      console.error("❌ Erreur d'envoi:", err);
+      alert("Erreur lors de l'envoi du contenu.");
     }
   });
 }
