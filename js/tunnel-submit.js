@@ -1,18 +1,33 @@
+// ✅ VERSION DASHBOARD AVEC BOUTON FONCTIONNEL + FORMULAIRE UNIFIÉ + ROUTAGE TYPE + CORRECTION AFFICHAGE
+
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const createBtn = document.getElementById("create-tunnel");
+const formContainer = document.getElementById("create-tunnel-form");
 const form = document.getElementById("tunnel-form");
+const dashboardContent = document.getElementById("dashboard-content");
+
+if (createBtn && form && formContainer && dashboardContent) {
+  createBtn.addEventListener("click", () => {
+    formContainer.style.display = "block";
+    form.style.display = "block";
+    dashboardContent.innerHTML = "";
+    console.log("🪩 Formulaire affiché");
+  });
+}
+
 const typeField = document.getElementById("tunnel-type");
 const dynamicFieldsContainer = document.getElementById("form-content-fields");
 const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
 if (form && typeField && dynamicFieldsContainer) {
-  typeField.addEventListener("change", () => {
+  typeField.addEventListener("change", async () => {
     const selected = typeField.value;
     dynamicFieldsContainer.innerHTML = "";
 
@@ -49,6 +64,21 @@ if (form && typeField && dynamicFieldsContainer) {
         <input type="url" id="payment-url"><br><br>
       `;
     } else if (selected === "email") {
+      const tunnelSelect = document.createElement("select");
+      tunnelSelect.id = "tunnel-select";
+      tunnelSelect.required = true;
+
+      if (auth.currentUser) {
+        const q = query(collection(db, "tunnels"), where("userId", "==", auth.currentUser.uid));
+        const snapshot = await getDocs(q);
+        snapshot.forEach(doc => {
+          const opt = document.createElement("option");
+          opt.value = doc.id;
+          opt.textContent = doc.data().name;
+          tunnelSelect.appendChild(opt);
+        });
+      }
+
       dynamicFieldsContainer.innerHTML = `
         <label>Nom de la campagne *</label><br>
         <input type="text" id="tunnel-name" required><br><br>
@@ -58,7 +88,10 @@ if (form && typeField && dynamicFieldsContainer) {
 
         <label>URL bouton</label><br>
         <input type="url" id="payment-url"><br><br>
+
+        <label>Cibler un tunnel :</label><br>
       `;
+      dynamicFieldsContainer.appendChild(tunnelSelect);
     }
   });
 
@@ -79,6 +112,7 @@ if (form && typeField && dynamicFieldsContainer) {
     const payment = document.getElementById("payment-url")?.value || "";
     const mainColor = document.getElementById("mainColor")?.value || "#00ccff";
     const backgroundColor = document.getElementById("backgroundColor")?.value || "#111";
+    const tunnelTargetId = document.getElementById("tunnel-select")?.value || null;
 
     const logoFile = document.getElementById("logo")?.files[0];
     const coverFile = document.getElementById("cover-image")?.files[0];
@@ -103,6 +137,7 @@ if (form && typeField && dynamicFieldsContainer) {
       logoUrl,
       coverUrl,
       videoUrl,
+      tunnelTargetId,
       createdAt: new Date().toISOString()
     };
 
