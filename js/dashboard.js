@@ -1,4 +1,4 @@
-// ✅ VERSION COMPLÈTE avec base fonctionnelle + Make + Logs + Mail targeting + UI tweaks
+// ✅ VERSION DASHBOARD AVEC BOUTON + AFFICHAGE FORMULAIRE + ROUTAGE TYPE
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -7,6 +7,18 @@ import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.
 
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+const createBtn = document.getElementById("create-tunnel");
+const formContainer = document.getElementById("create-tunnel-form");
+const dashboardContent = document.getElementById("dashboard-content");
+
+if (createBtn && formContainer && dashboardContent) {
+  createBtn.addEventListener("click", () => {
+    formContainer.style.display = "block";
+    dashboardContent.innerHTML = "";
+    console.log("🪩 Formulaire affiché");
+  });
+}
 
 const form = document.getElementById("tunnel-form");
 const typeField = document.getElementById("tunnel-type");
