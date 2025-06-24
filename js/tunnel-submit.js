@@ -1,4 +1,4 @@
-// ✅ VERSION COMPLÈTE avec séparation du formulaire "tunnel complet" et les autres options (landing, email, script)
+// ✅ tunnel-submit.js mis à jour avec choix du type de contenu
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -8,7 +8,12 @@ import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const makeWebhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+const makeWebhookURL = {
+  complet: "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp",
+  landing: "https://hook.eu2.make.com/YOUR_LANDING_WEBHOOK",
+  email: "https://hook.eu2.make.com/YOUR_EMAIL_WEBHOOK",
+  video: "https://hook.eu2.make.com/YOUR_VIDEO_WEBHOOK",
+};
 
 const createBtn = document.getElementById("create-tunnel");
 const formContainer = document.getElementById("create-tunnel-form");
@@ -54,7 +59,7 @@ if (tunnelType) {
   });
 }
 
-// Tunnel complet (formFull)
+// Gestion tunnel complet
 let pageCount = 0;
 const maxPages = 8;
 const addPageFull = document.getElementById("add-page-full");
@@ -65,7 +70,6 @@ if (addPageFull && tunnelPagesFull) {
   addPageFull.addEventListener("click", () => {
     if (pageCount >= maxPages) return;
     pageCount++;
-
     const pageDiv = document.createElement("div");
     pageDiv.style.marginBottom = "20px";
     pageDiv.innerHTML = `
@@ -88,10 +92,7 @@ if (addPageFull && tunnelPagesFull) {
 if (submitFullTunnel) {
   submitFullTunnel.addEventListener("click", async () => {
     const user = auth.currentUser;
-    if (!user) {
-      alert("Utilisateur non connecté");
-      return;
-    }
+    if (!user) return alert("Utilisateur non connecté");
 
     const pages = [];
     const form = document.getElementById("form-tunnel-complet");
@@ -100,13 +101,11 @@ if (submitFullTunnel) {
       const description = form.querySelector(`[name='page-desc-${i}']`)?.value || "";
       const url = form.querySelector(`[name='page-url-${i}']`)?.value || "";
       const price = form.querySelector(`[name='page-price-${i}']`)?.value || "";
-
       const imageFile = form.querySelector(`[name='page-img-${i}']`)?.files[0];
       let imageUrl = null;
       if (imageFile) {
         imageUrl = await uploadCoverImage(imageFile, `full-page-${i}`);
       }
-
       pages.push({ title, description, url, price, image: imageUrl });
     }
 
@@ -120,12 +119,11 @@ if (submitFullTunnel) {
     };
 
     try {
-      await fetch(makeWebhookURL, {
+      await fetch(makeWebhookURL.complet, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dataToSend)
       });
-
       alert("✅ Tunnel complet envoyé à Make !");
       tunnelPagesFull.innerHTML = "";
       form.style.display = "none";
