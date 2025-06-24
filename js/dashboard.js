@@ -1,4 +1,4 @@
-// ✅ VERSION DASHBOARD AVEC BOUTON FONCTIONNEL + FORMULAIRE UNIFIÉ + ROUTAGE TYPE
+// ✅ VERSION DASHBOARD AVEC BOUTON FONCTIONNEL + FORMULAIRE UNIFIÉ + ROUTAGE TYPE + CORRECTION AFFICHAGE + SUPPORT TUNNEL COMPLET
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -9,11 +9,13 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const createBtn = document.getElementById("create-tunnel");
+const formContainer = document.getElementById("create-tunnel-form");
 const form = document.getElementById("tunnel-form");
 const dashboardContent = document.getElementById("dashboard-content");
 
-if (createBtn && form && dashboardContent) {
+if (createBtn && form && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
+    formContainer.style.display = "block";
     form.style.display = "block";
     dashboardContent.innerHTML = "";
     console.log("🪩 Formulaire affiché");
@@ -90,6 +92,66 @@ if (form && typeField && dynamicFieldsContainer) {
         <label>Cibler un tunnel :</label><br>
       `;
       dynamicFieldsContainer.appendChild(tunnelSelect);
+    } else if (selected === "complet") {
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom du tunnel *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
+
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
+
+        <label>Secteur</label><br>
+        <input type="text" id="sector"><br><br>
+
+        <label>Description globale *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
+
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
+
+        <label>URL du bouton de paiement</label><br>
+        <input type="url" id="payment-url"><br><br>
+
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
+
+        <label>Image de couverture</label><br>
+        <input type="file" id="cover-image" accept="image/*"><br><br>
+
+        <label>Vidéo</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
+
+        <div id="tunnel-pages-complet" style="margin-top: 2rem;"></div>
+        <button type="button" id="add-page-full">+ Ajouter une page</button>
+      `;
+
+      const pageContainer = document.getElementById("tunnel-pages-complet");
+      const addPageBtn = document.getElementById("add-page-full");
+
+      let pageCount = 0;
+      const maxPages = 8;
+
+      addPageBtn.addEventListener("click", () => {
+        if (pageCount >= maxPages) return;
+        pageCount++;
+
+        const pageDiv = document.createElement("div");
+        pageDiv.style.marginBottom = "20px";
+        pageDiv.innerHTML = `
+          <h4>Page ${pageCount}</h4>
+          <label>Titre *</label><br>
+          <input type="text" name="page-title-${pageCount}" required><br><br>
+          <label>Description *</label><br>
+          <textarea name="page-desc-${pageCount}" required></textarea><br><br>
+          <label>Image</label><br>
+          <input type="file" name="page-img-${pageCount}" accept="image/*"><br><br>
+          <label>URL produit</label><br>
+          <input type="url" name="page-url-${pageCount}"><br><br>
+          <label>Prix (€)</label><br>
+          <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
+        `;
+        pageContainer.appendChild(pageDiv);
+      });
     }
   });
 
@@ -138,6 +200,22 @@ if (form && typeField && dynamicFieldsContainer) {
       tunnelTargetId,
       createdAt: new Date().toISOString()
     };
+
+    if (type === "complet") {
+      const pages = [];
+      for (let i = 1; i <= 8; i++) {
+        const titleEl = form.querySelector(`[name='page-title-${i}']`);
+        if (!titleEl) continue;
+        pages.push({
+          title: titleEl.value,
+          description: form.querySelector(`[name='page-desc-${i}']`)?.value || "",
+          image: null,
+          url: form.querySelector(`[name='page-url-${i}']`)?.value || "",
+          price: form.querySelector(`[name='page-price-${i}']`)?.value || ""
+        });
+      }
+      payload.pages = pages;
+    }
 
     try {
       await fetch(webhookURL, {
