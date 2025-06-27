@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js — Gère les soumissions du formulaire unifié
+// ✅ tunnel-submit.js — version complète mise à jour
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -115,8 +115,14 @@ if (form && typeField && dynamicFieldsContainer) {
             <textarea name="page-desc-${pageCount}" required></textarea><br><br>
             <label>URL produit</label><br>
             <input type="url" name="page-url-${pageCount}"><br><br>
+            <label>Lien de paiement</label><br>
+            <input type="url" name="page-payment-${pageCount}"><br><br>
             <label>Prix (€)</label><br>
             <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
+            <label>Image</label><br>
+            <input type="file" name="page-image-${pageCount}" accept="image/*"><br><br>
+            <label>Vidéo</label><br>
+            <input type="file" name="page-video-${pageCount}" accept="video/*"><br><br>
           `;
           tunnelPages.appendChild(page);
         });
@@ -170,14 +176,24 @@ if (form && typeField && dynamicFieldsContainer) {
 
     if (type === "complet") {
       const pages = [];
+
       for (let i = 1; i <= 8; i++) {
         const title = document.querySelector(`[name='page-title-${i}']`)?.value;
         if (!title) continue;
         const description = document.querySelector(`[name='page-desc-${i}']`)?.value || "";
         const url = document.querySelector(`[name='page-url-${i}']`)?.value || "";
+        const paymentUrl = document.querySelector(`[name='page-payment-${i}']`)?.value || "";
         const price = document.querySelector(`[name='page-price-${i}']`)?.value || "";
-        pages.push({ title, description, url, price });
+
+        const imageFile = document.querySelector(`[name='page-image-${i}']`)?.files?.[0];
+        const videoFile = document.querySelector(`[name='page-video-${i}']`)?.files?.[0];
+
+        const imageUrl = imageFile ? await uploadCoverImage(imageFile) : null;
+        const videoUrl = videoFile ? await uploadCustomVideo(videoFile) : null;
+
+        pages.push({ title, description, url, price, paymentUrl, imageUrl, videoUrl });
       }
+
       payload.pages = pages;
     }
 
@@ -189,6 +205,7 @@ if (form && typeField && dynamicFieldsContainer) {
       });
       alert("✅ Contenu envoyé à Make");
       form.reset();
+      document.getElementById("tunnel-pages-complet").innerHTML = "";
     } catch (err) {
       console.error("❌ Erreur d'envoi:", err);
       alert("Erreur lors de l'envoi du contenu.");
