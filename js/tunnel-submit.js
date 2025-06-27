@@ -150,7 +150,10 @@ if (form && typeField && dynamicFieldsContainer) {
     const folder = folderInput?.value?.trim();
 if (!folder) return alert("Nom public obligatoire");
     let slug = slugInput?.value || "";
-    slug = slug.replace(/\.html$/i, "").trim();
+   slug = slug.replace(/\.html$/i, "").trim();
+const uniqueId = Date.now().toString().slice(-5); // génère un ID court
+slug += "-" + uniqueId + ".html";
+
 
     const name = document.getElementById("tunnel-name")?.value || "";
     const goal = document.getElementById("tunnel-goal")?.value || "";
