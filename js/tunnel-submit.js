@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js — version corrigée avec suppression des doublons de folderName/slug
+// ✅ tunnel-submit.js — version corrigée avec suppression des doublons de folderName/slug + validation slug
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -12,6 +12,22 @@ const form = document.getElementById("tunnel-form");
 const typeField = document.getElementById("tunnel-type");
 const dynamicFieldsContainer = document.getElementById("form-content-fields");
 const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+
+// Empêcher les caractères non valides dans folderName et slug
+const folderInput = document.getElementById("folderName");
+const slugInput = document.getElementById("slug");
+
+if (folderInput) {
+  folderInput.addEventListener("input", (e) => {
+    folderInput.value = folderInput.value.replace(/[^a-zA-Z0-9\-]/g, "");
+  });
+}
+
+if (slugInput) {
+  slugInput.addEventListener("input", (e) => {
+    slugInput.value = slugInput.value.replace(/[^a-zA-Z0-9\-\.]/g, "");
+  });
+}
 
 if (form && typeField && dynamicFieldsContainer) {
   typeField.addEventListener("change", () => {
