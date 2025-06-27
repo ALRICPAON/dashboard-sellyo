@@ -147,7 +147,8 @@ if (form && typeField && dynamicFieldsContainer) {
     const type = typeField.value;
     if (!type) return alert("Sélectionnez un type de contenu");
 
-    const folder = folderInput?.value || "";
+    const folder = folderInput?.value?.trim();
+if (!folder) return alert("Nom public obligatoire");
     let slug = slugInput?.value || "";
     slug = slug.replace(/\.html$/i, "").trim();
 
