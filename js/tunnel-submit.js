@@ -1,8 +1,8 @@
-// ✅ tunnel-submit.js — version finale avec slug propre, ajout .html, validation, et envoi Make
+// ✅ tunnel-submit.js — version finale avec compteur unique pour le slug (sans ajouter .html ici)
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.js";
 
 const auth = getAuth(app);
@@ -147,13 +147,13 @@ if (form && typeField && dynamicFieldsContainer) {
     const type = typeField.value;
     if (!type) return alert("Sélectionnez un type de contenu");
 
-    const folder = folderInput?.value?.trim();
-if (!folder) return alert("Nom public obligatoire");
-    let slug = slugInput?.value || "";
-   slug = slug.replace(/\.html$/i, "").trim();
-const uniqueId = Date.now().toString().slice(-5); // génère un ID court
-slug += "-" + uniqueId + ".html";
+    const folder = folderInput?.value || "";
+    let slugBase = slugInput?.value || "";
+    slugBase = slugBase.replace(/\.html$/i, "").trim();
 
+    // Générer compteur simple pour éviter les doublons
+    const timestamp = Date.now().toString().slice(-5); // ex: "86729"
+    const slug = `${slugBase}-${timestamp}`;
 
     const name = document.getElementById("tunnel-name")?.value || "";
     const goal = document.getElementById("tunnel-goal")?.value || "";
