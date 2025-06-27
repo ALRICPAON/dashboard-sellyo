@@ -37,7 +37,7 @@
 
         <label>Nom de la page (ex: tunnel ou offre-speciale) *</label><br>
         <input type="text" id="slug" required><br>
-        <small style="color:#aaa;">L'extension <strong>.html</strong> sera ajoutée automatiquement</small><br><br>
+        <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
 
         <label>Type de contenu *</label><br>
         <select id="tunnel-type" required>
@@ -92,7 +92,6 @@
   <script type="module" src="js/dashboard.js"></script>
 
   <script>
-    // Reset formulaire si on reclique sur "Créer un tunnel"
     document.getElementById("create-tunnel").addEventListener("click", () => {
       const form = document.getElementById("tunnel-form");
       const fullForm = document.getElementById("form-tunnel-complet");
