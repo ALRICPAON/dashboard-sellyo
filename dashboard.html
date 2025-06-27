@@ -92,7 +92,6 @@
   <script type="module" src="js/dashboard.js"></script>
 
   <script>
-    // Reset formulaire si on reclique sur "Créer un tunnel"
     document.getElementById("create-tunnel").addEventListener("click", () => {
       const form = document.getElementById("tunnel-form");
       const fullForm = document.getElementById("form-tunnel-complet");
@@ -106,6 +105,13 @@
 
       document.getElementById("create-tunnel-form").style.display = "block";
       window.scrollTo(0, 0);
+    });
+
+    // ✅ Forcer le submit classique (Make webhook)
+    document.getElementById("tunnel-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const submitEvent = new Event("submit", { bubbles: true, cancelable: true });
+      document.getElementById("tunnel-form").dispatchEvent(submitEvent);
     });
   </script>
 </body>
