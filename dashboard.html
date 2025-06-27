@@ -8,7 +8,7 @@
 </head>
 <body style="background-color: #111; color: white; font-family: sans-serif;">
   <header>
-    <img src="assets/logo.png" alt="Logo Sellyo" class="logo">
+    <a href="index.html"><img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;"></a>
     <nav style="display: flex; align-items: center;">
       <ul>
         <li><a href="#" id="create-tunnel">Créer un tunnel</a></li>
@@ -58,6 +58,7 @@
     <!-- Formulaire pour Tunnel complet uniquement -->
     <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin-top: 2rem;">
       <h2>Tunnel Complet – Pages personnalisées</h2>
+
       <label>Logo de la marque</label><br>
       <input type="file" id="full-logo" accept="image/*"><br><br>
 
@@ -74,6 +75,7 @@
       <input type="url" id="full-main-url"><br><br>
 
       <div id="tunnel-pages-complet"></div>
+
       <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
       <button type="button" id="submit-full-tunnel">Générer le tunnel complet</button>
     </div>
@@ -81,5 +83,23 @@
 
   <script type="module" src="js/tunnel-submit.js"></script>
   <script type="module" src="js/dashboard.js"></script>
+
+  <script>
+    // Reset formulaire si on reclique sur "Créer un tunnel"
+    document.getElementById("create-tunnel").addEventListener("click", () => {
+      const form = document.getElementById("tunnel-form");
+      const fullForm = document.getElementById("form-tunnel-complet");
+      const formFields = document.getElementById("form-content-fields");
+      const tunnelPages = document.getElementById("tunnel-pages-complet");
+
+      if (form) form.reset();
+      if (formFields) formFields.innerHTML = "";
+      if (tunnelPages) tunnelPages.innerHTML = "";
+      if (fullForm) fullForm.style.display = "none";
+
+      document.getElementById("create-tunnel-form").style.display = "block";
+      window.scrollTo(0, 0);
+    });
+  </script>
 </body>
 </html>
