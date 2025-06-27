@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js — version corrigée avec suppression des doublons de folderName/slug + validation slug
+// ✅ tunnel-submit.js — version corrigée avec suppression des doublons de folderName/slug + validation slug + ajout automatique de .html
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -25,7 +25,7 @@ if (folderInput) {
 
 if (slugInput) {
   slugInput.addEventListener("input", (e) => {
-    slugInput.value = slugInput.value.replace(/[^a-zA-Z0-9\-\.]/g, "");
+    slugInput.value = slugInput.value.replace(/[^a-zA-Z0-9\-]/g, "");
   });
 }
 
@@ -139,4 +139,12 @@ if (form && typeField && dynamicFieldsContainer) {
       }
     }
   });
-} // le reste du script (envoi du webhook) reste inchangé
+}
+
+// 🔁 Ajout automatique de ".html" si absent
+form.addEventListener("submit", (e) => {
+  const slugInput = document.getElementById("slug");
+  if (slugInput && !slugInput.value.endsWith(".html")) {
+    slugInput.value += ".html";
+  }
+});
