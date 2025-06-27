@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js — version finale avec compteur et mapping correct
+// ✅ tunnel-submit.js — version finale avec compteur, mapping correct et envoi vers Make
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -144,10 +144,43 @@ if (form && typeField && dynamicFieldsContainer) {
 }
 
 // 🔁 Ajout automatique de .html + compteur pour unicité
-form.addEventListener("submit", (e) => {
-  const slugInput = document.getElementById("slug");
-  if (slugInput) {
-    const baseSlug = slugInput.value.replace(/[^a-zA-Z0-9\-]/g, "");
-    slugInput.value = `${baseSlug}-${slugCounter}`;
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const folderName = folderInput?.value || "";
+  const slugClean = slugInput?.value.replace(/[^a-zA-Z0-9\-]/g, "") || "";
+  const slugFinal = `${slugClean}-${slugCounter}`;
+
+  const payload = {
+    userId: user.uid,
+    folder: folderName,
+    slug: `${slugFinal}.html`,
+    name: document.getElementById("tunnel-name")?.value || "",
+    goal: document.getElementById("tunnel-goal")?.value || "",
+    sector: document.getElementById("sector")?.value || "",
+    desc: document.getElementById("tunnel-desc")?.value || "",
+    cta: document.getElementById("cta-text")?.value || "",
+    payment: document.getElementById("payment-url")?.value || "",
+    type: document.getElementById("tunnel-type")?.value || "",
+    mainColor: document.getElementById("mainColor")?.value || "",
+    backgroundColor: document.getElementById("backgroundColor")?.value || "",
+    createdAt: new Date().toLocaleString("fr-FR"),
+  };
+
+  try {
+    await fetch(webhookURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    alert("✅ Tunnel envoyé avec succès !");
+    form.reset();
+  } catch (err) {
+    console.error("Erreur d'envoi:", err);
+    alert("Erreur lors de l'envoi du tunnel.");
   }
 });
