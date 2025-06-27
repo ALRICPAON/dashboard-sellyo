@@ -14,6 +14,17 @@ const dynamicFieldsContainer = document.getElementById("form-content-fields");
 const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
 if (form && typeField && dynamicFieldsContainer) {
+  // Ajout des champs folderName et slug globaux (hors changement de type)
+  const folderSlugFields = document.createElement("div");
+  folderSlugFields.innerHTML = `
+    <label>Identifiant public (ex: nom marque, sans espace ni accent) *</label><br>
+    <input type="text" id="folderName" pattern="[a-zA-Z0-9\-]+" title="Pas d'espace, uniquement lettres, chiffres et tirets" required><br><br>
+
+    <label>Nom de la page (ex: tunnel.html) *</label><br>
+    <input type="text" id="slug" pattern="[a-zA-Z0-9\-]+\\.html" title="Ex: tunnel.html ou offre-speciale.html" required><br><br>
+  `;
+  form.insertBefore(folderSlugFields, dynamicFieldsContainer);
+
   typeField.addEventListener("change", () => {
     const selected = typeField.value;
     dynamicFieldsContainer.innerHTML = "";
@@ -49,12 +60,6 @@ if (form && typeField && dynamicFieldsContainer) {
 
         <label>URL du bouton de paiement</label><br>
         <input type="url" id="payment-url"><br><br>
-
-        <label>Identifiant public (ex: alricpaon)</label><br>
-        <input type="text" id="folderName" required><br><br>
-
-        <label>Nom du fichier (ex: mon-produit)</label><br>
-        <input type="text" id="slug" required><br><br>
       `;
     } else if (selected === "email") {
       dynamicFieldsContainer.innerHTML = `
@@ -66,12 +71,6 @@ if (form && typeField && dynamicFieldsContainer) {
 
         <label>URL bouton</label><br>
         <input type="url" id="payment-url"><br><br>
-
-        <label>Identifiant public (ex: alricpaon)</label><br>
-        <input type="text" id="folderName" required><br><br>
-
-        <label>Nom du fichier (ex: relance-1)</label><br>
-        <input type="text" id="slug" required><br><br>
       `;
     } else if (selected === "complet") {
       dynamicFieldsContainer.innerHTML = `
@@ -104,12 +103,6 @@ if (form && typeField && dynamicFieldsContainer) {
 
         <label>Couleur de fond</label><br>
         <input type="color" id="backgroundColor" value="#111"><br><br>
-
-        <label>Identifiant public (ex: alricpaon)</label><br>
-        <input type="text" id="folderName" required><br><br>
-
-        <label>Nom du fichier (ex: tunnel-formule-3)</label><br>
-        <input type="text" id="slug" required><br><br>
 
         <div id="tunnel-pages-complet"></div>
         <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
@@ -166,8 +159,8 @@ if (form && typeField && dynamicFieldsContainer) {
     const mainColor = document.getElementById("mainColor")?.value || "#00ccff";
     const backgroundColor = document.getElementById("backgroundColor")?.value || "#111";
 
-    const folderName = document.getElementById("folderName")?.value || "";
-    const slug = document.getElementById("slug")?.value || "";
+    const folderName = document.getElementById("folderName")?.value.trim();
+    const slug = document.getElementById("slug")?.value.trim();
 
     const logoFile = document.getElementById("logo")?.files[0];
     const coverFile = document.getElementById("cover-image")?.files[0];
