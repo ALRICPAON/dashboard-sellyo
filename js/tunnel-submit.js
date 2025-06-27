@@ -1,18 +1,20 @@
-// ✅ tunnel-submit.js — version finale avec compteur unique pour le slug (sans ajouter .html ici) + champs dynamiques personnalisables pour formulaire de capture
+// ✅ tunnel-submit.js — version finale avec compteur et mapping correct
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 const form = document.getElementById("tunnel-form");
 const typeField = document.getElementById("tunnel-type");
 const dynamicFieldsContainer = document.getElementById("form-content-fields");
 const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
+let slugCounter = Math.floor(10000 + Math.random() * 90000); // compteur simple à 5 chiffres
+
+// Nettoyage folderName & slug
 const folderInput = document.getElementById("folderName");
 const slugInput = document.getElementById("slug");
 
@@ -33,7 +35,7 @@ if (form && typeField && dynamicFieldsContainer) {
     const selected = typeField.value;
     dynamicFieldsContainer.innerHTML = "";
 
-    if (selected === "landing") {
+    if (selected === "landing" || selected === "video") {
       dynamicFieldsContainer.innerHTML = `
         <label>Nom du contenu *</label><br>
         <input type="text" id="tunnel-name" required><br><br>
@@ -59,46 +61,12 @@ if (form && typeField && dynamicFieldsContainer) {
         <label>Texte du bouton *</label><br>
         <input type="text" id="cta-text" required><br><br>
 
-        <fieldset style="margin-top: 20px;">
-          <legend>Champs à demander dans le formulaire client</legend>
-          <label><input type="checkbox" id="ask-name" checked> Nom</label><br>
-          <label><input type="checkbox" id="ask-firstname" checked> Prénom</label><br>
-          <label><input type="checkbox" id="ask-email" checked> Email</label><br>
-          <label><input type="checkbox" id="ask-phone"> Téléphone</label><br>
-          <label><input type="checkbox" id="ask-address"> Adresse</label><br>
-        </fieldset><br>
-      `;
-    } else if (selected === "video") {
-      dynamicFieldsContainer.innerHTML = `
-        <label>Nom du contenu *</label><br>
-        <input type="text" id="tunnel-name" required><br><br>
-
-        <label>Objectif *</label><br>
-        <input type="text" id="tunnel-goal"><br><br>
-
-        <label>Secteur</label><br>
-        <input type="text" id="sector"><br><br>
-
-        <label>Prix global</label><br>
-        <input type="number" id="general-price"><br><br>
-
-        <label>Logo</label><br>
-        <input type="file" id="logo" accept="image/*"><br><br>
-
-        <label>Image de couverture</label><br>
-        <input type="file" id="cover-image" accept="image/*"><br><br>
-
-        <label>Vidéo</label><br>
-        <input type="file" id="custom-video" accept="video/*"><br><br>
-
-        <label>Description de l’offre *</label><br>
-        <textarea id="tunnel-desc" required></textarea><br><br>
-
-        <label>Texte du bouton *</label><br>
-        <input type="text" id="cta-text" required><br><br>
-
-        <label>URL du bouton de paiement</label><br>
-        <input type="url" id="payment-url"><br><br>
+        <label>Champs à demander :</label><br>
+        <label><input type="checkbox" name="fields" value="nom"> Nom</label>
+        <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
+        <label><input type="checkbox" name="fields" value="email"> Email</label>
+        <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
+        <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
       `;
     } else if (selected === "email") {
       dynamicFieldsContainer.innerHTML = `
@@ -112,86 +80,74 @@ if (form && typeField && dynamicFieldsContainer) {
         <input type="url" id="payment-url"><br><br>
       `;
     } else if (selected === "complet") {
-      // inchangé ici
-    }
-  });
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom du tunnel *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const user = auth.currentUser;
-    if (!user) return alert("Non connecté");
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
 
-    const type = typeField.value;
-    if (!type) return alert("Sélectionnez un type de contenu");
+        <label>Secteur</label><br>
+        <input type="text" id="sector"><br><br>
 
-    const folder = folderInput?.value || "";
-    let slugBase = slugInput?.value || "";
-    slugBase = slugBase.replace(/\.html$/i, "").trim();
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
 
-    const timestamp = Date.now().toString().slice(-5);
-    const slug = `${slugBase}-${timestamp}`;
+        <label>Vidéo principale</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
 
-    const name = document.getElementById("tunnel-name")?.value || "";
-    const goal = document.getElementById("tunnel-goal")?.value || "";
-    const sector = document.getElementById("sector")?.value || "";
-    const desc = document.getElementById("tunnel-desc")?.value || "";
-    const cta = document.getElementById("cta-text")?.value || "";
-    const price = document.getElementById("general-price")?.value || "";
-    const payment = document.getElementById("payment-url")?.value || "";
-    const mainColor = document.getElementById("mainColor")?.value || "#00ccff";
-    const backgroundColor = document.getElementById("backgroundColor")?.value || "#111";
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
 
-    const logoFile = document.getElementById("logo")?.files[0];
-    const coverFile = document.getElementById("cover-image")?.files[0];
-    const videoFile = document.getElementById("custom-video")?.files[0];
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
 
-    const logoUrl = logoFile ? await uploadLogo(logoFile) : null;
-    const coverUrl = coverFile ? await uploadCoverImage(coverFile) : null;
-    const videoUrl = videoFile ? await uploadCustomVideo(videoFile) : null;
+        <label>URL du bouton (paiement)</label><br>
+        <input type="url" id="payment-url"><br><br>
 
-    const askFields = {
-      name: document.getElementById("ask-name")?.checked || false,
-      firstname: document.getElementById("ask-firstname")?.checked || false,
-      email: document.getElementById("ask-email")?.checked || false,
-      phone: document.getElementById("ask-phone")?.checked || false,
-      address: document.getElementById("ask-address")?.checked || false,
-    };
+        <div id="tunnel-pages-complet"></div>
+        <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
+      `;
 
-    const payload = {
-      userId: user.uid,
-      folder,
-      slug,
-      name,
-      goal,
-      sector,
-      desc,
-      cta,
-      payment,
-      type,
-      price,
-      mainColor,
-      backgroundColor,
-      logoUrl,
-      coverUrl,
-      videoUrl,
-      askFields,
-      createdAt: new Date().toISOString(),
-    };
+      let pageCount = 0;
+      const maxPages = 8;
+      const tunnelPages = document.getElementById("tunnel-pages-complet");
+      const addPageBtn = document.getElementById("add-page-full");
 
-    // pages tunnel complet inchangé...
-
-    try {
-      await fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      alert("✅ Contenu envoyé à Make");
-      form.reset();
-      document.getElementById("tunnel-pages-complet").innerHTML = "";
-    } catch (err) {
-      console.error("❌ Erreur d'envoi:", err);
-      alert("Erreur lors de l'envoi du contenu.");
+      if (addPageBtn && tunnelPages) {
+        addPageBtn.addEventListener("click", () => {
+          if (pageCount >= maxPages) return;
+          pageCount++;
+          const page = document.createElement("div");
+          page.innerHTML = `
+            <h4>Page ${pageCount}</h4>
+            <label>Titre *</label><br>
+            <input type="text" name="page-title-${pageCount}" required><br><br>
+            <label>Description *</label><br>
+            <textarea name="page-desc-${pageCount}" required></textarea><br><br>
+            <label>URL produit</label><br>
+            <input type="url" name="page-url-${pageCount}"><br><br>
+            <label>Lien de paiement</label><br>
+            <input type="url" name="page-payment-${pageCount}"><br><br>
+            <label>Prix (€)</label><br>
+            <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
+            <label>Image</label><br>
+            <input type="file" name="page-image-${pageCount}" accept="image/*"><br><br>
+            <label>Vidéo</label><br>
+            <input type="file" name="page-video-${pageCount}" accept="video/*"><br><br>
+          `;
+          tunnelPages.appendChild(page);
+        });
+      }
     }
   });
 }
+
+// 🔁 Ajout automatique de .html + compteur pour unicité
+form.addEventListener("submit", (e) => {
+  const slugInput = document.getElementById("slug");
+  if (slugInput) {
+    const baseSlug = slugInput.value.replace(/[^a-zA-Z0-9\-]/g, "");
+    slugInput.value = `${baseSlug}-${slugCounter}`;
+  }
+});
