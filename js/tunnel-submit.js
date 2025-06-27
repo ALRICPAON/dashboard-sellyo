@@ -149,7 +149,8 @@ if (form && typeField && dynamicFieldsContainer) {
 
     const folder = folderInput?.value || "";
     let slug = slugInput?.value || "";
-    if (!slug.endsWith(".html")) slug += ".html";
+    slug = slug.replace(/\.html$/i, "").trim();
+    slug += ".html";
 
     const name = document.getElementById("tunnel-name")?.value || "";
     const goal = document.getElementById("tunnel-goal")?.value || "";
