@@ -156,7 +156,7 @@ form.addEventListener("submit", async (e) => {
   const payload = {
     userId: user.uid,
     folder: folderName,
-    slug: `${slugFinal}.html`,
+    slug: slugFinal, // ✅ Sans extension, Make s'en charge
     name: document.getElementById("tunnel-name")?.value || "",
     goal: document.getElementById("tunnel-goal")?.value || "",
     sector: document.getElementById("sector")?.value || "",
