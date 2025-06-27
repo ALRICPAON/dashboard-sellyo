@@ -25,6 +25,25 @@ if (form && typeField && dynamicFieldsContainer) {
   `;
   form.insertBefore(folderSlugFields, dynamicFieldsContainer);
 
+  // Sanitize des champs folderName et slug
+  document.getElementById("folderName").addEventListener("input", (e) => {
+    e.target.value = e.target.value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9\-]/g, "")
+      .replace(/\s+/g, "-")
+      .toLowerCase();
+  });
+
+  document.getElementById("slug").addEventListener("input", (e) => {
+    e.target.value = e.target.value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9\-\.]/g, "")
+      .replace(/\s+/g, "-")
+      .toLowerCase();
+  });
+
   typeField.addEventListener("change", () => {
     const selected = typeField.value;
     dynamicFieldsContainer.innerHTML = "";
