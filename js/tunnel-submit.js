@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js — version corrigée avec suppression des doublons de folderName/slug + validation slug + ajout automatique de .html
+// ✅ tunnel-submit.js — version finale avec slug propre, ajout .html, validation, et envoi Make
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -13,18 +13,17 @@ const typeField = document.getElementById("tunnel-type");
 const dynamicFieldsContainer = document.getElementById("form-content-fields");
 const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
-// Empêcher les caractères non valides dans folderName et slug
 const folderInput = document.getElementById("folderName");
 const slugInput = document.getElementById("slug");
 
 if (folderInput) {
-  folderInput.addEventListener("input", (e) => {
+  folderInput.addEventListener("input", () => {
     folderInput.value = folderInput.value.replace(/[^a-zA-Z0-9\-]/g, "");
   });
 }
 
 if (slugInput) {
-  slugInput.addEventListener("input", (e) => {
+  slugInput.addEventListener("input", () => {
     slugInput.value = slugInput.value.replace(/[^a-zA-Z0-9\-]/g, "");
   });
 }
@@ -139,12 +138,92 @@ if (form && typeField && dynamicFieldsContainer) {
       }
     }
   });
-}
 
-// 🔁 Ajout automatique de ".html" si absent
-form.addEventListener("submit", (e) => {
-  const slugInput = document.getElementById("slug");
-  if (slugInput && !slugInput.value.endsWith(".html")) {
-    slugInput.value += ".html";
-  }
-});
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return alert("Non connecté");
+
+    const type = typeField.value;
+    if (!type) return alert("Sélectionnez un type de contenu");
+
+    const folder = folderInput?.value || "";
+    let slug = slugInput?.value || "";
+    if (!slug.endsWith(".html")) slug += ".html";
+
+    const name = document.getElementById("tunnel-name")?.value || "";
+    const goal = document.getElementById("tunnel-goal")?.value || "";
+    const sector = document.getElementById("sector")?.value || "";
+    const desc = document.getElementById("tunnel-desc")?.value || "";
+    const cta = document.getElementById("cta-text")?.value || "";
+    const price = document.getElementById("general-price")?.value || "";
+    const payment = document.getElementById("payment-url")?.value || "";
+    const mainColor = document.getElementById("mainColor")?.value || "#00ccff";
+    const backgroundColor = document.getElementById("backgroundColor")?.value || "#111";
+
+    const logoFile = document.getElementById("logo")?.files[0];
+    const coverFile = document.getElementById("cover-image")?.files[0];
+    const videoFile = document.getElementById("custom-video")?.files[0];
+
+    const logoUrl = logoFile ? await uploadLogo(logoFile) : null;
+    const coverUrl = coverFile ? await uploadCoverImage(coverFile) : null;
+    const videoUrl = videoFile ? await uploadCustomVideo(videoFile) : null;
+
+    const payload = {
+      userId: user.uid,
+      folder,
+      slug,
+      name,
+      goal,
+      sector,
+      desc,
+      cta,
+      payment,
+      type,
+      price,
+      mainColor,
+      backgroundColor,
+      logoUrl,
+      coverUrl,
+      videoUrl,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (type === "complet") {
+      const pages = [];
+
+      for (let i = 1; i <= 8; i++) {
+        const title = document.querySelector(`[name='page-title-${i}']`)?.value;
+        if (!title) continue;
+        const description = document.querySelector(`[name='page-desc-${i}']`)?.value || "";
+        const url = document.querySelector(`[name='page-url-${i}']`)?.value || "";
+        const paymentUrl = document.querySelector(`[name='page-payment-${i}']`)?.value || "";
+        const price = document.querySelector(`[name='page-price-${i}']`)?.value || "";
+
+        const imageFile = document.querySelector(`[name='page-image-${i}']`)?.files?.[0];
+        const videoFile = document.querySelector(`[name='page-video-${i}']`)?.files?.[0];
+
+        const imageUrl = imageFile ? await uploadCoverImage(imageFile) : null;
+        const videoUrl = videoFile ? await uploadCustomVideo(videoFile) : null;
+
+        pages.push({ title, description, url, price, paymentUrl, imageUrl, videoUrl });
+      }
+
+      payload.pages = pages;
+    }
+
+    try {
+      await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      alert("✅ Contenu envoyé à Make");
+      form.reset();
+      document.getElementById("tunnel-pages-complet").innerHTML = "";
+    } catch (err) {
+      console.error("❌ Erreur d'envoi:", err);
+      alert("Erreur lors de l'envoi du contenu.");
+    }
+  });
+}
