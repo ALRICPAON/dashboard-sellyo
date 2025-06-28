@@ -12,9 +12,8 @@ const typeField = document.getElementById("tunnel-type");
 const dynamicFieldsContainer = document.getElementById("form-content-fields");
 const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
-let slugCounter = Math.floor(10000 + Math.random() * 90000); // compteur simple à 5 chiffres
+let slugCounter = Math.floor(10000 + Math.random() * 90000);
 
-// Nettoyage folderName & slug
 const folderInput = document.getElementById("folderName");
 const slugInput = document.getElementById("slug");
 
@@ -39,28 +38,20 @@ if (form && typeField && dynamicFieldsContainer) {
       dynamicFieldsContainer.innerHTML = `
         <label>Nom du contenu *</label><br>
         <input type="text" id="tunnel-name" required><br><br>
-
         <label>Objectif *</label><br>
         <input type="text" id="tunnel-goal"><br><br>
-
         <label>Secteur</label><br>
         <input type="text" id="sector"><br><br>
-
         <label>Logo</label><br>
         <input type="file" id="logo" accept="image/*"><br><br>
-
         <label>Image de couverture</label><br>
         <input type="file" id="cover-image" accept="image/*"><br><br>
-
         <label>Vidéo</label><br>
         <input type="file" id="custom-video" accept="video/*"><br><br>
-
         <label>Description de l’offre *</label><br>
         <textarea id="tunnel-desc" required></textarea><br><br>
-
         <label>Texte du bouton *</label><br>
         <input type="text" id="cta-text" required><br><br>
-
         <label>Champs à demander :</label><br>
         <label><input type="checkbox" name="fields" value="nom"> Nom</label>
         <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
@@ -72,10 +63,8 @@ if (form && typeField && dynamicFieldsContainer) {
       dynamicFieldsContainer.innerHTML = `
         <label>Nom de la campagne *</label><br>
         <input type="text" id="tunnel-name" required><br><br>
-
         <label>Message de relance *</label><br>
         <textarea id="tunnel-desc" required></textarea><br><br>
-
         <label>URL bouton</label><br>
         <input type="url" id="payment-url"><br><br>
       `;
@@ -83,28 +72,20 @@ if (form && typeField && dynamicFieldsContainer) {
       dynamicFieldsContainer.innerHTML = `
         <label>Nom du tunnel *</label><br>
         <input type="text" id="tunnel-name" required><br><br>
-
         <label>Objectif *</label><br>
         <input type="text" id="tunnel-goal"><br><br>
-
         <label>Secteur</label><br>
         <input type="text" id="sector"><br><br>
-
         <label>Logo</label><br>
         <input type="file" id="logo" accept="image/*"><br><br>
-
         <label>Vidéo principale</label><br>
         <input type="file" id="custom-video" accept="video/*"><br><br>
-
         <label>Description de l’offre *</label><br>
         <textarea id="tunnel-desc" required></textarea><br><br>
-
         <label>Texte du bouton *</label><br>
         <input type="text" id="cta-text" required><br><br>
-
         <label>URL du bouton (paiement)</label><br>
         <input type="url" id="payment-url"><br><br>
-
         <div id="tunnel-pages-complet"></div>
         <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
       `;
@@ -143,7 +124,6 @@ if (form && typeField && dynamicFieldsContainer) {
   });
 }
 
-// 🔁 Ajout automatique de .html + compteur pour unicite
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = auth.currentUser;
@@ -152,6 +132,8 @@ form.addEventListener("submit", async (e) => {
   const folderName = folderInput?.value || "";
   const slugClean = slugInput?.value.replace(/[^a-zA-Z0-9\-]/g, "") || "";
   const slugFinal = `${slugClean}-${slugCounter}`;
+
+  const checkedFields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => el.value);
 
   const payload = {
     userId: user.uid,
@@ -166,6 +148,7 @@ form.addEventListener("submit", async (e) => {
     type: document.getElementById("tunnel-type")?.value || "",
     mainColor: document.getElementById("mainColor")?.value || "",
     backgroundColor: document.getElementById("backgroundColor")?.value || "",
+    fields: checkedFields,
     createdAt: new Date().toLocaleString("fr-FR"),
   };
 
@@ -178,10 +161,9 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify(payload),
     });
 
-    // ✅ Enregistrement dans Firestore
     await addDoc(collection(db, "tunnels"), {
       ...payload,
-      url: `https://cdn.sellyo.fr/${payload.type}/${slugFinal}.html`,
+      url: `https://cdn.sellyo.fr/${payload.type}/${folderName}/${slugFinal}.html`,
     });
 
     alert("✅ Tunnel envoyé avec succès !");
