@@ -54,12 +54,16 @@ if (viewTunnelsBtn && tunnelsContainer) {
         const block = document.createElement("div");
         block.innerHTML = `<h3 style="margin-bottom: 0.5rem; text-transform: capitalize">${type}</h3>`;
 
+        const grid = document.createElement("div");
+        grid.style.display = "grid";
+        grid.style.gridTemplateColumns = "repeat(auto-fit, minmax(250px, 1fr))";
+        grid.style.gap = "1rem";
+
         tunnels.forEach((tunnel) => {
           const card = document.createElement("div");
           card.style.padding = "1rem";
           card.style.background = "#1e1e1e";
           card.style.borderRadius = "10px";
-          card.style.marginBottom = "0.5rem";
 
           const link = `https://cdn.sellyo.fr/${type}/${tunnel.folder}/${tunnel.slug}.html`;
           card.innerHTML = `
@@ -69,9 +73,10 @@ if (viewTunnelsBtn && tunnelsContainer) {
             <input type="text" value="${link}" style="width: 100%; margin-top: 0.5rem; padding: 0.3rem; background: #333; color: #fff; border: none;" readonly>
             <button onclick="navigator.clipboard.writeText('${link}')" style="margin-top: 0.3rem; background: #00ccff; color: black; border: none; padding: 0.3rem 0.6rem; cursor: pointer;">Copier le lien</button>
           `;
-          block.appendChild(card);
+          grid.appendChild(card);
         });
 
+        block.appendChild(grid);
         tunnelsContainer.appendChild(block);
       }
     });
