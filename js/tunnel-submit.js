@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js — version finale avec upload images/vidéo + affichage dashboard
+// ✅ tunnel-submit.js — version finale avec upload images/vidéo + Firestore + Make
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -84,9 +84,29 @@ form.addEventListener("submit", async (e) => {
   formData.append("createdAt", new Date().toLocaleString("fr-FR"));
 
   try {
+    // Envoi vers Make (Webhook)
     await fetch(webhookURL, {
       method: "POST",
       body: formData,
+    });
+
+    // Ajout dans Firestore
+    await addDoc(collection(db, "tunnels"), {
+      userId: user.uid,
+      name: formData.get("name"),
+      goal: formData.get("goal"),
+      sector: formData.get("sector"),
+      desc: formData.get("desc"),
+      cta: formData.get("cta"),
+      payment: formData.get("payment"),
+      type: formData.get("type"),
+      slug: slugFinal,
+      folder: folderName,
+      mainColor: formData.get("mainColor"),
+      backgroundColor: formData.get("backgroundColor"),
+      createdAt: new Date().toISOString(),
+      fields: formData.getAll("fields"),
+      pageUrl: `https://cdn.sellyo.fr/landing/${folderName}/${slugFinal}.html`
     });
 
     alert("✅ Tunnel envoyé avec succès !");
