@@ -36,21 +36,23 @@ if (form && typeField && dynamicFieldsContainer) {
     if (selected === "landing" || selected === "video") {
       dynamicFieldsContainer.innerHTML = `
         <label>Nom du contenu *</label><br>
-        <input type="text" id="tunnel-name" required><br><br>
+        <input type="text" id="tunnel-name" name="name" required><br><br>
         <label>Objectif *</label><br>
-        <input type="text" id="tunnel-goal"><br><br>
+        <input type="text" id="tunnel-goal" name="goal"><br><br>
         <label>Secteur</label><br>
-        <input type="text" id="sector"><br><br>
+        <input type="text" id="sector" name="sector"><br><br>
         <label>Logo</label><br>
-        <input type="file" id="logo" accept="image/*"><br><br>
+        <input type="file" id="logo" name="logo" accept="image/*"><br><br>
         <label>Image de couverture</label><br>
-        <input type="file" id="cover-image" accept="image/*"><br><br>
+        <input type="file" id="cover-image" name="cover" accept="image/*"><br><br>
         <label>Vidéo</label><br>
-        <input type="file" id="custom-video" accept="video/*"><br><br>
+        <input type="file" id="custom-video" name="video" accept="video/*"><br><br>
         <label>Description de l’offre *</label><br>
-        <textarea id="tunnel-desc" required></textarea><br><br>
+        <textarea id="tunnel-desc" name="desc" required></textarea><br><br>
         <label>Texte du bouton *</label><br>
-        <input type="text" id="cta-text" required><br><br>
+        <input type="text" id="cta-text" name="cta" required><br><br>
+        <label>URL du bouton (paiement)</label><br>
+        <input type="url" id="payment-url" name="payment"><br><br>
         <label>Champs à demander :</label><br>
         <label><input type="checkbox" name="fields" value="nom"> Nom</label>
         <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
@@ -58,67 +60,6 @@ if (form && typeField && dynamicFieldsContainer) {
         <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
         <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
       `;
-    } else if (selected === "email") {
-      dynamicFieldsContainer.innerHTML = `
-        <label>Nom de la campagne *</label><br>
-        <input type="text" id="tunnel-name" required><br><br>
-        <label>Message de relance *</label><br>
-        <textarea id="tunnel-desc" required></textarea><br><br>
-        <label>URL bouton</label><br>
-        <input type="url" id="payment-url"><br><br>
-      `;
-    } else if (selected === "complet") {
-      dynamicFieldsContainer.innerHTML = `
-        <label>Nom du tunnel *</label><br>
-        <input type="text" id="tunnel-name" required><br><br>
-        <label>Objectif *</label><br>
-        <input type="text" id="tunnel-goal"><br><br>
-        <label>Secteur</label><br>
-        <input type="text" id="sector"><br><br>
-        <label>Logo</label><br>
-        <input type="file" id="logo" accept="image/*"><br><br>
-        <label>Vidéo principale</label><br>
-        <input type="file" id="custom-video" accept="video/*"><br><br>
-        <label>Description de l’offre *</label><br>
-        <textarea id="tunnel-desc" required></textarea><br><br>
-        <label>Texte du bouton *</label><br>
-        <input type="text" id="cta-text" required><br><br>
-        <label>URL du bouton (paiement)</label><br>
-        <input type="url" id="payment-url"><br><br>
-        <div id="tunnel-pages-complet"></div>
-        <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
-      `;
-
-      let pageCount = 0;
-      const maxPages = 8;
-      const tunnelPages = document.getElementById("tunnel-pages-complet");
-      const addPageBtn = document.getElementById("add-page-full");
-
-      if (addPageBtn && tunnelPages) {
-        addPageBtn.addEventListener("click", () => {
-          if (pageCount >= maxPages) return;
-          pageCount++;
-          const page = document.createElement("div");
-          page.innerHTML = `
-            <h4>Page ${pageCount}</h4>
-            <label>Titre *</label><br>
-            <input type="text" name="page-title-${pageCount}" required><br><br>
-            <label>Description *</label><br>
-            <textarea name="page-desc-${pageCount}" required></textarea><br><br>
-            <label>URL produit</label><br>
-            <input type="url" name="page-url-${pageCount}"><br><br>
-            <label>Lien de paiement</label><br>
-            <input type="url" name="page-payment-${pageCount}"><br><br>
-            <label>Prix (€)</label><br>
-            <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
-            <label>Image</label><br>
-            <input type="file" name="page-image-${pageCount}" accept="image/*"><br><br>
-            <label>Vidéo</label><br>
-            <input type="file" name="page-video-${pageCount}" accept="video/*"><br><br>
-          `;
-          tunnelPages.appendChild(page);
-        });
-      }
     }
   });
 }
@@ -137,6 +78,9 @@ form.addEventListener("submit", async (e) => {
   formData.append("userId", user.uid);
   formData.append("folder", folderName);
   formData.append("slug", slugFinal);
+  formData.append("type", document.getElementById("tunnel-type")?.value || "");
+  formData.append("mainColor", document.getElementById("mainColor")?.value || "");
+  formData.append("backgroundColor", document.getElementById("backgroundColor")?.value || "");
   formData.append("createdAt", new Date().toLocaleString("fr-FR"));
 
   try {
