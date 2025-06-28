@@ -65,7 +65,9 @@ if (viewTunnelsBtn && tunnelsContainer) {
           card.innerHTML = `
             <strong>${tunnel.name}</strong><br>
             <small>${tunnel.createdAt}</small><br>
-            <a href="${link}" target="_blank" style="color:#00ccff; text-decoration:underline">Voir la page</a>
+            <a href="${link}" target="_blank" style="color:#00ccff; text-decoration:underline">Voir la page</a><br>
+            <input type="text" value="${link}" style="width: 100%; margin-top: 0.5rem; padding: 0.3rem; background: #333; color: #fff; border: none;" readonly>
+            <button onclick="navigator.clipboard.writeText('${link}')" style="margin-top: 0.3rem; background: #00ccff; color: black; border: none; padding: 0.3rem 0.6rem; cursor: pointer;">Copier le lien</button>
           `;
           block.appendChild(card);
         });
