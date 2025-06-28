@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js — version modifiée SANS Firebase Storage, avec envoi direct au Webhook Make
+// ✅ tunnel-submit.js — version finale avec upload images/vidéo + affichage dashboard
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -28,65 +28,121 @@ if (slugInput) {
   });
 }
 
-// La gestion dynamique reste inchangée ici, on passe directement au submit
+if (form && typeField && dynamicFieldsContainer) {
+  typeField.addEventListener("change", () => {
+    const selected = typeField.value;
+    dynamicFieldsContainer.innerHTML = "";
+
+    if (selected === "landing" || selected === "video") {
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom du contenu *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
+        <label>Secteur</label><br>
+        <input type="text" id="sector"><br><br>
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
+        <label>Image de couverture</label><br>
+        <input type="file" id="cover-image" accept="image/*"><br><br>
+        <label>Vidéo</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
+        <label>Champs à demander :</label><br>
+        <label><input type="checkbox" name="fields" value="nom"> Nom</label>
+        <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
+        <label><input type="checkbox" name="fields" value="email"> Email</label>
+        <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
+        <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
+      `;
+    } else if (selected === "email") {
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom de la campagne *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
+        <label>Message de relance *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
+        <label>URL bouton</label><br>
+        <input type="url" id="payment-url"><br><br>
+      `;
+    } else if (selected === "complet") {
+      dynamicFieldsContainer.innerHTML = `
+        <label>Nom du tunnel *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
+        <label>Secteur</label><br>
+        <input type="text" id="sector"><br><br>
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
+        <label>Vidéo principale</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
+        <label>URL du bouton (paiement)</label><br>
+        <input type="url" id="payment-url"><br><br>
+        <div id="tunnel-pages-complet"></div>
+        <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
+      `;
+
+      let pageCount = 0;
+      const maxPages = 8;
+      const tunnelPages = document.getElementById("tunnel-pages-complet");
+      const addPageBtn = document.getElementById("add-page-full");
+
+      if (addPageBtn && tunnelPages) {
+        addPageBtn.addEventListener("click", () => {
+          if (pageCount >= maxPages) return;
+          pageCount++;
+          const page = document.createElement("div");
+          page.innerHTML = `
+            <h4>Page ${pageCount}</h4>
+            <label>Titre *</label><br>
+            <input type="text" name="page-title-${pageCount}" required><br><br>
+            <label>Description *</label><br>
+            <textarea name="page-desc-${pageCount}" required></textarea><br><br>
+            <label>URL produit</label><br>
+            <input type="url" name="page-url-${pageCount}"><br><br>
+            <label>Lien de paiement</label><br>
+            <input type="url" name="page-payment-${pageCount}"><br><br>
+            <label>Prix (€)</label><br>
+            <input type="number" name="page-price-${pageCount}" step="0.01"><br><br>
+            <label>Image</label><br>
+            <input type="file" name="page-image-${pageCount}" accept="image/*"><br><br>
+            <label>Vidéo</label><br>
+            <input type="file" name="page-video-${pageCount}" accept="video/*"><br><br>
+          `;
+          tunnelPages.appendChild(page);
+        });
+      }
+    }
+  });
+}
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = auth.currentUser;
   if (!user) return;
 
+  const formData = new FormData(form);
+
   const folderName = folderInput?.value || "";
   const slugClean = slugInput?.value.replace(/[^a-zA-Z0-9\-]/g, "") || "";
   const slugFinal = `${slugClean}-${slugCounter}`;
 
-  const checkedFields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => el.value);
-
-  const formData = new FormData();
   formData.append("userId", user.uid);
   formData.append("folder", folderName);
   formData.append("slug", slugFinal);
-  formData.append("name", document.getElementById("tunnel-name")?.value || "");
-  formData.append("goal", document.getElementById("tunnel-goal")?.value || "");
-  formData.append("sector", document.getElementById("sector")?.value || "");
-  formData.append("desc", document.getElementById("tunnel-desc")?.value || "");
-  formData.append("cta", document.getElementById("cta-text")?.value || "");
-  formData.append("payment", document.getElementById("payment-url")?.value || "");
-  formData.append("type", document.getElementById("tunnel-type")?.value || "");
-  formData.append("mainColor", document.getElementById("mainColor")?.value || "");
-  formData.append("backgroundColor", document.getElementById("backgroundColor")?.value || "");
-  formData.append("fields", JSON.stringify(checkedFields));
   formData.append("createdAt", new Date().toLocaleString("fr-FR"));
-
-  const logoFile = document.getElementById("logo")?.files[0];
-  const coverFile = document.getElementById("cover-image")?.files[0];
-  const videoFile = document.getElementById("custom-video")?.files[0];
-
-  if (logoFile) formData.append("logo", logoFile);
-  if (coverFile) formData.append("cover", coverFile);
-  if (videoFile) formData.append("video", videoFile);
 
   try {
     await fetch(webhookURL, {
       method: "POST",
       body: formData,
-    });
-
-    await addDoc(collection(db, "tunnels"), {
-      userId: user.uid,
-      folder: folderName,
-      slug: slugFinal,
-      name: formData.get("name"),
-      goal: formData.get("goal"),
-      sector: formData.get("sector"),
-      desc: formData.get("desc"),
-      cta: formData.get("cta"),
-      payment: formData.get("payment"),
-      type: formData.get("type"),
-      mainColor: formData.get("mainColor"),
-      backgroundColor: formData.get("backgroundColor"),
-      fields: checkedFields,
-      createdAt: formData.get("createdAt"),
-      url: `https://cdn.sellyo.fr/${formData.get("type")}/${folderName}/${slugFinal}.html`
     });
 
     alert("✅ Tunnel envoyé avec succès !");
