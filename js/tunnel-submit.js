@@ -1,8 +1,8 @@
-// ✅ tunnel-submit.js — version finale avec compteur, mapping correct et envoi vers Make
+// ✅ tunnel-submit.js — version finale avec compteur, mapping correct, envoi vers Make et enregistrement Firestore
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { uploadCoverImage, uploadCustomVideo, uploadLogo } from "./upload-media.js";
 
 const auth = getAuth(app);
@@ -143,7 +143,7 @@ if (form && typeField && dynamicFieldsContainer) {
   });
 }
 
-// 🔁 Ajout automatique de .html + compteur pour unicité
+// 🔁 Ajout automatique de .html + compteur pour unicite
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = auth.currentUser;
@@ -156,7 +156,7 @@ form.addEventListener("submit", async (e) => {
   const payload = {
     userId: user.uid,
     folder: folderName,
-    slug: slugFinal, // ✅ Sans extension, Make s'en charge
+    slug: slugFinal,
     name: document.getElementById("tunnel-name")?.value || "",
     goal: document.getElementById("tunnel-goal")?.value || "",
     sector: document.getElementById("sector")?.value || "",
@@ -177,6 +177,13 @@ form.addEventListener("submit", async (e) => {
       },
       body: JSON.stringify(payload),
     });
+
+    // ✅ Enregistrement dans Firestore
+    await addDoc(collection(db, "tunnels"), {
+      ...payload,
+      url: `https://cdn.sellyo.fr/${payload.type}/${slugFinal}.html`,
+    });
+
     alert("✅ Tunnel envoyé avec succès !");
     form.reset();
   } catch (err) {
