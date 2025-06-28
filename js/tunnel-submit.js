@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js — version finale avec compteur, mapping correct, envoi vers Make et enregistrement Firestore
+// ✅ tunnel-submit.js — version finale avec upload images/vidéo + affichage dashboard
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -135,6 +135,16 @@ form.addEventListener("submit", async (e) => {
 
   const checkedFields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => el.value);
 
+  const logoFile = document.getElementById("logo")?.files[0] || null;
+  const coverFile = document.getElementById("cover-image")?.files[0] || null;
+  const videoFile = document.getElementById("custom-video")?.files[0] || null;
+
+  const [logoURL, coverURL, videoURL] = await Promise.all([
+    logoFile ? uploadLogo(logoFile, user.uid, slugFinal) : "",
+    coverFile ? uploadCoverImage(coverFile, user.uid, slugFinal) : "",
+    videoFile ? uploadCustomVideo(videoFile, user.uid, slugFinal) : "",
+  ]);
+
   const payload = {
     userId: user.uid,
     folder: folderName,
@@ -149,6 +159,9 @@ form.addEventListener("submit", async (e) => {
     mainColor: document.getElementById("mainColor")?.value || "",
     backgroundColor: document.getElementById("backgroundColor")?.value || "",
     fields: checkedFields,
+    logoURL,
+    coverURL,
+    videoURL,
     createdAt: new Date().toLocaleString("fr-FR"),
   };
 
