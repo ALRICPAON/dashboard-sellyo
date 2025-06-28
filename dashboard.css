@@ -152,4 +152,20 @@ form button:hover {
 
 .tunnel-card a:hover {
   background: #00aacc;
+  .delete-btn {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  background: #ff4444;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
+
+.delete-btn:hover {
+  background: #cc0000;
+}
+
