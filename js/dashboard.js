@@ -34,18 +34,35 @@ if (createBtn && formContainer && dashboardContent) {
     formContainer.style.display = "block";
     dashboardContent.innerHTML = "";
     tunnelsContainer.innerHTML = "";
-    console.log("✅ Formulaire principal affiché !");
+
+    // Réinitialisation des placeholders lors de l'affichage
+    document.getElementById("folderName").placeholder = "ex: nomdemarque";
+    document.getElementById("slug").placeholder = "ex: offre-speciale";
+
+    const objectifField = document.getElementById("objectif");
+    if (objectifField) objectifField.placeholder = "ex: Obtenir des inscrits pour newsletter";
+
+    const secteurField = document.getElementById("secteur");
+    if (secteurField) secteurField.placeholder = "ex: Beauté, coaching, immobilier...";
+
+    const ctaField = document.getElementById("cta");
+    if (ctaField) ctaField.placeholder = "ex: Je m'inscris / Je télécharge";
+
+    const paymentUrlField = document.getElementById("paymentUrl");
+    if (paymentUrlField && tunnelType.value === "landing") {
+      paymentUrlField.parentElement.remove();
+    }
+
+    console.log("✅ Formulaire principal affiché avec placeholders !");
   });
 }
 
 // Supprime le champ URL de paiement si "landing" sélectionné
 if (tunnelType) {
   tunnelType.addEventListener("change", () => {
-    if (tunnelType.value === "landing") {
-      const paymentField = document.querySelector("#form-content-fields input[type='url']");
-      if (paymentField && paymentField.parentElement) {
-        paymentField.parentElement.remove();
-      }
+    const paymentField = document.querySelector("#form-content-fields input[type='url']");
+    if (tunnelType.value === "landing" && paymentField && paymentField.parentElement) {
+      paymentField.parentElement.remove();
     }
   });
 }
