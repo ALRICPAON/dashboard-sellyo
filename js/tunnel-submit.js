@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js – version corrigée avec garde-fou d'affichage
+// ✅ tunnel-submit.js – version modifiée avec exemples + suppression champ URL paiement
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -44,11 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (["landing", "video"].includes(selected)) {
         dynamicFieldsContainer.innerHTML = `
-          <label>Nom du contenu *</label><br>
+          <label>Nom du contenu *<br><small style="color:#aaa;">Ex : Formation express, méthode virale, etc.</small></label><br>
           <input type="text" id="tunnel-name" name="name" required><br><br>
-          <label>Objectif *</label><br>
+          <label>Objectif *<br><small style="color:#aaa;">Ex : Générer des ventes, récolter des emails...</small></label><br>
           <input type="text" id="tunnel-goal" name="goal"><br><br>
-          <label>Secteur</label><br>
+          <label>Secteur<br><small style="color:#aaa;">Ex : Coaching, immobilier, e-commerce</small></label><br>
           <input type="text" id="sector" name="sector"><br><br>
           <label>Logo</label><br>
           <input type="file" id="logo" name="logo" accept="image/*"><br><br>
@@ -56,12 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <input type="file" id="cover-image" name="cover" accept="image/*"><br><br>
           <label>Vidéo</label><br>
           <input type="file" id="custom-video" name="video" accept="video/*"><br><br>
-          <label>Description de l’offre *</label><br>
+          <label>Description de l’offre *<br><small style="color:#aaa;">Ex : Accède à 10 modules gratuits pour booster tes ventes.</small></label><br>
           <textarea id="tunnel-desc" name="desc" required></textarea><br><br>
-          <label>Texte du bouton *</label><br>
+          <label>Texte du bouton *<br><small style="color:#aaa;">Ex : Je démarre maintenant, Accéder à l'offre...</small></label><br>
           <input type="text" id="cta-text" name="cta" required><br><br>
-          <label>URL du bouton (paiement)</label><br>
-          <input type="url" id="payment-url" name="payment"><br><br>
           <label>Champs à demander :</label><br>
           <label><input type="checkbox" name="fields" value="nom"> Nom</label>
           <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
@@ -101,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.set("sector", document.getElementById("sector")?.value || "");
       formData.set("desc", document.getElementById("tunnel-desc")?.value || "");
       formData.set("cta", document.getElementById("cta-text")?.value || "");
-      formData.set("payment", document.getElementById("payment-url")?.value || "");
       formData.set("mainColor", document.getElementById("mainColor")?.value || "");
       formData.set("backgroundColor", document.getElementById("backgroundColor")?.value || "");
       formData.set("userId", user.uid);
@@ -116,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
         sector: formData.get("sector"),
         desc: formData.get("desc"),
         cta: formData.get("cta"),
-        payment: formData.get("payment"),
         type,
         slug: slugFinal,
         folder: folderName,
