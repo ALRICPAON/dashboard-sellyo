@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const firestoreData = {
-          userId: user.uid,
+         const userId = "test-user";
           name: formData.get("name"),
           goal: formData.get("goal"),
           sector: formData.get("sector"),
