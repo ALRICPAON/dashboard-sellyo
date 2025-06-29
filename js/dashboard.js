@@ -12,21 +12,6 @@ const formContainer = document.getElementById("create-tunnel-form");
 const dashboardContent = document.getElementById("dashboard-content");
 const tunnelsContainer = document.getElementById("tunnels-by-type");
 const viewTunnelsBtn = document.getElementById("view-tunnels");
-const form = document.getElementById("tunnel-form");
-const tunnelType = document.getElementById("tunnel-type");
-const formFields = document.getElementById("form-content-fields");
-
-// Loader HTML ajouté dynamiquement
-const loader = document.createElement("div");
-loader.innerHTML = "<div style='text-align:center; margin-top:20px;'><span style='display:inline-block; border:4px solid #ccc; border-top:4px solid #00ccff; border-radius:50%; width:30px; height:30px; animation: spin 1s linear infinite;'></span></div>";
-
-const loaderStyle = document.createElement("style");
-loaderStyle.textContent = `
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}`;
-document.head.appendChild(loaderStyle);
 
 // Affiche le formulaire
 if (createBtn && formContainer && dashboardContent) {
@@ -34,36 +19,7 @@ if (createBtn && formContainer && dashboardContent) {
     formContainer.style.display = "block";
     dashboardContent.innerHTML = "";
     tunnelsContainer.innerHTML = "";
-
-    // Réinitialisation des placeholders lors de l'affichage
-    document.getElementById("folderName").placeholder = "ex: nomdemarque";
-    document.getElementById("slug").placeholder = "ex: offre-speciale";
-
-    const objectifField = document.getElementById("objectif");
-    if (objectifField) objectifField.placeholder = "ex: Obtenir des inscrits pour newsletter";
-
-    const secteurField = document.getElementById("secteur");
-    if (secteurField) secteurField.placeholder = "ex: Beauté, coaching, immobilier...";
-
-    const ctaField = document.getElementById("cta");
-    if (ctaField) ctaField.placeholder = "ex: Je m'inscris / Je télécharge";
-
-    const paymentUrlField = document.getElementById("paymentUrl");
-    if (paymentUrlField && tunnelType.value === "landing") {
-      paymentUrlField.parentElement.remove();
-    }
-
-    console.log("✅ Formulaire principal affiché avec placeholders !");
-  });
-}
-
-// Supprime le champ URL de paiement si "landing" sélectionné
-if (tunnelType) {
-  tunnelType.addEventListener("change", () => {
-    const paymentField = document.querySelector("#form-content-fields input[type='url']");
-    if (tunnelType.value === "landing" && paymentField && paymentField.parentElement) {
-      paymentField.parentElement.remove();
-    }
+    console.log("✅ Formulaire principal affiché !");
   });
 }
 
@@ -72,8 +28,7 @@ if (viewTunnelsBtn && tunnelsContainer) {
   viewTunnelsBtn.addEventListener("click", async () => {
     dashboardContent.innerHTML = "";
     formContainer.style.display = "none";
-    tunnelsContainer.innerHTML = "";
-    tunnelsContainer.appendChild(loader);
+    tunnelsContainer.innerHTML = "Chargement...";
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
@@ -132,7 +87,7 @@ if (viewTunnelsBtn && tunnelsContainer) {
 
           const deleteBtn = card.querySelector(".delete-btn");
           deleteBtn.addEventListener("click", async () => {
-            const confirmed = confirm(`Supprimer le tunnel \"${tunnel.name}\" ?`);
+            const confirmed = confirm(`Supprimer le tunnel "${tunnel.name}" ?`);
             if (!confirmed) return;
 
             try {
