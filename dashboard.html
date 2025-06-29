@@ -38,13 +38,12 @@
     <div id="create-tunnel-form" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
       <h2>Créer un contenu</h2>
       <form id="tunnel-form">
-        <label>Identifiant public *</label><br>
-        <input type="text" id="folderName" required><br>
-        <small style="color:#aaa;">Ex : nom-marque (sans espace ni accent)</small><br><br>
+        <label>Identifiant public (ex: nom marque, sans espace ni accent) *</label><br>
+        <input type="text" id="folderName" required><br><br>
 
-        <label>Nom de la page *</label><br>
+        <label>Nom de la page (ex: tunnel ou offre-speciale) *</label><br>
         <input type="text" id="slug" required><br>
-        <small style="color:#aaa;">Ex : offre-speciale (l'extension .html sera ajoutée automatiquement)</small><br><br>
+        <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
 
         <label>Type de contenu *</label><br>
         <select id="tunnel-type" required>
@@ -74,8 +73,7 @@
       <h2>Tunnel Complet – Pages personnalisées</h2>
 
       <label>Logo de la marque</label><br>
-      <input type="file" id="full-logo" accept="image/*"><br>
-      <small style="color:#aaa;">Nom de fichier simple, sans espace ni caractère spécial</small><br><br>
+      <input type="file" id="full-logo" accept="image/*"><br><br>
 
       <label>Couleur de fond</label><br>
       <input type="color" id="full-background-color" value="#121212"><br><br>
@@ -84,8 +82,7 @@
       <input type="color" id="full-button-color" value="#ff9900"><br><br>
 
       <label>Vidéo principale</label><br>
-      <input type="file" id="full-video" accept="video/*"><br>
-      <small style="color:#aaa;">Nom de fichier simple, sans espace ni caractère spécial</small><br><br>
+      <input type="file" id="full-video" accept="video/*"><br><br>
 
       <label>URL globale (bouton final)</label><br>
       <input type="url" id="full-main-url"><br><br>
