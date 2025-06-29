@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
           method: "POST",
           body: formData,
         });
-
+console.log("👤 Utilisateur Firebase :", user);
         const firestoreData = {
   userId: user.uid,
   name: formData.get("name"),
