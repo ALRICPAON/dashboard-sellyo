@@ -97,6 +97,13 @@ form.addEventListener("submit", async (e) => {
     });
 
     // Ajout Firestore
+    console.log("📥 Firestore -> tentative d’envoi :", {
+  userId: user.uid,
+  name: formData.get("name"),
+  type: formData.get("type"),
+  pageUrl: `https://cdn.sellyo.fr/landing/${folderName}/${slugFinal}.html`
+});
+
     await addDoc(collection(db, "tunnels"), {
       userId: user.uid,
       name: formData.get("name"),
@@ -117,8 +124,8 @@ form.addEventListener("submit", async (e) => {
 
     alert("✅ Tunnel envoyé avec succès !");
     form.reset();
-  } catch (err) {
-    console.error("❌ Erreur d'envoi :", err);
-    alert("Erreur lors de l'envoi du tunnel.");
-  }
+ } catch (err) {
+  console.error("❌ Erreur Firestore :", err.code, err.message, err);
+  alert("Erreur Firestore : " + err.message);
+}
 });
