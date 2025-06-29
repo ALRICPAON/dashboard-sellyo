@@ -45,7 +45,7 @@ if (viewTunnelsBtn && tunnelsContainer) {
 
       querySnapshot.forEach((docSnap) => {
         const data = docSnap.data();
-        data.id = docSnap.id; // Ajout de l'ID Firestore
+        data.id = docSnap.id;
         const type = data.type || "autre";
         if (tunnelsByType[type]) {
           tunnelsByType[type].push(data);
@@ -61,32 +61,30 @@ if (viewTunnelsBtn && tunnelsContainer) {
         block.innerHTML = `<h3 style="margin-bottom: 0.5rem; text-transform: capitalize">${type}</h3>`;
 
         const grid = document.createElement("div");
-        grid.className = "tunnel-grid"; // Pour CSS 4 colonnes
+        grid.className = "tunnel-grid";
 
         tunnels.forEach((tunnel) => {
           const card = document.createElement("div");
           card.className = "tunnel-card";
 
-          const link = `https://cdn.sellyo.fr/${type}/${tunnel.folder}/${tunnel.slug}.html`;
+          const finalLink = tunnel.pageUrl || `https://cdn.sellyo.fr/${type}/${tunnel.folder}/${tunnel.slug}.html`;
 
           card.innerHTML = `
             <h3>${tunnel.name}</h3>
             <p><small>${tunnel.createdAt || ''}</small></p>
-            <a href="${link}" target="_blank">Voir la page</a>
-            <input type="text" value="${link}" readonly style="margin-top: 0.5rem; background: #333; color: #fff; border: none; width: 100%; padding: 0.3rem; border-radius: 6px;">
+            <a href="${finalLink}" target="_blank">Voir la page</a>
+            <input type="text" value="${finalLink}" readonly style="margin-top: 0.5rem; background: #333; color: #fff; border: none; width: 100%; padding: 0.3rem; border-radius: 6px;">
             <button class="copy-btn">Copier le lien</button>
             <button class="delete-btn">Supprimer</button>
           `;
 
-          // Copier le lien
           const copyBtn = card.querySelector(".copy-btn");
           copyBtn.addEventListener("click", () => {
-            navigator.clipboard.writeText(link);
+            navigator.clipboard.writeText(finalLink);
             copyBtn.textContent = "✅ Copié !";
             setTimeout(() => copyBtn.textContent = "Copier le lien", 1500);
           });
 
-          // Supprimer le tunnel
           const deleteBtn = card.querySelector(".delete-btn");
           deleteBtn.addEventListener("click", async () => {
             const confirmed = confirm(`Supprimer le tunnel "${tunnel.name}" ?`);
