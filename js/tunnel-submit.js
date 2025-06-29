@@ -33,14 +33,37 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("📌 Type sélectionné :", selected);
       dynamicFieldsContainer.innerHTML = "";
 
-      if (["landing", "video"].includes(selected)) {
+      if (selected === "landing") {
         dynamicFieldsContainer.innerHTML = `
           <label>Nom du contenu *</label><br>
-          <input type="text" id="tunnel-name" name="name" required><br><br>
+          <input type="text" id="tunnel-name" name="name" required placeholder="ex: Formation gratuite"><br><br>
           <label>Objectif *</label><br>
-          <input type="text" id="tunnel-goal" name="goal"><br><br>
+          <input type="text" id="tunnel-goal" name="goal" placeholder="ex: Collecter des emails pour une offre"><br><br>
           <label>Secteur</label><br>
-          <input type="text" id="sector" name="sector"><br><br>
+          <input type="text" id="sector" name="sector" placeholder="ex: Coaching, immobilier, santé..."><br><br>
+          <label>Logo</label><br>
+          <input type="file" id="logo" name="logo" accept="image/*"><br><br>
+          <label>Image de couverture</label><br>
+          <input type="file" id="cover-image" name="cover" accept="image/*"><br><br>
+          <label>Description de l’offre *</label><br>
+          <textarea id="tunnel-desc" name="desc" required placeholder="ex: Découvrez notre méthode pas à pas pour générer vos premiers clients"></textarea><br><br>
+          <label>Texte du bouton *</label><br>
+          <input type="text" id="cta-text" name="cta" required placeholder="ex: Je m'inscris / Je télécharge"><br><br>
+          <label>Champs à demander :</label><br>
+          <label><input type="checkbox" name="fields" value="nom"> Nom</label>
+          <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
+          <label><input type="checkbox" name="fields" value="email"> Email</label>
+          <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
+          <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
+        `;
+      } else if (selected === "video") {
+        dynamicFieldsContainer.innerHTML = `
+          <label>Nom du contenu *</label><br>
+          <input type="text" id="tunnel-name" name="name" required placeholder="ex: Vidéo promotionnelle IA"><br><br>
+          <label>Objectif *</label><br>
+          <input type="text" id="tunnel-goal" name="goal" placeholder="ex: Convaincre avec une vidéo persuasive"><br><br>
+          <label>Secteur</label><br>
+          <input type="text" id="sector" name="sector" placeholder="ex: E-commerce, finance, etc."><br><br>
           <label>Logo</label><br>
           <input type="file" id="logo" name="logo" accept="image/*"><br><br>
           <label>Image de couverture</label><br>
@@ -48,11 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <label>Vidéo</label><br>
           <input type="file" id="custom-video" name="video" accept="video/*"><br><br>
           <label>Description de l’offre *</label><br>
-          <textarea id="tunnel-desc" name="desc" required></textarea><br><br>
+          <textarea id="tunnel-desc" name="desc" required placeholder="ex: Cette vidéo montre comment booster vos ventes"></textarea><br><br>
           <label>Texte du bouton *</label><br>
-          <input type="text" id="cta-text" name="cta" required><br><br>
+          <input type="text" id="cta-text" name="cta" required placeholder="ex: Voir la vidéo"><br><br>
           <label>URL du bouton (paiement)</label><br>
-          <input type="url" id="payment-url" name="payment"><br><br>
+          <input type="url" id="payment-url" name="payment" placeholder="ex: https://votresite.com/checkout"><br><br>
           <label>Champs à demander :</label><br>
           <label><input type="checkbox" name="fields" value="nom"> Nom</label>
           <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
@@ -121,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("🧪 Données prêtes pour Firestore :", firestoreData);
 
       try {
-        // Envoi vers Make
         console.log("📤 Envoi à Make...");
         await fetch(webhookURL, {
           method: "POST",
@@ -129,7 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         console.log("✅ Make a bien reçu.");
 
-        // Ensuite, envoi Firestore
         console.log("📤 Envoi vers Firestore...");
         await addDoc(collection(db, "tunnels"), firestoreData);
         console.log("✅ Firestore success");
