@@ -39,12 +39,12 @@
       <h2>Créer un contenu</h2>
       <form id="tunnel-form">
         <label>Identifiant public *</label><br>
-        <input type="text" id="folderName" required><br>
-        <small style="color:#aaa;">Ex : nom-marque (sans espace ni accent)</small><br><br>
+        <input type="text" id="folderName" required placeholder="ex: nom-marque"><br>
+        <small style="color:#aaa;">Sans espace ni accent</small><br><br>
 
         <label>Nom de la page *</label><br>
-        <input type="text" id="slug" required><br>
-        <small style="color:#aaa;">Ex : offre-speciale (l'extension .html sera ajoutée automatiquement)</small><br><br>
+        <input type="text" id="slug" required placeholder="ex: offre-speciale"><br>
+        <small style="color:#aaa;">L'extension .html sera ajoutée automatiquement</small><br><br>
 
         <label>Type de contenu *</label><br>
         <select id="tunnel-type" required>
@@ -56,7 +56,19 @@
         </select><br><br>
 
         <div id="form-content-fields">
-          <!-- les champs dynamiques selon le type sélectionné -->
+          <label>Objectif du tunnel *</label><br>
+          <input type="text" id="objectif" required placeholder="ex: Collecter des mails pour une newsletter"><br><br>
+
+          <label>Secteur d'activité *</label><br>
+          <input type="text" id="secteur" required placeholder="ex: Beauté, coaching, immobilier..."><br><br>
+
+          <label>Call-To-Action (CTA) *</label><br>
+          <input type="text" id="cta" required placeholder="ex: Je m'inscris / Je télécharge"><br><br>
+
+          <div id="payment-url-block">
+            <label>URL de paiement</label><br>
+            <input type="url" id="paymentUrl" placeholder="ex: https://sellyo.fr/checkout/produit"><br><br>
+          </div>
         </div>
 
         <label>Couleur principale du bouton</label><br>
@@ -106,11 +118,35 @@
       const fullForm = document.getElementById("form-tunnel-complet");
       const formFields = document.getElementById("form-content-fields");
       const tunnelPages = document.getElementById("tunnel-pages-complet");
+      const tunnelType = document.getElementById("tunnel-type");
 
       if (form) form.reset();
-      if (formFields) formFields.innerHTML = "";
+      if (formFields) {
+        formFields.innerHTML = `
+          <label>Objectif du tunnel *</label><br>
+          <input type="text" id="objectif" required placeholder="ex: Collecter des mails pour une newsletter"><br><br>
+
+          <label>Secteur d'activité *</label><br>
+          <input type="text" id="secteur" required placeholder="ex: Beauté, coaching, immobilier..."><br><br>
+
+          <label>Call-To-Action (CTA) *</label><br>
+          <input type="text" id="cta" required placeholder="ex: Je m'inscris / Je télécharge"><br><br>
+
+          <div id="payment-url-block">
+            <label>URL de paiement</label><br>
+            <input type="url" id="paymentUrl" placeholder="ex: https://sellyo.fr/checkout/produit"><br><br>
+          </div>
+        `;
+      }
       if (tunnelPages) tunnelPages.innerHTML = "";
       if (fullForm) fullForm.style.display = "none";
+
+      tunnelType.addEventListener("change", () => {
+        const paymentBlock = document.getElementById("payment-url-block");
+        if (tunnelType.value === "landing" && paymentBlock) {
+          paymentBlock.remove();
+        }
+      });
 
       document.getElementById("create-tunnel-form").style.display = "block";
       window.scrollTo(0, 0);
