@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js – version restaurée
+// ✅ tunnel-submit.js – version corrigée avec garde-fou d'affichage
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -29,8 +29,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  let formTypeManuallySelected = false;
+
   if (typeField && dynamicFieldsContainer) {
     typeField.addEventListener("change", () => {
+      if (!formTypeManuallySelected) {
+        formTypeManuallySelected = true;
+        return;
+      }
+
       const selected = typeField.value;
       console.log("📌 Type sélectionné :", selected);
       dynamicFieldsContainer.innerHTML = "";
@@ -123,7 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("🧪 Données prêtes pour Firestore :", firestoreData);
 
       try {
-        // Envoi vers Make
         console.log("📤 Envoi à Make...");
         await fetch(webhookURL, {
           method: "POST",
@@ -131,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         console.log("✅ Make a bien reçu.");
 
-        // Ensuite, envoi Firestore
         console.log("📤 Envoi vers Firestore...");
         await addDoc(collection(db, "tunnels"), firestoreData);
         console.log("✅ Firestore success");
