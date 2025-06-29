@@ -93,6 +93,11 @@ form.addEventListener("submit", async (e) => {
     // 📥 Enregistrement Firestore
     await addDoc(collection(db, "tunnels"), {
       userId: user.uid,
+      console.log("✅ Utilisateur connecté :", user);
+if (!user) {
+  alert("❌ Vous devez être connecté pour envoyer le tunnel.");
+  return;
+}
       name: formData.get("name") ?? "",
       goal: formData.get("goal") ?? "",
       sector: formData.get("sector") ?? "",
