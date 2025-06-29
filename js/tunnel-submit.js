@@ -64,12 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔁 Attente active du DOM et rattachement du listener une fois visible
   const observer = new MutationObserver(() => {
     const form = document.getElementById("tunnel-form");
     if (!form) return;
-
-    observer.disconnect(); // une fois trouvé, on n’observe plus
+    observer.disconnect();
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -86,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const type = document.getElementById("tunnel-type")?.value || "tunnel";
       const urlPrefix = ["landing", "email", "video"].includes(type) ? type : "tunnel";
 
-      // 🔁 Forçage manuel des valeurs pour Make + Firestore
       formData.set("type", type);
       formData.set("name", document.getElementById("tunnel-name")?.value || "");
       formData.set("goal", document.getElementById("tunnel-goal")?.value || "");
@@ -101,42 +98,48 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.set("slug", slugFinal);
       formData.set("createdAt", new Date().toLocaleString("fr-FR"));
 
+      const firestoreData = {
+        userId: user.uid,
+        name: formData.get("name"),
+        goal: formData.get("goal"),
+        sector: formData.get("sector"),
+        desc: formData.get("desc"),
+        cta: formData.get("cta"),
+        payment: formData.get("payment"),
+        type,
+        slug: slugFinal,
+        folder: folderName,
+        mainColor: formData.get("mainColor"),
+        backgroundColor: formData.get("backgroundColor"),
+        createdAt: new Date().toISOString(),
+        fields: formData.getAll("fields"),
+        pageUrl: `https://cdn.sellyo.fr/${urlPrefix}/${folderName}/${slugFinal}.html`
+      };
+
+      try {
+        console.log("📥 Firestore data :", firestoreData);
+        await addDoc(collection(db, "tunnels"), firestoreData);
+        console.log("✅ Ajout Firestore OK");
+      } catch (err) {
+        console.error("❌ Erreur Firestore :", err);
+        alert("Erreur Firestore : " + err.message);
+        return;
+      }
+
       try {
         console.log("📤 Envoi à Make...");
         await fetch(webhookURL, {
           method: "POST",
           body: formData,
         });
-console.log("👤 Utilisateur Firebase :", user);
-        const firestoreData = {
-  userId: user.uid,
-  name: formData.get("name"),
-  goal: formData.get("goal"),
-  sector: formData.get("sector"),
-  desc: formData.get("desc"),
-  cta: formData.get("cta"),
-  payment: formData.get("payment"),
-  type,
-  slug: slugFinal,
-  folder: folderName,
-  mainColor: formData.get("mainColor"),
-  backgroundColor: formData.get("backgroundColor"),
-  createdAt: new Date().toISOString(),
-  fields: formData.getAll("fields"),
-  pageUrl: `https://cdn.sellyo.fr/${urlPrefix}/${folderName}/${slugFinal}.html`
-};
-
-
-        console.log("📥 Firestore data :", firestoreData);
-
-        await addDoc(collection(db, "tunnels"), firestoreData);
-
-        alert("✅ Tunnel envoyé avec succès !");
-        form.reset();
+        console.log("✅ Make OK");
       } catch (err) {
-        console.error("❌ Erreur Firestore ou Make :", err);
-        alert("Erreur lors de l'envoi : " + err.message);
+        console.error("❌ Erreur Make :", err);
+        alert("Erreur Make : " + err.message);
       }
+
+      alert("✅ Tunnel envoyé avec succès !");
+      form.reset();
     });
   });
 
