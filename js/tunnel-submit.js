@@ -67,10 +67,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const observer = new MutationObserver(() => {
     const form = document.getElementById("tunnel-form");
     if (!form) return;
+
     observer.disconnect();
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const user = auth.currentUser;
       if (!user) {
         alert("Vous devez être connecté.");
@@ -113,33 +115,31 @@ document.addEventListener("DOMContentLoaded", () => {
         backgroundColor: formData.get("backgroundColor"),
         createdAt: new Date().toISOString(),
         fields: formData.getAll("fields"),
-        pageUrl: `https://cdn.sellyo.fr/${urlPrefix}/${folderName}/${slugFinal}.html`
+        pageUrl: `https://cdn.sellyo.fr/${urlPrefix}/${folderName}/${slugFinal}.html`,
       };
 
-      try {
-        console.log("📥 Firestore data :", firestoreData);
-        await addDoc(collection(db, "tunnels"), firestoreData);
-        console.log("✅ Ajout Firestore OK");
-      } catch (err) {
-        console.error("❌ Erreur Firestore :", err);
-        alert("Erreur Firestore : " + err.message);
-        return;
-      }
+      console.log("🧪 Données prêtes pour Firestore :", firestoreData);
 
       try {
+        // Envoi vers Make
         console.log("📤 Envoi à Make...");
         await fetch(webhookURL, {
           method: "POST",
           body: formData,
         });
-        console.log("✅ Make OK");
+        console.log("✅ Make a bien reçu.");
+
+        // Ensuite, envoi Firestore
+        console.log("📤 Envoi vers Firestore...");
+        await addDoc(collection(db, "tunnels"), firestoreData);
+        console.log("✅ Firestore success");
+
+        alert("✅ Tunnel envoyé avec succès !");
+        form.reset();
       } catch (err) {
-        console.error("❌ Erreur Make :", err);
+        console.error("❌ Erreur Make ou Firestore :", err);
         alert("Erreur Make : " + err.message);
       }
-
-      alert("✅ Tunnel envoyé avec succès !");
-      form.reset();
     });
   });
 
