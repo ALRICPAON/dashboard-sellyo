@@ -1,5 +1,3 @@
-// ✅ tunnel-submit.js — version finale avec upload images/vidéo + Firestore + Make
-
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -33,7 +31,7 @@ if (form && typeField && dynamicFieldsContainer) {
     const selected = typeField.value;
     dynamicFieldsContainer.innerHTML = "";
 
-    if (selected === "landing" || selected === "video") {
+    if (["landing", "video"].includes(selected)) {
       dynamicFieldsContainer.innerHTML = `
         <label>Nom du contenu *</label><br>
         <input type="text" id="tunnel-name" name="name" required><br><br>
@@ -70,49 +68,53 @@ form.addEventListener("submit", async (e) => {
   if (!user) return;
 
   const formData = new FormData(form);
+  const submitBtn = form.querySelector("button[type='submit']");
+  if (submitBtn) submitBtn.disabled = true;
 
-  const folderName = folderInput?.value || "";
-  const slugClean = slugInput?.value.replace(/[^a-zA-Z0-9\-]/g, "") || "";
+  const folderName = folderInput?.value ?? "";
+  const slugClean = slugInput?.value.replace(/[^a-zA-Z0-9\-]/g, "") ?? "";
   const slugFinal = `${slugClean}-${slugCounter}`;
+  const type = formData.get("type") ?? "tunnel";
+
+  const urlPrefix = ["landing", "email", "video"].includes(type) ? type : "tunnel";
 
   formData.append("userId", user.uid);
   formData.append("folder", folderName);
   formData.append("slug", slugFinal);
-  formData.append("type", document.getElementById("tunnel-type")?.value || "");
-  formData.append("mainColor", document.getElementById("mainColor")?.value || "");
-  formData.append("backgroundColor", document.getElementById("backgroundColor")?.value || "");
   formData.append("createdAt", new Date().toLocaleString("fr-FR"));
 
   try {
-    // Envoi vers Make (Webhook)
+    // 🔁 Envoi à Make
     await fetch(webhookURL, {
       method: "POST",
       body: formData,
     });
 
-    // Ajout dans Firestore
+    // 📥 Enregistrement Firestore
     await addDoc(collection(db, "tunnels"), {
       userId: user.uid,
-      name: formData.get("name"),
-      goal: formData.get("goal"),
-      sector: formData.get("sector"),
-      desc: formData.get("desc"),
-      cta: formData.get("cta"),
-      payment: formData.get("payment"),
-      type: formData.get("type"),
+      name: formData.get("name") ?? "",
+      goal: formData.get("goal") ?? "",
+      sector: formData.get("sector") ?? "",
+      desc: formData.get("desc") ?? "",
+      cta: formData.get("cta") ?? "",
+      payment: formData.get("payment") ?? "",
+      type: type,
       slug: slugFinal,
       folder: folderName,
-      mainColor: formData.get("mainColor"),
-      backgroundColor: formData.get("backgroundColor"),
+      mainColor: formData.get("mainColor") ?? "",
+      backgroundColor: formData.get("backgroundColor") ?? "",
       createdAt: new Date().toISOString(),
       fields: formData.getAll("fields"),
-      pageUrl: `https://cdn.sellyo.fr/landing/${folderName}/${slugFinal}.html`
+      pageUrl: `https://cdn.sellyo.fr/${urlPrefix}/${folderName}/${slugFinal}.html`,
     });
 
     alert("✅ Tunnel envoyé avec succès !");
     form.reset();
   } catch (err) {
-    console.error("Erreur d'envoi:", err);
+    console.error("❌ Erreur d'envoi:", err);
     alert("Erreur lors de l'envoi du tunnel.");
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 });
