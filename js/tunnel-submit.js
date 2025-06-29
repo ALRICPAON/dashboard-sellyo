@@ -109,22 +109,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const firestoreData = {
-         const userId = "test-user";
-          name: formData.get("name"),
-          goal: formData.get("goal"),
-          sector: formData.get("sector"),
-          desc: formData.get("desc"),
-          cta: formData.get("cta"),
-          payment: formData.get("payment"),
-          type,
-          slug: slugFinal,
-          folder: folderName,
-          mainColor: formData.get("mainColor"),
-          backgroundColor: formData.get("backgroundColor"),
-          createdAt: new Date().toISOString(),
-          fields: formData.getAll("fields"),
-          pageUrl: `https://cdn.sellyo.fr/${urlPrefix}/${folderName}/${slugFinal}.html`
-        };
+  userId: user.uid,
+  name: formData.get("name"),
+  goal: formData.get("goal"),
+  sector: formData.get("sector"),
+  desc: formData.get("desc"),
+  cta: formData.get("cta"),
+  payment: formData.get("payment"),
+  type,
+  slug: slugFinal,
+  folder: folderName,
+  mainColor: formData.get("mainColor"),
+  backgroundColor: formData.get("backgroundColor"),
+  createdAt: new Date().toISOString(),
+  fields: formData.getAll("fields"),
+  pageUrl: `https://cdn.sellyo.fr/${urlPrefix}/${folderName}/${slugFinal}.html`
+};
+
 
         console.log("📥 Firestore data :", firestoreData);
 
