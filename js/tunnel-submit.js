@@ -134,24 +134,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       console.log("🧪 Données prêtes pour Firestore :", firestoreData);
 
-      try {
-        console.log("📤 Envoi à Make...");
-        await fetch(webhookURL, {
-          method: "POST",
-          body: formData,
-        });
-        console.log("✅ Make a bien reçu.");
+     try {
+  console.log("📤 Envoi à Make (format JSON)...");
+  await fetch(webhookURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(firestoreData),
+  });
+  console.log("✅ Make a bien reçu.");
 
-        console.log("📤 Envoi vers Firestore...");
-        await addDoc(collection(db, "tunnels"), firestoreData);
-        console.log("✅ Firestore success");
+  console.log("📤 Envoi vers Firestore...");
+  await addDoc(collection(db, "tunnels"), firestoreData);
+  console.log("✅ Firestore success");
 
-        alert("✅ Tunnel envoyé avec succès !");
-        form.reset();
-      } catch (err) {
-        console.error("❌ Erreur Make ou Firestore :", err);
-        alert("Erreur Make : " + err.message);
-      }
+  alert("✅ Tunnel envoyé avec succès !");
+  form.reset();
+} catch (err) {
+  console.error("❌ Erreur Make ou Firestore :", err);
+  alert("Erreur Make : " + err.message);
+}
     });
   });
 
