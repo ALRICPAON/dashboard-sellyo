@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Dashboard – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="js/firebase-auth-check.js"></script>
 </head>
 <body style="background-color: #111; color: white; font-family: sans-serif;">
@@ -28,7 +29,19 @@
     <h1 id="welcome">Bienvenue 👋</h1>
     <div id="dashboard-content"></div>
 
-    <!-- Section pour afficher les tunnels -->
+    <!-- Section nouveaux leads -->
+    <section id="latest-leads" style="margin-top: 2rem;">
+      <h2>Nouveaux clients cette semaine</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+        <canvas id="leadsChart" style="flex: 2; max-width: 600px;"></canvas>
+        <div id="leadsListContainer" style="flex: 1;">
+          <h3>Liste des nouveaux leads</h3>
+          <ul id="leadsList" style="list-style: none; padding: 0; margin: 0;"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section tunnels -->
     <section id="user-tunnels" style="margin-top: 2rem;">
       <h2>Mes tunnels générés</h2>
       <div id="tunnels-by-type" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;"></div>
@@ -54,9 +67,7 @@
           <option value="video">Script vidéo</option>
         </select><br><br>
 
-        <div id="form-content-fields">
-          <!-- les champs dynamiques selon le type sélectionné -->
-        </div>
+        <div id="form-content-fields"></div>
 
         <label>Couleur principale du bouton</label><br>
         <input type="color" id="mainColor" value="#00ccff"><br><br>
@@ -68,10 +79,9 @@
       </form>
     </div>
 
-    <!-- Formulaire pour Tunnel complet uniquement -->
+    <!-- Formulaire pour Tunnel complet -->
     <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin-top: 2rem;">
       <h2>Tunnel Complet – Pages personnalisées</h2>
-
       <label>Logo de la marque</label><br>
       <input type="file" id="full-logo" accept="image/*"><br><br>
 
