@@ -119,7 +119,16 @@ document.addEventListener("DOMContentLoaded", () => {
         mainColor: formData.get("mainColor"),
         backgroundColor: formData.get("backgroundColor"),
         createdAt: new Date().toISOString(),
-        fields: formData.getAll("fields"),
+        fields: formData.getAll("fields").map((value) => {
+  const label = value.charAt(0).toUpperCase() + value.slice(1);
+  const type = value === "email" ? "email" : "text";
+  return {
+    label,
+    name: value,
+    type,
+    placeholder: `Votre ${value}`
+  };
+}),
         pageUrl: `https://cdn.sellyo.fr/${urlPrefix}/${folderName}/${slugFinal}.html`,
       };
 
