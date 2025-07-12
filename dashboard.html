@@ -27,34 +27,38 @@
 
   <main>
     <h1 id="welcome">Bienvenue 👋</h1>
-    <div id="dashboard-content"></div>
 
-    <!-- Section nouveaux leads -->
-    <section id="latest-leads" style="margin-top: 2rem;">
-      <h2>Nouveaux clients cette semaine</h2>
-      <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
-        <canvas id="leadsChart" style="flex: 2; max-width: 600px;"></canvas>
-        <div id="leadsListContainer" style="flex: 1;">
-          <h3>Liste des nouveaux leads</h3>
-          <ul id="leadsList" style="list-style: none; padding: 0; margin: 0;"></ul>
-        </div>
+    <!-- 🔥 Nouvelles données leads 7 jours -->
+    <section style="display: flex; gap: 2rem; margin-top: 2rem;">
+      <!-- Graphique -->
+      <div style="flex: 2; background: #1c1c1c; padding: 1rem; border-radius: 10px;">
+        <h2>Nouveaux leads (7 derniers jours)</h2>
+        <canvas id="leadsChart" width="400" height="200"></canvas>
+      </div>
+
+      <!-- Liste des clients -->
+      <div style="flex: 1; background: #1c1c1c; padding: 1rem; border-radius: 10px;">
+        <h2>Clients récents</h2>
+        <ul id="recent-leads-list" style="list-style: none; padding: 0;"></ul>
       </div>
     </section>
 
-    <!-- Section tunnels -->
+    <div id="dashboard-content"></div>
+
+    <!-- Tunnels générés -->
     <section id="user-tunnels" style="margin-top: 2rem;">
       <h2>Mes tunnels générés</h2>
       <div id="tunnels-by-type" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;"></div>
     </section>
 
-    <!-- Formulaire principal -->
+    <!-- Formulaire -->
     <div id="create-tunnel-form" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
       <h2>Créer un contenu</h2>
       <form id="tunnel-form">
-        <label>Identifiant public (ex: nom marque, sans espace ni accent) *</label><br>
+        <label>Identifiant public *</label><br>
         <input type="text" id="folderName" required><br><br>
 
-        <label>Nom de la page (ex: tunnel ou offre-speciale) *</label><br>
+        <label>Nom de la page *</label><br>
         <input type="text" id="slug" required><br>
         <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
 
@@ -79,9 +83,10 @@
       </form>
     </div>
 
-    <!-- Formulaire pour Tunnel complet -->
+    <!-- Tunnel complet -->
     <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin-top: 2rem;">
       <h2>Tunnel Complet – Pages personnalisées</h2>
+
       <label>Logo de la marque</label><br>
       <input type="file" id="full-logo" accept="image/*"><br><br>
 
