@@ -29,18 +29,17 @@
     <h1 id="welcome">Bienvenue 👋</h1>
 
     <!-- 🔥 Nouvelles données leads 7 jours -->
-    <section style="display: flex; gap: 2rem; margin-top: 2rem;">
+    <section id="leads-section" style="display: flex; gap: 2rem; margin-top: 2rem; max-width: 100%;">
   <!-- Graphique -->
-  <div style="flex: 2; background: #1c1c1c; padding: 1rem; border-radius: 10px;">
-    <h2>Nouveaux leads (7 derniers jours)</h2>
-    <canvas id="leadsChart" width="400" height="200"></canvas>
-  </div>
+  <div style="flex: 3; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
+  <h2>Nouveaux leads (7 derniers jours)</h2>
+  <canvas id="leadsChart" width="600" height="300"></canvas>
+</div>
 
-  <!-- Liste des clients -->
-  <div style="flex: 1; background: #1c1c1c; padding: 1rem; border-radius: 10px;">
-    <h2>Clients récents</h2>
-    <ul id="leadsList" style="padding-left: 1rem; margin: 0; list-style: none;"></ul>
-  </div>
+<div style="flex: 2; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
+  <h2>Clients récents</h2>
+  <ul id="leadsList" style="padding-left: 1rem; margin: 0; list-style: none;"></ul>
+</div>
 </section>
 
     <div id="dashboard-content"></div>
@@ -113,20 +112,23 @@
   <script type="module" src="js/dashboard.js"></script>
 
   <script>
-    document.getElementById("create-tunnel").addEventListener("click", () => {
-      const form = document.getElementById("tunnel-form");
-      const fullForm = document.getElementById("form-tunnel-complet");
-      const formFields = document.getElementById("form-content-fields");
-      const tunnelPages = document.getElementById("tunnel-pages-complet");
+  document.getElementById("create-tunnel").addEventListener("click", () => {
+    const form = document.getElementById("tunnel-form");
+    const fullForm = document.getElementById("form-tunnel-complet");
+    const formFields = document.getElementById("form-content-fields");
+    const tunnelPages = document.getElementById("tunnel-pages-complet");
 
-      if (form) form.reset();
-      if (formFields) formFields.innerHTML = "";
-      if (tunnelPages) tunnelPages.innerHTML = "";
-      if (fullForm) fullForm.style.display = "none";
+    if (form) form.reset();
+    if (formFields) formFields.innerHTML = "";
+    if (tunnelPages) tunnelPages.innerHTML = "";
+    if (fullForm) fullForm.style.display = "none";
 
-      document.getElementById("create-tunnel-form").style.display = "block";
-      window.scrollTo(0, 0);
-    });
-  </script>
+    // 👉 Cacher le graphique + leads
+    document.getElementById("leads-section").style.display = "none";
+
+    document.getElementById("create-tunnel-form").style.display = "block";
+    window.scrollTo(0, 0);
+  });
+</script>
 </body>
 </html>
