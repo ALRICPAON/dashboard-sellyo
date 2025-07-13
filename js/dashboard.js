@@ -1,4 +1,4 @@
-// ✅ dashboard.js – Affiche le formulaire, les tunnels, les leads et les clients
+// ✅ dashboard.js – Affiche le formulaire, les tunnels, les leads et les clients avec filtre et export CSV
 
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -15,6 +15,10 @@ const viewTunnelsBtn = document.getElementById("view-tunnels");
 const viewClientsBtn = document.getElementById("view-clients");
 const clientListSection = document.getElementById("client-list-section");
 const clientListContainer = document.getElementById("client-list");
+const filterType = document.getElementById("filter-type");
+const exportCsvBtn = document.getElementById("export-csv");
+
+let allLeads = [];
 
 if (createBtn && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
@@ -98,10 +102,74 @@ if (viewTunnelsBtn && tunnelsContainer) {
   });
 }
 
-// ✅ Leads de la semaine (graphique + liste)
+if (viewClientsBtn && clientListSection && clientListContainer) {
+  viewClientsBtn.addEventListener("click", async () => {
+    document.getElementById("leads-section").style.display = "none";
+    formContainer.style.display = "none";
+    tunnelsContainer.innerHTML = "";
+    dashboardContent.innerHTML = "";
+    clientListSection.style.display = "block";
+    clientListContainer.innerHTML = "Chargement...";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+
+      const q = query(collection(db, "leads"), where("userId", "==", user.uid));
+      const snapshot = await getDocs(q);
+      allLeads = snapshot.docs.map(docSnap => docSnap.data());
+      renderClientTable(allLeads);
+    });
+  });
+}
+
+if (filterType) {
+  filterType.addEventListener("change", () => {
+    const type = filterType.value;
+    const filtered = type ? allLeads.filter(l => l.type === type) : allLeads;
+    renderClientTable(filtered);
+  });
+}
+
+if (exportCsvBtn) {
+  exportCsvBtn.addEventListener("click", () => {
+    const rows = ["Nom,Email,Téléphone,Type,Date"];
+    const filtered = filterType.value ? allLeads.filter(l => l.type === filterType.value) : allLeads;
+    filtered.forEach(l => {
+      const nom = l.nom || "";
+      const email = l.email || "";
+      const tel = l.telephone || "";
+      const type = l.type || "";
+      const date = l.createdAt?.toDate ? l.createdAt.toDate().toLocaleDateString() : new Date(l.createdAt).toLocaleDateString();
+      rows.push(`${nom},${email},${tel},${type},${date}`);
+    });
+    const blob = new Blob([rows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "clients.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+function renderClientTable(leads) {
+  let html = `<table style="width:100%; border-collapse: collapse; color: white;">
+    <thead><tr><th style="text-align:left; padding: 0.5rem;">Nom</th><th>Email</th><th>Téléphone</th><th>Type</th><th>Date</th></tr></thead><tbody>`;
+  leads.forEach(lead => {
+    const nom = lead.nom || "-";
+    const email = lead.email || "-";
+    const tel = lead.telephone || "-";
+    const type = lead.type || "-";
+    const date = lead.createdAt?.toDate ? lead.createdAt.toDate().toLocaleDateString() : new Date(lead.createdAt).toLocaleDateString();
+    html += `<tr><td style="padding: 0.5rem;">${nom}</td><td>${email}</td><td>${tel}</td><td>${type}</td><td>${date}</td></tr>`;
+  });
+  html += "</tbody></table>";
+  clientListContainer.innerHTML = html;
+}
+
+// ✅ Graphique + liste leads récents
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
-
   const q = query(collection(db, "leads"), where("userId", "==", user.uid));
   const snapshot = await getDocs(q);
   const now = new Date();
@@ -168,46 +236,3 @@ onAuthStateChanged(auth, async (user) => {
     });
   }
 });
-
-// ✅ Bouton Clients
-if (viewClientsBtn && clientListSection && clientListContainer) {
-  viewClientsBtn.addEventListener("click", async () => {
-    document.getElementById("leads-section").style.display = "none";
-    formContainer.style.display = "none";
-    tunnelsContainer.innerHTML = "";
-    dashboardContent.innerHTML = "";
-    clientListSection.style.display = "block";
-    clientListContainer.innerHTML = "Chargement...";
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
-
-      const q = query(collection(db, "leads"), where("userId", "==", user.uid));
-      const snapshot = await getDocs(q);
-      let html = `<table style="width:100%; border-collapse: collapse; color: white;">
-        <thead><tr><th style="text-align:left; padding: 0.5rem;">Nom</th><th>Email</th><th>Téléphone</th><th>Type</th><th>Date</th></tr></thead><tbody>`;
-
-      snapshot.forEach(docSnap => {
-        const lead = docSnap.data();
-        const nom = lead.nom || "-";
-        const email = lead.email || "-";
-        const tel = lead.telephone || "-";
-        const type = lead.type || "-";
-        let date = lead.createdAt;
-        if (date?.toDate) date = date.toDate().toLocaleDateString();
-        else date = new Date(date).toLocaleDateString();
-
-        html += `<tr>
-          <td style="padding: 0.5rem;">${nom}</td>
-          <td>${email}</td>
-          <td>${tel}</td>
-          <td>${type}</td>
-          <td>${date}</td>
-        </tr>`;
-      });
-
-      html += "</tbody></table>";
-      clientListContainer.innerHTML = html;
-    });
-  });
-}
