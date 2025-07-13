@@ -12,6 +12,9 @@ const formContainer = document.getElementById("create-tunnel-form");
 const dashboardContent = document.getElementById("dashboard-content");
 const tunnelsContainer = document.getElementById("tunnels-by-type");
 const viewTunnelsBtn = document.getElementById("view-tunnels");
+const viewClientsBtn = document.getElementById("view-clients");
+const clientListSection = document.getElementById("client-list-section");
+const clientListContainer = document.getElementById("client-list");
 
 if (createBtn && formContainer && dashboardContent) {
   createBtn.addEventListener("click", () => {
@@ -19,6 +22,7 @@ if (createBtn && formContainer && dashboardContent) {
     formContainer.style.display = "block";
     dashboardContent.innerHTML = "";
     tunnelsContainer.innerHTML = "";
+    clientListSection.style.display = "none";
   });
 }
 
@@ -27,6 +31,7 @@ if (viewTunnelsBtn && tunnelsContainer) {
     document.getElementById("leads-section").style.display = "none";
     dashboardContent.innerHTML = "";
     formContainer.style.display = "none";
+    clientListSection.style.display = "none";
     tunnelsContainer.innerHTML = "Chargement...";
 
     onAuthStateChanged(auth, async (user) => {
@@ -163,3 +168,46 @@ onAuthStateChanged(auth, async (user) => {
     });
   }
 });
+
+// ✅ Bouton Clients
+if (viewClientsBtn && clientListSection && clientListContainer) {
+  viewClientsBtn.addEventListener("click", async () => {
+    document.getElementById("leads-section").style.display = "none";
+    formContainer.style.display = "none";
+    tunnelsContainer.innerHTML = "";
+    dashboardContent.innerHTML = "";
+    clientListSection.style.display = "block";
+    clientListContainer.innerHTML = "Chargement...";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+
+      const q = query(collection(db, "leads"), where("userId", "==", user.uid));
+      const snapshot = await getDocs(q);
+      let html = `<table style="width:100%; border-collapse: collapse; color: white;">
+        <thead><tr><th style="text-align:left; padding: 0.5rem;">Nom</th><th>Email</th><th>Téléphone</th><th>Type</th><th>Date</th></tr></thead><tbody>`;
+
+      snapshot.forEach(docSnap => {
+        const lead = docSnap.data();
+        const nom = lead.nom || "-";
+        const email = lead.email || "-";
+        const tel = lead.telephone || "-";
+        const type = lead.type || "-";
+        let date = lead.createdAt;
+        if (date?.toDate) date = date.toDate().toLocaleDateString();
+        else date = new Date(date).toLocaleDateString();
+
+        html += `<tr>
+          <td style="padding: 0.5rem;">${nom}</td>
+          <td>${email}</td>
+          <td>${tel}</td>
+          <td>${type}</td>
+          <td>${date}</td>
+        </tr>`;
+      });
+
+      html += "</tbody></table>";
+      clientListContainer.innerHTML = html;
+    });
+  });
+}
