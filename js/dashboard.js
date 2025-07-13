@@ -162,6 +162,7 @@ function renderClientTable(leads) {
           <th style="padding: 12px 16px;">Téléphone</th>
           <th style="padding: 12px 16px;">Type</th>
           <th style="padding: 12px 16px;">Date</th>
+          <th style="padding: 12px 16px;">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -170,6 +171,7 @@ function renderClientTable(leads) {
   leads.forEach((lead) => {
     const prenom = lead.prenom || "-";
     const nom = lead.nom || lead.email || "-";
+    const email = lead.email || "";
     const tel = lead.telephone || "-";
     const type = lead.type || "-";
     const date = lead.createdAt?.toDate ? lead.createdAt.toDate().toLocaleDateString() : new Date(lead.createdAt).toLocaleDateString();
@@ -181,6 +183,9 @@ function renderClientTable(leads) {
         <td style="padding: 12px 16px;">${tel}</td>
         <td style="padding: 12px 16px; text-transform: capitalize;">${type}</td>
         <td style="padding: 12px 16px;">${date}</td>
+        <td style="padding: 12px 16px;">
+          ${email ? `<button onclick="navigator.clipboard.writeText('${email}'); this.innerText='✅ Copié'; setTimeout(() => this.innerText='Copier l’email', 1500);" style="background:#00ccff; color:#000; border:none; padding:6px 10px; border-radius:5px; cursor:pointer;">Copier l’email</button>` : "-"}
+        </td>
       </tr>
     `;
   });
