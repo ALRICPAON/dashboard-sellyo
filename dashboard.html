@@ -53,6 +53,19 @@
     <section id="client-list-section" style="display: none; margin-top: 2rem;">
   <h2>Mes clients</h2>
   <div id="client-list" style="background: #1c1c1c; padding: 1.5rem; border-radius: 10px;"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+  <div>
+    <label for="filter-type">Filtrer :</label>
+    <select id="filter-type" style="background: #000; color: #fff; border: none; padding: 0.4rem;">
+      <option value="">Tous</option>
+      <option value="tunnel">Tunnel</option>
+      <option value="landing">Landing</option>
+      <option value="email">Email</option>
+      <option value="video">Vidéo</option>
+    </select>
+  </div>
+  <button id="export-csv" style="background: #00ccff; color: #000; padding: 0.5rem 1rem; border: none; border-radius: 6px;">📁 Exporter CSV</button>
+</div>
 </section>
 
     <!-- Formulaire -->
