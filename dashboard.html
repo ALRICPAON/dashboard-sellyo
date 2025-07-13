@@ -14,6 +14,7 @@
       <ul>
         <li><a href="#" id="create-tunnel">Créer un tunnel</a></li>
         <li><a href="#" id="view-tunnels">Mes tunnels</a></li>
+        <li><a href="#" id="view-clients">Clients</a></li>
         <li><a href="#" id="stats">Statistiques</a></li>
         <li><a href="#" id="upgrade">Passer Premium</a></li>
         <li><a href="#" id="logout">Déconnexion</a></li>
@@ -49,6 +50,10 @@
       <h2>Mes tunnels générés</h2>
       <div id="tunnels-by-type" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;"></div>
     </section>
+    <section id="client-list-section" style="display: none; margin-top: 2rem;">
+  <h2>Mes clients</h2>
+  <div id="client-list" style="background: #1c1c1c; padding: 1.5rem; border-radius: 10px;"></div>
+</section>
 
     <!-- Formulaire -->
     <div id="create-tunnel-form" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
