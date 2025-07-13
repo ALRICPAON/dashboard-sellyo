@@ -1,8 +1,14 @@
-// ✅ dashboard.js – Affiche le formulaire, les tunnels, et les nouveaux leads avec graphique
-
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -12,21 +18,31 @@ const formContainer = document.getElementById("create-tunnel-form");
 const dashboardContent = document.getElementById("dashboard-content");
 const tunnelsContainer = document.getElementById("tunnels-by-type");
 const viewTunnelsBtn = document.getElementById("view-tunnels");
+const viewClientsBtn = document.getElementById("view-clients");
+const clientListSection = document.getElementById("client-list-section");
+const clientListContainer = document.getElementById("client-list");
+const filterTypeSelect = document.getElementById("filter-type");
+const exportCsvBtn = document.getElementById("export-csv");
 
+let allLeads = []; // Stocker tous les leads pour filtrage et export
+
+// ➕ Tunnels
 if (createBtn && formContainer && dashboardContent) {
- createBtn.addEventListener("click", () => {
-  document.getElementById("leads-section").style.display = "none"; // 👈 Ajoute cette ligne
-  formContainer.style.display = "block";
-  dashboardContent.innerHTML = "";
-  tunnelsContainer.innerHTML = "";
-});
+  createBtn.addEventListener("click", () => {
+    document.getElementById("leads-section").style.display = "none";
+    formContainer.style.display = "block";
+    dashboardContent.innerHTML = "";
+    tunnelsContainer.innerHTML = "";
+    clientListSection.style.display = "none";
+  });
 }
 
 if (viewTunnelsBtn && tunnelsContainer) {
   viewTunnelsBtn.addEventListener("click", async () => {
-   document.getElementById("leads-section").style.display = "none";
-    dashboardContent.innerHTML = "";
+    document.getElementById("leads-section").style.display = "none";
     formContainer.style.display = "none";
+    clientListSection.style.display = "none";
+    dashboardContent.innerHTML = "";
     tunnelsContainer.innerHTML = "Chargement...";
 
     onAuthStateChanged(auth, async (user) => {
@@ -93,69 +109,7 @@ if (viewTunnelsBtn && tunnelsContainer) {
   });
 }
 
-// ➕ Récupérer les leads récents et les afficher dans le graphique et la liste
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return;
-  const leadsRef = collection(db, "leads");
-  const snapshot = await getDocs(leadsRef);
-  const now = new Date();
-  const leadsThisWeek = [];
-
-  snapshot.forEach((doc) => {
-    const data = doc.data();
-    const created = data.createdAt ? new Date(data.createdAt) : null;
-    if (created && (now - created) / (1000 * 60 * 60 * 24) <= 7) {
-      leadsThisWeek.push(data);
-    }
-  });
-
-  // Générer le graphique avec Chart.js
-  const dailyCounts = {};
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(now.getDate() - i);
-    const key = d.toLocaleDateString();
-    dailyCounts[key] = 0;
-  }
-  leadsThisWeek.forEach((lead) => {
-    const d = new Date(lead.createdAt).toLocaleDateString();
-    if (dailyCounts[d] !== undefined) dailyCounts[d]++;
-  });
-
-  const ctx = document.getElementById("leadsChart").getContext("2d");
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: Object.keys(dailyCounts),
-      datasets: [{
-        label: "Nouveaux leads",
-        data: Object.values(dailyCounts),
-        borderColor: "#00ccff",
-        tension: 0.3,
-      }]
-    },
-    options: {
-      scales: {
-        y: { beginAtZero: true, ticks: { precision: 0 } }
-      }
-    }
-  });
-
-  // Liste des noms des leads
-  const list = document.getElementById("leadsList");
-  leadsThisWeek.forEach((lead) => {
-    const li = document.createElement("li");
-    const date = lead.createdAt ? new Date(lead.createdAt).toLocaleDateString() : "Date inconnue";
-const type = lead.type || "n.c.";
-const name = lead.nom || lead.email || lead.telephone || "(inconnu)";
-li.textContent = `${name} — ${type} — ${date}`;
-    list.appendChild(li);
-  });
-});
-const viewClientsBtn = document.getElementById("view-clients");
-const clientListSection = document.getElementById("client-list-section");
-const clientListContainer = document.getElementById("client-list");
-
+// ➕ Clients
 if (viewClientsBtn && clientListSection) {
   viewClientsBtn.addEventListener("click", async () => {
     document.getElementById("leads-section").style.display = "none";
@@ -170,28 +124,71 @@ if (viewClientsBtn && clientListSection) {
 
       const q = query(collection(db, "leads"), where("userId", "==", user.uid));
       const snapshot = await getDocs(q);
-      let html = `<table style="width:100%; border-collapse: collapse; color: white;">
-        <thead><tr><th style="text-align:left; padding: 0.5rem;">Nom</th><th>Email</th><th>Téléphone</th><th>Type</th><th>Date</th></tr></thead><tbody>`;
+      allLeads = [];
 
       snapshot.forEach(docSnap => {
         const lead = docSnap.data();
-        const nom = lead.nom || "-";
-        const email = lead.email || "-";
-        const tel = lead.telephone || "-";
-        const type = lead.type || "-";
-        const date = lead.createdAt ? new Date(lead.createdAt).toLocaleDateString() : "-";
-
-        html += `<tr>
-          <td style="padding: 0.5rem;">${nom}</td>
-          <td>${email}</td>
-          <td>${tel}</td>
-          <td>${type}</td>
-          <td>${date}</td>
-        </tr>`;
+        allLeads.push({
+          nom: lead.nom || "-",
+          email: lead.email || "-",
+          tel: lead.telephone || "-",
+          type: lead.type || "-",
+          date: lead.createdAt ? new Date(lead.createdAt).toLocaleDateString() : "-"
+        });
       });
 
-      html += "</tbody></table>";
-      clientListContainer.innerHTML = html;
+      renderLeadsTable(allLeads);
     });
+  });
+}
+
+// ➕ Affichage du tableau filtré
+function renderLeadsTable(leads) {
+  let html = `<table style="width:100%; border-collapse: collapse; color: white;">
+    <thead><tr><th style="padding: 0.5rem; text-align:left;">Nom</th><th>Email</th><th>Téléphone</th><th>Type</th><th>Date</th></tr></thead><tbody>`;
+  leads.forEach(lead => {
+    html += `<tr>
+      <td style="padding: 0.5rem;">${lead.nom}</td>
+      <td>${lead.email}</td>
+      <td>${lead.tel}</td>
+      <td>${lead.type}</td>
+      <td>${lead.date}</td>
+    </tr>`;
+  });
+  html += "</tbody></table>";
+  clientListContainer.innerHTML = html;
+}
+
+// ➕ Filtrage par type
+if (filterTypeSelect) {
+  filterTypeSelect.addEventListener("change", () => {
+    const value = filterTypeSelect.value;
+    if (!value) {
+      renderLeadsTable(allLeads);
+    } else {
+      const filtered = allLeads.filter(lead => lead.type === value);
+      renderLeadsTable(filtered);
+    }
+  });
+}
+
+// ➕ Export CSV
+if (exportCsvBtn) {
+  exportCsvBtn.addEventListener("click", () => {
+    const type = filterTypeSelect.value;
+    const filteredLeads = type ? allLeads.filter(lead => lead.type === type) : allLeads;
+
+    const csvContent = "data:text/csv;charset=utf-8," + [
+      ["Nom", "Email", "Téléphone", "Type", "Date"],
+      ...filteredLeads.map(lead => [lead.nom, lead.email, lead.tel, lead.type, lead.date])
+    ].map(e => e.join(";")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `clients_${type || "tous"}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   });
 }
