@@ -153,16 +153,38 @@ if (exportCsvBtn) {
 }
 
 function renderClientTable(leads) {
-  let html = `<table style="width:100%; border-collapse: collapse; color: white;">
-    <thead><tr><th style="text-align:left; padding: 0.5rem;">Nom</th><th>Email</th><th>Téléphone</th><th>Type</th><th>Date</th></tr></thead><tbody>`;
-  leads.forEach(lead => {
-    const nom = lead.nom || "-";
-    const email = lead.email || "-";
+  let html = `
+    <table style="width:100%; border-collapse: collapse; font-size: 16px; color: white;">
+      <thead>
+        <tr style="background:#333;">
+          <th style="padding: 12px 16px;">Prénom</th>
+          <th style="padding: 12px 16px;">Nom / Email</th>
+          <th style="padding: 12px 16px;">Téléphone</th>
+          <th style="padding: 12px 16px;">Type</th>
+          <th style="padding: 12px 16px;">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  leads.forEach((lead) => {
+    const prenom = lead.prenom || "-";
+    const nom = lead.nom || lead.email || "-";
     const tel = lead.telephone || "-";
     const type = lead.type || "-";
     const date = lead.createdAt?.toDate ? lead.createdAt.toDate().toLocaleDateString() : new Date(lead.createdAt).toLocaleDateString();
-    html += `<tr><td style="padding: 0.5rem;">${nom}</td><td>${email}</td><td>${tel}</td><td>${type}</td><td>${date}</td></tr>`;
+
+    html += `
+      <tr style="border-bottom:1px solid #444;">
+        <td style="padding: 12px 16px;">${prenom}</td>
+        <td style="padding: 12px 16px;">${nom}</td>
+        <td style="padding: 12px 16px;">${tel}</td>
+        <td style="padding: 12px 16px; text-transform: capitalize;">${type}</td>
+        <td style="padding: 12px 16px;">${date}</td>
+      </tr>
+    `;
   });
+
   html += "</tbody></table>";
   clientListContainer.innerHTML = html;
 }
