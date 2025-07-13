@@ -170,8 +170,8 @@ function renderClientTable(leads) {
 
   leads.forEach((lead) => {
     const prenom = lead.prenom || "-";
-    const nom = lead.nom || lead.email || "-";
-    const email = lead.email || "";
+    const nom = lead.nom || "-";
+const email = lead.email || "-";
     const tel = lead.telephone || "-";
     const type = lead.type || "-";
     const date = lead.createdAt?.toDate ? lead.createdAt.toDate().toLocaleDateString() : new Date(lead.createdAt).toLocaleDateString();
@@ -179,7 +179,10 @@ function renderClientTable(leads) {
     html += `
       <tr style="border-bottom:1px solid #444;">
         <td style="padding: 12px 16px;">${prenom}</td>
-        <td style="padding: 12px 16px;">${nom}</td>
+        <td style="padding: 12px 16px;">
+  <strong>${nom}</strong><br>
+  <small style="color: #ccc;">${email}</small>
+</td>
         <td style="padding: 12px 16px;">${tel}</td>
         <td style="padding: 12px 16px; text-transform: capitalize;">${type}</td>
         <td style="padding: 12px 16px;">${date}</td>
