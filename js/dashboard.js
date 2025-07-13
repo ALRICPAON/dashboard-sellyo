@@ -14,15 +14,17 @@ const tunnelsContainer = document.getElementById("tunnels-by-type");
 const viewTunnelsBtn = document.getElementById("view-tunnels");
 
 if (createBtn && formContainer && dashboardContent) {
-  createBtn.addEventListener("click", () => {
-    formContainer.style.display = "block";
-    dashboardContent.innerHTML = "";
-    tunnelsContainer.innerHTML = "";
-  });
+ createBtn.addEventListener("click", () => {
+  document.getElementById("leads-section").style.display = "none"; // 👈 Ajoute cette ligne
+  formContainer.style.display = "block";
+  dashboardContent.innerHTML = "";
+  tunnelsContainer.innerHTML = "";
+});
 }
 
 if (viewTunnelsBtn && tunnelsContainer) {
   viewTunnelsBtn.addEventListener("click", async () => {
+   document.getElementById("leads-section").style.display = "none";
     dashboardContent.innerHTML = "";
     formContainer.style.display = "none";
     tunnelsContainer.innerHTML = "Chargement...";
@@ -143,7 +145,10 @@ onAuthStateChanged(auth, async (user) => {
   const list = document.getElementById("leadsList");
   leadsThisWeek.forEach((lead) => {
     const li = document.createElement("li");
-    li.textContent = lead.nom || lead.email || lead.telephone || "(inconnu)";
+    const date = lead.createdAt ? new Date(lead.createdAt).toLocaleDateString() : "Date inconnue";
+const type = lead.type || "n.c.";
+const name = lead.nom || lead.email || lead.telephone || "(inconnu)";
+li.textContent = `${name} — ${type} — ${date}`;
     list.appendChild(li);
   });
 });
