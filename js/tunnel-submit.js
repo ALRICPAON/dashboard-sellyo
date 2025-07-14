@@ -146,8 +146,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         await addDoc(collection(db, "tunnels"), firestoreData);
-        alert("✅ Tunnel généré avec succès !");
-        form.reset();
+
+// 🔄 Ajout du loader
+const submitBtn = form.querySelector("button[type='submit'], input[type='submit']");
+if (submitBtn) {
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `Génération du tunnel en cours... <span class="loader"></span>`;
+}
+
+// ⏳ Attente de 30 secondes avant redirection
+setTimeout(() => {
+  window.location.href = "dashboard.html";
+}, 30000);
       } catch (err) {
         console.error("❌ Erreur Make ou Firestore :", err);
         alert("Erreur lors de l'envoi : " + err.message);
