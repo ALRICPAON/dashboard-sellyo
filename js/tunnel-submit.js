@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const submitBtn = form.querySelector("button[type='submit'], input[type='submit']");
 if (submitBtn) {
   submitBtn.disabled = true;
-  submitBtn.innerHTML = `Génération du tunnel en cours... <span class="loader"></span>`;
+  submitBtn.innerHTML = `Génération en cours <span class="button-loader"></span>`;
 }
 
 // ⏳ Attente de 30 secondes avant redirection
