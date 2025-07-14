@@ -16,6 +16,9 @@ if (tunnelParam === "1") {
       loadingMsg.innerHTML = "✅ Ton tunnel est prêt. Clique sur <strong>“Mes tunnels”</strong> pour le découvrir.";
     }, 30000);
   }
+// Nettoyer l'URL pour ne plus afficher le message au prochain chargement
+const newUrl = window.location.pathname;
+window.history.replaceState({}, document.title, newUrl);
 
   // Cacher toutes les autres sections, afficher "Mes tunnels"
   document.getElementById("leads-section").style.display = "none";
