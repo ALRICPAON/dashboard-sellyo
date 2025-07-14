@@ -171,11 +171,20 @@
     document.getElementById("tunnel-form").addEventListener("submit", () => {
       loaderZone.innerHTML = '<span class="button-loader"></span>';
 
-      const loadingMsg = document.getElementById("loading-message");
-      if (loadingMsg) {
-        loadingMsg.innerText = '🛠️ Génération en cours… Ton tunnel est désormais disponible dans l’onglet "Mes tunnels".';
-        loadingMsg.style.display = "block";
-      }
+      setTimeout(() => {
+        // 👉 Cacher le formulaire
+        document.getElementById("create-tunnel-form").style.display = "none";
+
+        // 👉 Afficher le message
+        const loadingMsg = document.getElementById("loading-message");
+        if (loadingMsg) {
+          loadingMsg.innerText = '🛠️ Génération en cours… Ton tunnel est désormais disponible dans l’onglet "Mes tunnels".';
+          loadingMsg.style.display = "block";
+          window.scrollTo(0, 0); // remonte pour bien voir le message
+        }
+
+        loaderZone.innerHTML = '';
+      }, 30000);
     });
   }
 </script>
