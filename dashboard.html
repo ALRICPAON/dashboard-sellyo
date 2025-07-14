@@ -175,7 +175,7 @@
 
       // Empêche l'accès à la redirection trop tôt
       setTimeout(() => {
-        window.location.href = "dashboard.html"; // Redirige vers le dashboard après 30s
+       document.getElementById("view-tunnels").click();
       }, 30000);
     });
   }
