@@ -207,17 +207,22 @@
     });
   }
 </script>
- <script>
+<script>
   // ✅ Affiche le message si on arrive avec ?tunnel=1
   window.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("tunnel") === "1") {
       const loadingMsg = document.getElementById("loading-message");
+      const leadsSection = document.getElementById("leads-section");
       if (loadingMsg) {
-        loadingMsg.innerHTML = "🛠️ Génération en cours… Votre tunnel sera visible ici dans moins de 2 minutes...";
+        // 👉 Cacher le bloc graphique et clients
+        if (leadsSection) leadsSection.style.display = "none";
+
+        // 👉 Afficher le message de génération
+        loadingMsg.innerHTML = "🛠️ Génération en cours… Votre tunnel sera visible dans moins de 2 minutes...";
         loadingMsg.style.display = "block";
 
-        // ⏱️ Après 1min30 : message + rechargement des tunnels
+        // ⏱️ Après 1min30 : second message + recharge des tunnels
         setTimeout(() => {
           loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur l’onglet <strong>Mes tunnels</strong> pour le découvrir.";
           import('./js/reload-tunnels.js').then(module => {
@@ -225,7 +230,7 @@
           });
         }, 90000);
 
-        // 🚫 Supprime le paramètre ?tunnel=1 de l’URL pour éviter qu’il reste
+        // 🚫 Supprime le paramètre de l’URL
         const url = new URL(window.location);
         url.searchParams.delete('tunnel');
         window.history.replaceState({}, document.title, url);
