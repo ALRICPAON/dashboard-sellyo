@@ -60,6 +60,8 @@
 
     <div id="dashboard-content"></div>
 
+    <div id="loading-message" style="display:none; margin-top: 1rem; background:#1c1c1c; padding:1rem; border-radius:8px; color:#00ccff; font-weight:bold;"></div>
+
     <!-- ✅ Message temporaire après génération -->
     <div id="loading-message" style="display:none; text-align:center; margin-top: 2rem; font-size: 1.2rem; color: #00ccff;">
       🛠️ Génération en cours… Votre tunnel sera visible ici dans quelques instants...
@@ -145,49 +147,37 @@
   <script type="module" src="js/tunnel-submit.js"></script>
   <script type="module" src="js/dashboard.js"></script>
 
-  <script>
-    document.getElementById("create-tunnel").addEventListener("click", () => {
-      const form = document.getElementById("tunnel-form");
-      const fullForm = document.getElementById("form-tunnel-complet");
-      const formFields = document.getElementById("form-content-fields");
-      const tunnelPages = document.getElementById("tunnel-pages-complet");
+<script>
+  document.getElementById("create-tunnel").addEventListener("click", () => {
+    const form = document.getElementById("tunnel-form");
+    const fullForm = document.getElementById("form-tunnel-complet");
+    const formFields = document.getElementById("form-content-fields");
+    const tunnelPages = document.getElementById("tunnel-pages-complet");
 
-      if (form) form.reset();
-      if (formFields) formFields.innerHTML = "";
-      if (tunnelPages) tunnelPages.innerHTML = "";
-      if (fullForm) fullForm.style.display = "none";
+    if (form) form.reset();
+    if (formFields) formFields.innerHTML = "";
+    if (tunnelPages) tunnelPages.innerHTML = "";
+    if (fullForm) fullForm.style.display = "none";
 
-      document.getElementById("leads-section").style.display = "none";
-      document.getElementById("create-tunnel-form").style.display = "block";
-      window.scrollTo(0, 0);
+    document.getElementById("leads-section").style.display = "none";
+    document.getElementById("create-tunnel-form").style.display = "block";
+    window.scrollTo(0, 0);
+  });
+
+  const generateBtn = document.getElementById("generate-button");
+  const loaderZone = document.getElementById("loader-zone");
+
+  if (generateBtn && loaderZone) {
+    document.getElementById("tunnel-form").addEventListener("submit", () => {
+      loaderZone.innerHTML = '<span class="button-loader"></span>';
+
+      const loadingMsg = document.getElementById("loading-message");
+      if (loadingMsg) {
+        loadingMsg.innerText = '🛠️ Génération en cours… Ton tunnel est désormais disponible dans l’onglet "Mes tunnels".';
+        loadingMsg.style.display = "block";
+      }
     });
-
-    const generateBtn = document.getElementById("generate-button");
-    const loaderZone = document.getElementById("loader-zone");
-
-    if (generateBtn && loaderZone) {
-      document.getElementById("tunnel-form").addEventListener("submit", () => {
-        loaderZone.innerHTML = '<span class="button-loader"></span>';
-
-        setTimeout(() => {
-          // Masquer toutes les sections
-          document.querySelectorAll(".section").forEach(el => el.style.display = "none");
-
-          // Afficher le message temporaire
-          const loadingMsg = document.getElementById("loading-message");
-          if (loadingMsg) loadingMsg.style.display = "block";
-
-          // Afficher la section "Mes tunnels"
-          const tunnelSection = document.getElementById("user-tunnels");
-          if (tunnelSection) {
-            tunnelSection.style.display = "block";
-            tunnelSection.scrollIntoView({ behavior: "smooth" });
-          }
-
-          loaderZone.innerHTML = '';
-        }, 30000);
-      });
-    }
-  </script>
+  }
+</script>
 </body>
 </html>
