@@ -174,6 +174,8 @@
 
   if (generateBtn && loaderZone) {
     document.getElementById("tunnel-form").addEventListener("submit", (e) => {
+      e.preventDefault(); // ← ⛔ empêche la soumission par défaut du formulaire
+
       loaderZone.innerHTML = '<span class="button-loader"></span>';
 
       // Masquer tout sauf le message de chargement
@@ -188,17 +190,15 @@
       loadingMsg.innerHTML = "🛠️ Génération en cours… Votre tunnel sera visible ici dans moins de 2 minutes...";
       loadingMsg.style.display = "block";
 
-      // Au bout de 90s, afficher le message de fin
+      // ⏱ Après 1m30 → met à jour le message
       setTimeout(() => {
         loaderZone.innerHTML = '';
-
-        // Met à jour le message pour guider l’utilisateur
         loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur l’onglet <strong>Mes tunnels</strong> pour le découvrir.";
       }, 90000);
     });
   }
 
-  // Réinitialise le message si on clique sur "Mes tunnels"
+  // Cacher le message quand on clique sur "Mes tunnels"
   const viewTunnelsBtn = document.getElementById("view-tunnels");
   if (viewTunnelsBtn) {
     viewTunnelsBtn.addEventListener("click", () => {
