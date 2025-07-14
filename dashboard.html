@@ -164,14 +164,17 @@
 
   const generateBtn = document.getElementById("generate-button");
   const loaderZone = document.getElementById("loader-zone");
+if (generateBtn && loaderZone) {
+  document.getElementById("tunnel-form").addEventListener("submit", (e) => {
+    // On affiche la roue
+    loaderZone.innerHTML = '<span class="button-loader"></span>';
 
-  if (generateBtn && loaderZone) {
-    document.getElementById("tunnel-form").addEventListener("submit", () => {
-      loaderZone.innerHTML = '<span class="button-loader"></span>';
-
+    // Petite pause pour laisser le tunnel-submit.js envoyer les données
+    setTimeout(() => {
       window.location.href = "dashboard.html?tunnel=1";
-    });
-  }
+    }, 1000); // 1 seconde avant redirection
+  });
+}
 </script>
 </body>
 </html>
