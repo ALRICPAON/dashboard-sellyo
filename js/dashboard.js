@@ -4,23 +4,21 @@ const tunnelParam = urlParams.get("tunnel");
 
 if (tunnelParam === "1") {
   const loadingMsg = document.getElementById("loading-message");
-
   if (loadingMsg) {
-    // Premier message
-    loadingMsg.innerHTML = "⏳ Génération du tunnel en cours. Cela peut prendre jusqu'à 30 secondes.";
+    loadingMsg.innerHTML = "⚡ Génération en cours... Ton tunnel est en train d’être créé...";
     loadingMsg.style.display = "block";
     window.scrollTo(0, 0);
 
-    // Changement de message au bout de 30s
     setTimeout(() => {
-      loadingMsg.innerHTML = "✅ Ton tunnel est prêt. Clique sur <strong>“Mes tunnels”</strong> pour le découvrir.";
+      loadingMsg.innerHTML = "✅ Ton tunnel est prêt. Clique sur <strong>« Mes tunnels »</strong> pour le découvrir.";
     }, 30000);
-  }
-// Nettoyer l'URL pour ne plus afficher le message au prochain chargement
-const newUrl = window.location.pathname;
-window.history.replaceState({}, document.title, newUrl);
 
-  // Cacher toutes les autres sections, afficher "Mes tunnels"
+    // Supprimer le ?tunnel=1 de l'URL
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+
+  // On affiche "Mes tunnels"
   document.getElementById("leads-section").style.display = "none";
   document.getElementById("create-tunnel-form").style.display = "none";
   document.getElementById("form-tunnel-complet").style.display = "none";
