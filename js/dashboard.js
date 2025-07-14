@@ -273,3 +273,48 @@ if (viewTunnelsBtn && loadingMsg) {
     loadingMsg.style.display = "none";
   });
 }
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { app } from "./firebase-init.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+export async function reloadTunnels() {
+  const tunnelsContainer = document.getElementById("tunnels-by-type");
+  if (!tunnelsContainer) return;
+
+  tunnelsContainer.innerHTML = "<p>🔄 Mise à jour des tunnels...</p>";
+
+  const user = auth.currentUser;
+  if (!user) {
+    tunnelsContainer.innerHTML = "<p>❌ Utilisateur non connecté</p>";
+    return;
+  }
+
+  const q = query(collection(db, "tunnels"), where("userId", "==", user.uid));
+  const querySnapshot = await getDocs(q);
+
+  if (querySnapshot.empty) {
+    tunnelsContainer.innerHTML = "<p>Aucun tunnel généré pour le moment.</p>";
+    return;
+  }
+
+  tunnelsContainer.innerHTML = ""; // reset
+
+  querySnapshot.forEach((doc) => {
+    const tunnel = doc.data();
+    const card = document.createElement("div");
+    card.style.background = "#1c1c1c";
+    card.style.padding = "1rem";
+    card.style.borderRadius = "8px";
+
+    card.innerHTML = `
+      <h3>${tunnel.name || "(sans nom)"}</h3>
+      <p>Type : ${tunnel.type}</p>
+      <a href="${tunnel.pageUrl}" target="_blank" style="color:#00ccff;">Voir la page</a>
+    `;
+
+    tunnelsContainer.appendChild(card);
+  });
+}
