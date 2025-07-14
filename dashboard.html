@@ -5,23 +5,23 @@
   <title>Dashboard – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .button-loader {
-      border: 4px solid #fff;
-      border-top: 4px solid #00ccff;
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 10px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+<style>
+.button-loader {
+  border: 4px solid #fff;
+  border-top: 4px solid #00ccff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
   <script type="module" src="js/firebase-auth-check.js"></script>
 </head>
 <body style="background-color: #111; color: white; font-family: sans-serif;">
@@ -46,52 +46,47 @@
   <main>
     <h1 id="welcome">Bienvenue 👋</h1>
 
-    <!-- 🔥 Section Leads -->
-    <section id="leads-section" class="section" style="display: flex; gap: 2rem; margin-top: 2rem; max-width: 100%;">
-      <div style="flex: 3; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
-        <h2>Nouveaux leads (7 derniers jours)</h2>
-        <canvas id="leadsChart" width="600" height="300"></canvas>
-      </div>
-      <div style="flex: 2; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
-        <h2>Clients récents</h2>
-        <ul id="leadsList" style="padding-left: 1rem; margin: 0; list-style: none;"></ul>
-      </div>
-    </section>
+    <!-- 🔥 Nouvelles données leads 7 jours -->
+    <section id="leads-section" style="display: flex; gap: 2rem; margin-top: 2rem; max-width: 100%;">
+  <!-- Graphique -->
+  <div style="flex: 3; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
+  <h2>Nouveaux leads (7 derniers jours)</h2>
+  <canvas id="leadsChart" width="600" height="300"></canvas>
+</div>
+
+<div style="flex: 2; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
+  <h2>Clients récents</h2>
+  <ul id="leadsList" style="padding-left: 1rem; margin: 0; list-style: none;"></ul>
+</div>
+</section>
 
     <div id="dashboard-content"></div>
 
-    <div id="loading-message" style="display:none; margin-top: 1rem; background:#1c1c1c; padding:1rem; border-radius:8px; color:#00ccff; font-weight:bold;">
-  🛠️ Génération en cours… Votre tunnel sera visible ici dans quelques instants...
-</div>
-
-
     <!-- Tunnels générés -->
-    <section id="user-tunnels" class="section" style="margin-top: 2rem;">
+    <section id="user-tunnels" style="margin-top: 2rem;">
       <h2>Mes tunnels générés</h2>
       <div id="tunnels-by-type" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;"></div>
     </section>
-
-    <!-- Liste des clients -->
-    <section id="client-list-section" class="section" style="display: none; margin-top: 2rem;">
-      <h2>Mes clients</h2>
-      <div id="client-list" style="background: #1c1c1c; padding: 1.5rem; border-radius: 10px;"></div>
+    <section id="client-list-section" style="display: none; margin-top: 2rem;">
+  <h2>Mes clients</h2>
+  <div id="client-list" style="background: #1c1c1c; padding: 1.5rem; border-radius: 10px;"></div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <div>
-          <label for="filter-type">Filtrer :</label>
-          <select id="filter-type" style="background: #000; color: #fff; border: none; padding: 0.4rem;">
-            <option value="">Tous</option>
-            <option value="tunnel">Tunnel</option>
-            <option value="landing">Landing</option>
-            <option value="email">Email</option>
-            <option value="video">Vidéo</option>
-          </select>
-        </div>
-        <button id="export-csv" style="background: #00ccff; color: #000; padding: 0.5rem 1rem; border: none; border-radius: 6px;">📁 Exporter CSV</button>
-      </div>
-    </section>
+  <div>
+    <label for="filter-type">Filtrer :</label>
+    <select id="filter-type" style="background: #000; color: #fff; border: none; padding: 0.4rem;">
+      <option value="">Tous</option>
+      <option value="tunnel">Tunnel</option>
+      <option value="landing">Landing</option>
+      <option value="email">Email</option>
+      <option value="video">Vidéo</option>
+    </select>
+  </div>
+  <button id="export-csv" style="background: #00ccff; color: #000; padding: 0.5rem 1rem; border: none; border-radius: 6px;">📁 Exporter CSV</button>
+</div>
+</section>
 
-    <!-- Formulaire de création -->
-    <div id="create-tunnel-form" class="section" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
+    <!-- Formulaire -->
+    <div id="create-tunnel-form" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
       <h2>Créer un contenu</h2>
       <form id="tunnel-form">
         <label>Identifiant public *</label><br>
@@ -122,30 +117,36 @@
       </form>
     </div>
 
-    <!-- Tunnel Complet -->
-    <div id="form-tunnel-complet" class="section" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin-top: 2rem;">
+    <!-- Tunnel complet -->
+    <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin-top: 2rem;">
       <h2>Tunnel Complet – Pages personnalisées</h2>
+
       <label>Logo de la marque</label><br>
       <input type="file" id="full-logo" accept="image/*"><br><br>
+
       <label>Couleur de fond</label><br>
       <input type="color" id="full-background-color" value="#121212"><br><br>
+
       <label>Couleur du bouton</label><br>
       <input type="color" id="full-button-color" value="#ff9900"><br><br>
+
       <label>Vidéo principale</label><br>
       <input type="file" id="full-video" accept="video/*"><br><br>
+
       <label>URL globale (bouton final)</label><br>
       <input type="url" id="full-main-url"><br><br>
+
       <div id="tunnel-pages-complet"></div>
+
       <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
       <button type="button" id="submit-full-tunnel">Générer le tunnel complet</button>
     </div>
   </main>
 
-  <!-- Scripts -->
   <script type="module" src="js/tunnel-submit.js"></script>
   <script type="module" src="js/dashboard.js"></script>
 
-<script>
+  <script>
   document.getElementById("create-tunnel").addEventListener("click", () => {
     const form = document.getElementById("tunnel-form");
     const fullForm = document.getElementById("form-tunnel-complet");
@@ -157,24 +158,34 @@
     if (tunnelPages) tunnelPages.innerHTML = "";
     if (fullForm) fullForm.style.display = "none";
 
+    // 👉 Cacher le graphique + leads
     document.getElementById("leads-section").style.display = "none";
+
     document.getElementById("create-tunnel-form").style.display = "block";
     window.scrollTo(0, 0);
   });
-
+</script>
+  <script>
   const generateBtn = document.getElementById("generate-button");
   const loaderZone = document.getElementById("loader-zone");
-if (generateBtn && loaderZone) {
-  document.getElementById("tunnel-form").addEventListener("submit", (e) => {
-    // On affiche la roue
-    loaderZone.innerHTML = '<span class="button-loader"></span>';
 
-    // Petite pause pour laisser le tunnel-submit.js envoyer les données
-    setTimeout(() => {
-      window.location.href = "dashboard.html?tunnel=1";
-    }, 1000); // 1 seconde avant redirection
-  });
-}
+  if (generateBtn && loaderZone) {
+    document.getElementById("tunnel-form").addEventListener("submit", () => {
+      loaderZone.innerHTML = '<span class="loader"></span>';
+
+      // Empêche l'accès à la redirection trop tôt
+      setTimeout(() => {
+       // Masque toutes les sections
+document.getElementById("leads-section").style.display = "none";
+document.getElementById("create-tunnel-form").style.display = "none";
+document.getElementById("form-tunnel-complet").style.display = "none";
+document.getElementById("client-list-section").style.display = "none";
+
+// Affiche uniquement la section des tunnels
+document.getElementById("user-tunnels").scrollIntoView({ behavior: "smooth" });
+      }, 30000);
+    });
+  }
 </script>
 </body>
 </html>
