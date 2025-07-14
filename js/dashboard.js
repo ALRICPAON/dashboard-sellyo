@@ -1,7 +1,4 @@
 // ✅ dashboard.js – Affiche le formulaire, les tunnels, les leads et les clients avec filtre et export CSV
-const urlParams = new URLSearchParams(window.location.search);
-const tunnelParam = urlParams.get("tunnel");
-
 if (tunnelParam === "1") {
   const loadingMsg = document.getElementById("loading-message");
   if (loadingMsg) {
@@ -18,13 +15,13 @@ if (tunnelParam === "1") {
     window.history.replaceState({}, document.title, newUrl);
   }
 
-  // On affiche "Mes tunnels"
   document.getElementById("leads-section").style.display = "none";
   document.getElementById("create-tunnel-form").style.display = "none";
   document.getElementById("form-tunnel-complet").style.display = "none";
   document.getElementById("client-list-section").style.display = "none";
   document.getElementById("user-tunnels").style.display = "block";
 }
+
 
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
