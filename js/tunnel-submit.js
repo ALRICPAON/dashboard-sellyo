@@ -156,7 +156,7 @@ if (submitBtn) {
 
 // ⏳ Attente de 30 secondes avant redirection
 setTimeout(() => {
-  window.location.href = "dashboard.html";
+  window.location.href = "dashboard.html?tunnel=1";
 }, 30000);
       } catch (err) {
         console.error("❌ Erreur Make ou Firestore :", err);
