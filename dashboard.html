@@ -185,11 +185,18 @@
 const newUrl = window.location.origin + window.location.pathname;
 window.history.replaceState({}, document.title, newUrl);
 
-    // ⏱ Affiche le second message après 1min30
-    setTimeout(() => {
-      loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur l’onglet <strong>Mes tunnels</strong> pour le découvrir.";
-    }, 90000);
-  }
+   // ⏱ Affiche le second message après 1min30 et recharge les tunnels
+setTimeout(() => {
+  loaderZone.innerHTML = '';
+  loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur l’onglet <strong>Mes tunnels</strong> pour le découvrir.";
+
+  // Recharge les tunnels sans reload
+  import('./js/dashboard.js').then(module => {
+    if (module.reloadTunnels) {
+      module.reloadTunnels();
+    }
+  });
+}, 90000);
 
   // Cacher le message quand on clique sur "Mes tunnels"
   const viewTunnelsBtn = document.getElementById("view-tunnels");
