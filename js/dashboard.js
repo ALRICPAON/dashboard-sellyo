@@ -1,4 +1,7 @@
 // ✅ dashboard.js – Affiche le formulaire, les tunnels, les leads et les clients avec filtre et export CSV
+const urlParams = new URLSearchParams(window.location.search);
+const tunnelParam = urlParams.get("tunnel");
+
 if (tunnelParam === "1") {
   const loadingMsg = document.getElementById("loading-message");
   if (loadingMsg) {
