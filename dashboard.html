@@ -175,7 +175,14 @@
 
       // Empêche l'accès à la redirection trop tôt
       setTimeout(() => {
-       document.getElementById("view-tunnels").click();
+       // Masque toutes les sections
+document.getElementById("leads-section").style.display = "none";
+document.getElementById("create-tunnel-form").style.display = "none";
+document.getElementById("form-tunnel-complet").style.display = "none";
+document.getElementById("client-list-section").style.display = "none";
+
+// Affiche uniquement la section des tunnels
+document.getElementById("user-tunnels").scrollIntoView({ behavior: "smooth" });
       }, 30000);
     });
   }
