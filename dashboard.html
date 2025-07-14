@@ -168,45 +168,6 @@
     window.scrollTo(0, 0);
   });
 </script>
-<script type="module">
-  import { reloadTunnels } from './js/reload-tunnels.js';
-
-  const generateBtn = document.getElementById("generate-button");
-  const loaderZone = document.getElementById("loader-zone");
-
-  if (generateBtn && loaderZone) {
-    document.getElementById("tunnel-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      loaderZone.innerHTML = '<span class="button-loader"></span>';
-      document.getElementById("leads-section").style.display = "none";
-      document.getElementById("create-tunnel-form").style.display = "none";
-      document.getElementById("form-tunnel-complet").style.display = "none";
-      document.getElementById("client-list-section").style.display = "none";
-      document.getElementById("user-tunnels").style.display = "none";
-
-      const loadingMsg = document.getElementById("loading-message");
-      loadingMsg.innerHTML = "🛠️ Génération en cours… Votre tunnel sera visible ici dans moins de 2 minutes...";
-      loadingMsg.style.display = "block";
-
-      setTimeout(() => {
-        loaderZone.innerHTML = '';
-        loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur l’onglet <strong>Mes tunnels</strong> pour le découvrir.";
-
-        // 🧠 Recharge les tunnels sans recharger toute la page
-        reloadTunnels();
-      }, 90000);
-    });
-  }
-
-  const viewTunnelsBtn = document.getElementById("view-tunnels");
-  if (viewTunnelsBtn) {
-    viewTunnelsBtn.addEventListener("click", () => {
-      const msg = document.getElementById("loading-message");
-      if (msg) msg.style.display = "none";
-    });
-  }
-</script>
 <script>
   // ✅ Affiche le message si on arrive avec ?tunnel=1
   window.addEventListener("DOMContentLoaded", () => {
