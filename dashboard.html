@@ -165,5 +165,20 @@
     window.scrollTo(0, 0);
   });
 </script>
+  <script>
+  const generateBtn = document.getElementById("generate-button");
+  const loaderZone = document.getElementById("loader-zone");
+
+  if (generateBtn && loaderZone) {
+    document.getElementById("tunnel-form").addEventListener("submit", () => {
+      loaderZone.innerHTML = '<span class="loader"></span>';
+
+      // Empêche l'accès à la redirection trop tôt
+      setTimeout(() => {
+        window.location.href = "dashboard.html"; // Redirige vers le dashboard après 30s
+      }, 30000);
+    });
+  }
+</script>
 </body>
 </html>
