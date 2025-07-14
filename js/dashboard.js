@@ -2,13 +2,13 @@
 if (tunnelParam === "1") {
   const loadingMsg = document.getElementById("loading-message");
   if (loadingMsg) {
-    loadingMsg.innerHTML = "⚡ Génération en cours... Ton tunnel est en train d’être créé...";
+    loadingMsg.innerHTML = "⚡ Génération en cours… Cela peut prendre jusqu’à 2 minutes, merci de patienter.";
     loadingMsg.style.display = "block";
     window.scrollTo(0, 0);
 
     setTimeout(() => {
       loadingMsg.innerHTML = "✅ Ton tunnel est prêt. Clique sur <strong>« Mes tunnels »</strong> pour le découvrir.";
-    }, 30000);
+    }, 90000); // 1min30
 
     // Supprimer le ?tunnel=1 de l'URL
     const newUrl = window.location.pathname;
@@ -21,6 +21,7 @@ if (tunnelParam === "1") {
   document.getElementById("client-list-section").style.display = "none";
   document.getElementById("user-tunnels").style.display = "block";
 }
+
 
 
 import { app } from "./firebase-init.js";
