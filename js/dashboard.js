@@ -3,15 +3,21 @@ const urlParams = new URLSearchParams(window.location.search);
 const tunnelParam = urlParams.get("tunnel");
 
 if (tunnelParam === "1") {
-  // Affiche le message
   const loadingMsg = document.getElementById("loading-message");
+
   if (loadingMsg) {
-    loadingMsg.innerText = '🛠️ Génération en cours… Ton tunnel est désormais disponible dans l’onglet "Mes tunnels".';
+    // Premier message
+    loadingMsg.innerHTML = "⏳ Génération du tunnel en cours. Cela peut prendre jusqu'à 30 secondes.";
     loadingMsg.style.display = "block";
     window.scrollTo(0, 0);
+
+    // Changement de message au bout de 30s
+    setTimeout(() => {
+      loadingMsg.innerHTML = "✅ Ton tunnel est prêt. Clique sur <strong>“Mes tunnels”</strong> pour le découvrir.";
+    }, 30000);
   }
 
-  // Affiche directement "Mes tunnels"
+  // Cacher toutes les autres sections, afficher "Mes tunnels"
   document.getElementById("leads-section").style.display = "none";
   document.getElementById("create-tunnel-form").style.display = "none";
   document.getElementById("form-tunnel-complet").style.display = "none";
@@ -285,3 +291,9 @@ onAuthStateChanged(auth, async (user) => {
     });
   }
 });
+const loadingMsg = document.getElementById("loading-message");
+if (viewTunnelsBtn && loadingMsg) {
+  viewTunnelsBtn.addEventListener("click", () => {
+    loadingMsg.style.display = "none";
+  });
+}
