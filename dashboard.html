@@ -168,32 +168,40 @@
     window.scrollTo(0, 0);
   });
 </script>
-  <script>
+<script>
   const generateBtn = document.getElementById("generate-button");
   const loaderZone = document.getElementById("loader-zone");
-  const loadingMessage = document.getElementById("loading-message");
 
-  if (generateBtn && loaderZone && loadingMessage) {
+  if (generateBtn && loaderZone) {
     document.getElementById("tunnel-form").addEventListener("submit", () => {
       loaderZone.innerHTML = '<span class="button-loader"></span>';
-      loadingMessage.style.display = "block";
 
-      // Empêche l'accès à la redirection trop tôt
+      // Masquer le formulaire immédiatement
+      document.getElementById("create-tunnel-form").style.display = "none";
+      document.getElementById("form-tunnel-complet").style.display = "none";
+      document.getElementById("leads-section").style.display = "none";
+      document.getElementById("client-list-section").style.display = "none";
+
+      // Afficher le message
+      const loadingMsg = document.getElementById("loading-message");
+      if (loadingMsg) loadingMsg.style.display = "block";
+
+      // Après 90 secondes → afficher les tunnels
       setTimeout(() => {
-        // Masque toutes les sections
-        document.getElementById("leads-section").style.display = "none";
-        document.getElementById("create-tunnel-form").style.display = "none";
-        document.getElementById("form-tunnel-complet").style.display = "none";
-        document.getElementById("client-list-section").style.display = "none";
-
-        // Cache le message de chargement
-        loadingMessage.style.display = "none";
-
-        // Scroll vers la section "Mes tunnels"
-        document.getElementById("user-tunnels").scrollIntoView({ behavior: "smooth" });
-      }, 90000); // ⏱️ 1 min 30 s
+        const tunnelSection = document.getElementById("user-tunnels");
+        if (tunnelSection) {
+          tunnelSection.style.display = "block";
+          tunnelSection.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 90000); // 1min30
     });
   }
+
+  // Cacher le message si l’utilisateur clique sur “Mes tunnels”
+  document.getElementById("view-tunnels").addEventListener("click", () => {
+    const loadingMsg = document.getElementById("loading-message");
+    if (loadingMsg) loadingMsg.style.display = "none";
+  });
 </script>
 </body>
 </html>
