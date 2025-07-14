@@ -181,6 +181,9 @@
     const loadingMsg = document.getElementById("loading-message");
     loadingMsg.innerHTML = "🛠️ Génération en cours… Votre tunnel sera visible ici dans moins de 2 minutes...";
     loadingMsg.style.display = "block";
+    // Supprimer le paramètre ?tunnel=1 de l'URL sans recharger
+const newUrl = window.location.origin + window.location.pathname;
+window.history.replaceState({}, document.title, newUrl);
 
     // ⏱ Affiche le second message après 1min30
     setTimeout(() => {
