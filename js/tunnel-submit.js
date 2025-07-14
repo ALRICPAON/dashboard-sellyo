@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js – version FormData avec affichage dynamique corrigé
+// ✅ tunnel-submit.js – version finale avec redirection via dashboard
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -27,20 +27,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ✅ Affichage dynamique des champs selon le type sélectionné
   if (typeField && dynamicFieldsContainer) {
     typeField.addEventListener("change", () => {
       const selected = typeField.value;
-      console.log("📌 Type sélectionné :", selected);
       dynamicFieldsContainer.innerHTML = "";
 
       if (["landing", "video"].includes(selected)) {
         dynamicFieldsContainer.innerHTML = `
-          <label>Nom du contenu *<br><small style="color:#aaa;">Ex : Formation express, méthode virale, etc.</small></label><br>
+          <label>Nom du contenu *</label><br>
           <input type="text" id="tunnel-name" name="name" required><br><br>
-          <label>Objectif *<br><small style="color:#aaa;">Ex : Générer des ventes, récolter des emails...</small></label><br>
+          <label>Objectif *</label><br>
           <input type="text" id="tunnel-goal" name="goal"><br><br>
-          <label>Secteur<br><small style="color:#aaa;">Ex : Coaching, immobilier, e-commerce</small></label><br>
+          <label>Secteur</label><br>
           <input type="text" id="sector" name="sector"><br><br>
           <label>Logo</label><br>
           <input type="file" id="logo" name="logo" accept="image/*"><br><br>
@@ -48,9 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <input type="file" id="cover-image" name="cover" accept="image/*"><br><br>
           <label>Vidéo</label><br>
           <input type="file" id="custom-video" name="video" accept="video/*"><br><br>
-          <label>Description de l’offre *<br><small style="color:#aaa;">Ex : Accède à 10 modules gratuits pour booster tes ventes.</small></label><br>
+          <label>Description de l’offre *</label><br>
           <textarea id="tunnel-desc" name="desc" required></textarea><br><br>
-          <label>Texte du bouton *<br><small style="color:#aaa;">Ex : Je démarre maintenant, Accéder à l'offre...</small></label><br>
+          <label>Texte du bouton *</label><br>
           <input type="text" id="cta-text" name="cta" required><br><br>
           <label>Champs à demander :</label><br>
           <label><input type="checkbox" name="fields" value="nom"> Nom</label>
@@ -115,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fields
       };
 
-      // ✅ Envoi à Make (fichiers + données)
       const formData = new FormData();
       formData.append("type", type);
       formData.append("name", name);
@@ -147,17 +144,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         await addDoc(collection(db, "tunnels"), firestoreData);
 
-// 🔄 Ajout du loader
-const submitBtn = form.querySelector("button[type='submit'], input[type='submit']");
-if (submitBtn) {
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = `Génération en cours <span class="button-loader"></span>`;
-}
+        // 🔄 Loader visuel
+        const submitBtn = form.querySelector("button[type='submit'], input[type='submit']");
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = `Génération en cours <span class="button-loader"></span>`;
+        }
 
-// ⏳ Attente de 30 secondes avant redirection
-setTimeout(() => {
-  window.location.href = "dashboard.html?tunnel=1";
-}, 30000);
+        // ✅ Redirection avec message dashboard
+        window.location.href = "dashboard.html?tunnel=1";
+
       } catch (err) {
         console.error("❌ Erreur Make ou Firestore :", err);
         alert("Erreur lors de l'envoi : " + err.message);
