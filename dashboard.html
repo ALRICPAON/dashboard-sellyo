@@ -171,22 +171,27 @@
   <script>
   const generateBtn = document.getElementById("generate-button");
   const loaderZone = document.getElementById("loader-zone");
+  const loadingMessage = document.getElementById("loading-message");
 
-  if (generateBtn && loaderZone) {
+  if (generateBtn && loaderZone && loadingMessage) {
     document.getElementById("tunnel-form").addEventListener("submit", () => {
-      loaderZone.innerHTML = '<span class="loader"></span>';
+      loaderZone.innerHTML = '<span class="button-loader"></span>';
+      loadingMessage.style.display = "block";
 
       // Empêche l'accès à la redirection trop tôt
       setTimeout(() => {
-       // Masque toutes les sections
-document.getElementById("leads-section").style.display = "none";
-document.getElementById("create-tunnel-form").style.display = "none";
-document.getElementById("form-tunnel-complet").style.display = "none";
-document.getElementById("client-list-section").style.display = "none";
+        // Masque toutes les sections
+        document.getElementById("leads-section").style.display = "none";
+        document.getElementById("create-tunnel-form").style.display = "none";
+        document.getElementById("form-tunnel-complet").style.display = "none";
+        document.getElementById("client-list-section").style.display = "none";
 
-// Affiche uniquement la section des tunnels
-document.getElementById("user-tunnels").scrollIntoView({ behavior: "smooth" });
-      }, 30000);
+        // Cache le message de chargement
+        loadingMessage.style.display = "none";
+
+        // Scroll vers la section "Mes tunnels"
+        document.getElementById("user-tunnels").scrollIntoView({ behavior: "smooth" });
+      }, 90000); // ⏱️ 1 min 30 s
     });
   }
 </script>
