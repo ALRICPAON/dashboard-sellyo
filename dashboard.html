@@ -146,24 +146,33 @@
       </a>
     </div>
   </main>
-  <script>
-  // ✅ Affiche un message + redirection après 90 secondes si ?tunnel=1 dans l'URL
+ <script>
   window.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("tunnel") === "1") {
       const loadingMsg = document.createElement("div");
       loadingMsg.id = "loading-message";
-      loadingMsg.style.cssText = "margin-top: 3rem; background:#1c1c1c; padding:1rem; border-radius:8px; color:#00ccff; font-weight:bold;";
+      loadingMsg.style.cssText = `
+        margin-top: 3rem;
+        background:#1c1c1c;
+        padding:1rem;
+        border-radius:8px;
+        color:#00ccff;
+        font-weight:bold;
+        font-size: 1.1rem;
+      `;
       loadingMsg.innerHTML = "🛠️ Génération en cours… Cela peut prendre jusqu’à 2 minutes. Veuillez patienter...";
       document.querySelector("main").appendChild(loadingMsg);
 
+      // Après 1min30, indique que c'est prêt
       setTimeout(() => {
-        loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Redirection vers vos tunnels...";
-      }, 90000); // Change le texte après 1min30
+        loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur <strong>Mes tunnels</strong> pour le voir.";
+      }, 90000);
 
+      // Redirection automatique à 1min45 si l’utilisateur ne clique pas
       setTimeout(() => {
         window.location.href = "tunnels.html";
-      }, 95000); // Redirection après 1min35
+      }, 105000);
 
       // Nettoie l’URL
       const url = new URL(window.location);
