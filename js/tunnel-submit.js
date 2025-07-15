@@ -29,11 +29,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Affiche ou masque les bons champs selon le type
   if (typeField && dynamicFieldsContainer) {
     typeField.addEventListener("change", () => {
       const selected = typeField.value.trim().toLowerCase();
       dynamicFieldsContainer.innerHTML = "";
+
       if (["landing", "landing page", "video"].includes(selected)) {
         dynamicFieldsContainer.innerHTML = `
           <label>Nom du contenu *</label><br>
@@ -44,14 +44,19 @@ document.addEventListener("DOMContentLoaded", async () => {
           <input type="text" id="sector"><br><br>
           <label>Description de l’offre *</label><br>
           <textarea id="tunnel-desc" required></textarea><br><br>
-          <label>Texte du bouton *</label><br>
-          <input type="text" id="cta-text" required><br><br>
           <label>Prix (optionnel)</label><br>
           <input type="text" id="price"><br><br>
           <label>URL de paiement</label><br>
           <input type="url" id="payment"><br><br>
+          <label>Logo (URL ou fichier)</label><br>
+          <input type="file" id="logo" accept="image/*"><br><br>
+          <label>Image principale (URL ou fichier)</label><br>
+          <input type="file" id="cover-image" accept="image/*"><br><br>
+          <label>Vidéo (URL ou fichier)</label><br>
+          <input type="file" id="custom-video" accept="video/*"><br><br>
         `;
       }
+
       if (selected === "email") {
         if (emailBlock) emailBlock.style.display = "block";
       } else {
@@ -61,7 +66,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     typeField.dispatchEvent(new Event("change"));
   }
 
-  // Injection dynamique des tunnels existants dans le menu email
   onAuthStateChanged(auth, async (user) => {
     if (user && linkedContent) {
       const q = query(collection(db, "tunnels"), where("userId", "==", user.uid));
@@ -78,7 +82,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Soumission du formulaire
   const observer = new MutationObserver(() => {
     const form = document.getElementById("tunnel-form");
     if (!form) return;
@@ -114,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const emailType = document.getElementById("email-type")?.value || "";
       const sendMode = document.getElementById("email-send-mode")?.value || "";
       const sendDate = document.getElementById("email-schedule-date")?.value || "";
+      const sendHour = document.getElementById("email-schedule-hour")?.value || "";
 
       const firestoreData = {
         userId: user.uid,
@@ -135,7 +139,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         manualClientList: manualList,
         emailType,
         sendMode,
-        sendDate
+        sendDate,
+        sendHour
       };
 
       const formData = new FormData();
