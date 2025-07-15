@@ -6,59 +6,97 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 export async function reloadTunnels() {
-  const tunnelsContainer = document.getElementById("tunnels-by-type");
-  if (!tunnelsContainer) return;
+  const container = document.getElementById("tunnels-by-type");
+  if (!container) return;
 
-  tunnelsContainer.innerHTML = "Chargement...";
+  container.innerHTML = "Chargement...";
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      tunnelsContainer.innerHTML = "Vous n'êtes pas connecté.";
+      container.innerHTML = "Non connecté.";
       return;
     }
 
     try {
       const q = query(collection(db, "tunnels"), where("userId", "==", user.uid));
       const snapshot = await getDocs(q);
-
       if (snapshot.empty) {
-        tunnelsContainer.innerHTML = "<p>Aucun tunnel généré pour le moment.</p>";
+        container.innerHTML = "<p>Aucun tunnel trouvé.</p>";
         return;
       }
 
-      tunnelsContainer.innerHTML = "";
+      container.innerHTML = "";
 
-      snapshot.forEach((doc) => {
-        const tunnel = doc.data();
+      const types = ["landing", "email", "video", "complet"];
+      const typeLabels = {
+        landing: "Landing",
+        email: "Email",
+        video: "Vidéo",
+        complet: "Tunnel"
+      };
 
-        const card = document.createElement("div");
-        card.style.background = "#1c1c1c";
-        card.style.padding = "1.5rem";
-        card.style.borderRadius = "10px";
-        card.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
-        card.style.transition = "transform 0.2s ease";
-        card.style.cursor = "default";
+      const columns = {};
 
-        card.onmouseover = () => (card.style.transform = "scale(1.02)");
-        card.onmouseleave = () => (card.style.transform = "scale(1)");
-
-        card.innerHTML = `
-          <h3 style="margin: 0 0 0.5rem 0; color: #00ccff;">${tunnel.name || "Tunnel"}</h3>
-          <p style="margin: 0 0 0.5rem 0;"><strong>Objectif :</strong> ${tunnel.goal || "-"}</p>
-          <p style="margin: 0 0 1rem 0;"><strong>Type :</strong> <span style="background:#333; color:#fff; padding: 0.2rem 0.6rem; border-radius: 5px;">${tunnel.type || "-"}</span></p>
-          <button onclick="navigator.clipboard.writeText('${tunnel.pageUrl || ""}')" style="background:#00ccff; color:#000; border:none; padding:0.5rem 1rem; border-radius: 6px; cursor:pointer;">
-            📎 Copier l'URL
-          </button>
-        `;
-
-        tunnelsContainer.appendChild(card);
+      types.forEach(type => {
+        columns[type] = [];
       });
+
+      snapshot.forEach(doc => {
+        const tunnel = doc.data();
+        const type = tunnel.type === "complet" ? "complet" : tunnel.type;
+        columns[type]?.push(tunnel);
+      });
+
+      // Grille d'affichage
+      const grid = document.createElement("div");
+      grid.style.display = "grid";
+      grid.style.gridTemplateColumns = "repeat(4, 1fr)";
+      grid.style.gap = "1.5rem";
+
+      types.forEach(type => {
+        const col = document.createElement("div");
+        col.style.background = "#1a1a1a";
+        col.style.padding = "1rem";
+        col.style.borderRadius = "10px";
+
+        const title = document.createElement("h3");
+        title.textContent = typeLabels[type];
+        title.style.color = "#00ccff";
+        title.style.borderBottom = "1px solid #333";
+        title.style.paddingBottom = "0.5rem";
+        col.appendChild(title);
+
+        columns[type].forEach(tunnel => {
+          const card = document.createElement("div");
+          card.style.background = "#222";
+          card.style.marginTop = "1rem";
+          card.style.padding = "1rem";
+          card.style.borderRadius = "8px";
+          card.style.boxShadow = "0 0 6px rgba(0,0,0,0.3)";
+
+          card.innerHTML = `
+            <strong>${tunnel.name || "Tunnel"}</strong><br>
+            <small>${tunnel.goal || ""}</small><br><br>
+            <button onclick="navigator.clipboard.writeText('${tunnel.pageUrl || ""}')" style="background:#00ccff; color:#000; border:none; padding:0.4rem 0.8rem; border-radius:5px; cursor:pointer; margin-right:0.5rem;">
+              📎 Copier l'URL
+            </button>
+            <a href="${tunnel.pageUrl}" target="_blank" style="background:#333; color:#fff; text-decoration:none; padding:0.4rem 0.8rem; border-radius:5px;">
+              🔗 Voir la page
+            </a>
+          `;
+          col.appendChild(card);
+        });
+
+        grid.appendChild(col);
+      });
+
+      container.appendChild(grid);
     } catch (err) {
-      console.error("❌ Erreur lors du chargement :", err);
-      tunnelsContainer.innerHTML = `<p style="color:red;">Erreur de chargement des tunnels.</p>`;
+      console.error("Erreur tunnels:", err);
+      container.innerHTML = "<p style='color:red;'>Erreur de chargement des tunnels.</p>";
     }
   });
 }
 
-// 🟢 Exécute au chargement de la page
+// Lance au chargement
 reloadTunnels();
