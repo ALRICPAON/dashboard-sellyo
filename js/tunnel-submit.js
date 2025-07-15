@@ -58,9 +58,17 @@ document.addEventListener("DOMContentLoaded", () => {
           <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
         `;
       }
+
+      // 📨 Affiche ou masque le bloc email
+      const emailBlock = document.getElementById("form-email-fields");
+      if (selected === "email") {
+        if (emailBlock) emailBlock.style.display = "block";
+      } else {
+        if (emailBlock) emailBlock.style.display = "none";
+      }
     });
 
-    // 🔁 Affiche le formulaire dès que la page est prête
+    // 🔁 Affiche le bon bloc au chargement
     typeField.dispatchEvent(new Event("change"));
   }
 
@@ -79,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Affiche la popup immédiatement
+      // Popup loading
       const popup = document.createElement("div");
       popup.id = "tunnel-loading-overlay";
       popup.innerHTML = `
@@ -112,20 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const type = document.getElementById("tunnel-type")?.value || "tunnel";
-      // Champs spécifiques au type email
-let linkedContent = "";
-let manualClientList = "";
-let emailType = "";
-let sendMode = "";
-let sendDate = "";
-
-if (type === "email") {
-  linkedContent = document.getElementById("linked-content")?.value || "";
-  manualClientList = document.getElementById("manual-client-list")?.value || "";
-  emailType = document.getElementById("email-type")?.value || "";
-  sendMode = document.getElementById("email-send-mode")?.value || "";
-  sendDate = document.getElementById("email-schedule-date")?.value || "";
-}
       const name = document.getElementById("tunnel-name")?.value || "";
       const goal = document.getElementById("tunnel-goal")?.value || "";
       const sector = document.getElementById("sector")?.value || "";
@@ -137,6 +131,21 @@ if (type === "email") {
       const slug = slugInput?.value || "";
       const slugFinal = `${slug}-${slugCounter}`;
       const createdAt = new Date().toISOString();
+
+      // Champs email
+      let linkedContent = "";
+      let manualClientList = "";
+      let emailType = "";
+      let sendMode = "";
+      let sendDate = "";
+
+      if (type === "email") {
+        linkedContent = document.getElementById("linked-content")?.value || "";
+        manualClientList = document.getElementById("manual-client-list")?.value || "";
+        emailType = document.getElementById("email-type")?.value || "";
+        sendMode = document.getElementById("email-send-mode")?.value || "";
+        sendDate = document.getElementById("email-schedule-date")?.value || "";
+      }
 
       const fields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => ({
         label: el.value.charAt(0).toUpperCase() + el.value.slice(1),
@@ -161,13 +170,14 @@ if (type === "email") {
         pageUrl: `https://cdn.sellyo.fr/${["landing", "email", "video"].includes(type) ? type : "tunnel"}/${folder}/${slugFinal}.html`,
         fields
       };
+
       if (type === "email") {
-  firestoreData.linkedContent = linkedContent;
-  firestoreData.manualClientList = manualClientList;
-  firestoreData.emailType = emailType;
-  firestoreData.sendMode = sendMode;
-  firestoreData.sendDate = sendDate;
-}
+        firestoreData.linkedContent = linkedContent;
+        firestoreData.manualClientList = manualClientList;
+        firestoreData.emailType = emailType;
+        firestoreData.sendMode = sendMode;
+        firestoreData.sendDate = sendDate;
+      }
 
       const formData = new FormData();
       formData.append("type", type);
@@ -183,13 +193,14 @@ if (type === "email") {
       formData.append("slug", slugFinal);
       formData.append("createdAt", createdAt);
       formData.append("fields", JSON.stringify(fields));
+
       if (type === "email") {
-  formData.append("linkedContent", linkedContent);
-  formData.append("manualClientList", manualClientList);
-  formData.append("emailType", emailType);
-  formData.append("sendMode", sendMode);
-  formData.append("sendDate", sendDate);
-}
+        formData.append("linkedContent", linkedContent);
+        formData.append("manualClientList", manualClientList);
+        formData.append("emailType", emailType);
+        formData.append("sendMode", sendMode);
+        formData.append("sendDate", sendDate);
+      }
 
       const logo = document.getElementById("logo")?.files[0];
       const cover = document.getElementById("cover-image")?.files[0];
@@ -199,7 +210,7 @@ if (type === "email") {
       if (cover) formData.append("cover", cover);
       if (video) formData.append("video", video);
 
-      // Redirection automatique après 90 secondes
+      // Redirection après 90s
       setTimeout(() => {
         window.location.href = "tunnels.html";
       }, 90000);
@@ -211,7 +222,6 @@ if (type === "email") {
         });
 
         await addDoc(collection(db, "tunnels"), firestoreData);
-
       } catch (err) {
         console.error("❌ Erreur Make ou Firestore :", err);
         alert("Erreur lors de l'envoi : " + err.message);
