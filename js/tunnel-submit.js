@@ -50,6 +50,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           <input type="text" id="price"><br><br>
           <label>URL de paiement</label><br>
           <input type="url" id="payment"><br><br>
+          <label>Logo (optionnel)</label><br>
+          <input type="file" id="logo" accept="image/*"><br><br>
+          <label>Image de couverture (optionnel)</label><br>
+          <input type="file" id="cover-image" accept="image/*"><br><br>
+          <label>Vidéo (optionnel)</label><br>
+          <input type="file" id="custom-video" accept="video/*"><br><br>
           <label>Champs à demander :</label><br>
           <label><input type="checkbox" name="fields" value="nom"> Nom</label>
           <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
