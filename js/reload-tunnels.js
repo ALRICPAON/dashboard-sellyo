@@ -12,24 +12,48 @@ export async function reloadTunnels() {
   tunnelsContainer.innerHTML = "Chargement...";
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) return;
+    if (!user) {
+      tunnelsContainer.innerHTML = "Non connecté.";
+      return;
+    }
 
-    const q = query(collection(db, "tunnels"), where("userId", "==", user.uid));
-    const snapshot = await getDocs(q);
-    tunnelsContainer.innerHTML = "";
+    console.log("User connecté :", user.uid);
 
-    snapshot.forEach((doc) => {
-      const tunnel = doc.data();
-      const card = document.createElement("div");
-      card.style.background = "#222";
-      card.style.padding = "1rem";
-      card.style.borderRadius = "10px";
-      card.innerHTML = `
-        <h3>${tunnel.name || "Tunnel"}</h3>
-        <p>${tunnel.goal || ""}</p>
-        <a href="${tunnel.pageUrl}" target="_blank" style="color: #00ccff;">Voir la page</a>
-      `;
-      tunnelsContainer.appendChild(card);
-    });
+    try {
+      const q = query(collection(db, "tunnels"), where("userId", "==", user.uid));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        tunnelsContainer.innerHTML = "<p>Aucun tunnel trouvé.</p>";
+        return;
+      }
+
+      tunnelsContainer.innerHTML = "";
+
+      snapshot.forEach((doc) => {
+        const tunnel = doc.data();
+        console.log("Tunnel trouvé :", tunnel);
+
+        const card = document.createElement("div");
+        card.style.background = "#222";
+        card.style.padding = "1rem";
+        card.style.borderRadius = "10px";
+        card.style.marginBottom = "1rem";
+
+        card.innerHTML = `
+          <h3>${tunnel.name || "Tunnel"}</h3>
+          <p>${tunnel.goal || ""}</p>
+          <p><strong>Type :</strong> ${tunnel.type || "-"}</p>
+          <a href="${tunnel.pageUrl || "#"}" target="_blank" style="color: #00ccff;">Voir la page</a>
+        `;
+
+        tunnelsContainer.appendChild(card);
+      });
+    } catch (err) {
+      console.error("Erreur lors du chargement des tunnels :", err);
+      tunnelsContainer.innerHTML = `<p style="color:red;">Erreur de chargement.</p>`;
+    }
   });
 }
+
+reloadTunnels(); // 🟢 Exécute immédiatement
