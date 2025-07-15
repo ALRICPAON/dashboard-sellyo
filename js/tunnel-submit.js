@@ -27,46 +27,48 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (typeField && dynamicFieldsContainer) {
-    typeField.addEventListener("change", () => {
-      const selected = typeField.value.trim().toLowerCase();
-      dynamicFieldsContainer.innerHTML = "";
+ typeField.addEventListener("change", () => {
+  const selected = typeField.value.trim().toLowerCase();
+  dynamicFieldsContainer.innerHTML = "";
 
-      if (["landing", "landing page", "video"].includes(selected)) {
-        dynamicFieldsContainer.innerHTML = `
-          <label>Nom du contenu *</label><br>
-          <input type="text" id="tunnel-name" name="name" required><br><br>
-          <label>Objectif *</label><br>
-          <input type="text" id="tunnel-goal" name="goal"><br><br>
-          <label>Secteur</label><br>
-          <input type="text" id="sector" name="sector"><br><br>
-          <label>Logo</label><br>
-          <input type="file" id="logo" name="logo" accept="image/*"><br><br>
-          <label>Image de couverture</label><br>
-          <input type="file" id="cover-image" name="cover" accept="image/*"><br><br>
-          <label>Vidéo</label><br>
-          <input type="file" id="custom-video" name="video" accept="video/*"><br><br>
-          <label>Description de l’offre *</label><br>
-          <textarea id="tunnel-desc" name="desc" required></textarea><br><br>
-          <label>Texte du bouton *</label><br>
-          <input type="text" id="cta-text" name="cta" required><br><br>
-          <label>Champs à demander :</label><br>
-          <label><input type="checkbox" name="fields" value="nom"> Nom</label>
-          <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
-          <label><input type="checkbox" name="fields" value="email"> Email</label>
-          <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
-          <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
-        `;
-      }
+  // Bloc landing / video
+  if (["landing", "landing page", "video"].includes(selected)) {
+    dynamicFieldsContainer.innerHTML = `
+      <label>Nom du contenu *</label><br>
+      <input type="text" id="tunnel-name" name="name" required><br><br>
+      <label>Objectif *</label><br>
+      <input type="text" id="tunnel-goal" name="goal"><br><br>
+      <label>Secteur</label><br>
+      <input type="text" id="sector" name="sector"><br><br>
+      <label>Logo</label><br>
+      <input type="file" id="logo" name="logo" accept="image/*"><br><br>
+      <label>Image de couverture</label><br>
+      <input type="file" id="cover-image" name="cover" accept="image/*"><br><br>
+      <label>Vidéo</label><br>
+      <input type="file" id="custom-video" name="video" accept="video/*"><br><br>
+      <label>Description de l’offre *</label><br>
+      <textarea id="tunnel-desc" name="desc" required></textarea><br><br>
+      <label>Texte du bouton *</label><br>
+      <input type="text" id="cta-text" name="cta" required><br><br>
+      <label>Champs à demander :</label><br>
+      <label><input type="checkbox" name="fields" value="nom"> Nom</label>
+      <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
+      <label><input type="checkbox" name="fields" value="email"> Email</label>
+      <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
+      <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
+    `;
+  }
 
-      // 📨 Affiche ou masque le bloc email
-      const emailBlock = document.getElementById("form-email-fields");
-      if (selected === "email") {
-        if (emailBlock) emailBlock.style.display = "block";
-      } else {
-        if (emailBlock) emailBlock.style.display = "none";
-      }
-    });
+  // ✅ Affichage dynamique du bloc Email
+  const emailBlock = document.getElementById("form-email-fields");
+  if (selected === "email") {
+    if (emailBlock) emailBlock.style.display = "block";
+  } else {
+    if (emailBlock) emailBlock.style.display = "none";
+  }
+
+  // Tu peux ajouter d'autres blocs ici si besoin (ex: full-tunnel)
+});
 
     // 🔁 Affiche le bon bloc au chargement
     typeField.dispatchEvent(new Event("change"));
