@@ -112,6 +112,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const type = document.getElementById("tunnel-type")?.value || "tunnel";
+      // Champs spécifiques au type email
+let linkedContent = "";
+let manualClientList = "";
+let emailType = "";
+let sendMode = "";
+let sendDate = "";
+
+if (type === "email") {
+  linkedContent = document.getElementById("linked-content")?.value || "";
+  manualClientList = document.getElementById("manual-client-list")?.value || "";
+  emailType = document.getElementById("email-type")?.value || "";
+  sendMode = document.getElementById("email-send-mode")?.value || "";
+  sendDate = document.getElementById("email-schedule-date")?.value || "";
+}
       const name = document.getElementById("tunnel-name")?.value || "";
       const goal = document.getElementById("tunnel-goal")?.value || "";
       const sector = document.getElementById("sector")?.value || "";
@@ -147,6 +161,13 @@ document.addEventListener("DOMContentLoaded", () => {
         pageUrl: `https://cdn.sellyo.fr/${["landing", "email", "video"].includes(type) ? type : "tunnel"}/${folder}/${slugFinal}.html`,
         fields
       };
+      if (type === "email") {
+  firestoreData.linkedContent = linkedContent;
+  firestoreData.manualClientList = manualClientList;
+  firestoreData.emailType = emailType;
+  firestoreData.sendMode = sendMode;
+  firestoreData.sendDate = sendDate;
+}
 
       const formData = new FormData();
       formData.append("type", type);
@@ -162,6 +183,13 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.append("slug", slugFinal);
       formData.append("createdAt", createdAt);
       formData.append("fields", JSON.stringify(fields));
+      if (type === "email") {
+  formData.append("linkedContent", linkedContent);
+  formData.append("manualClientList", manualClientList);
+  formData.append("emailType", emailType);
+  formData.append("sendMode", sendMode);
+  formData.append("sendDate", sendDate);
+}
 
       const logo = document.getElementById("logo")?.files[0];
       const cover = document.getElementById("cover-image")?.files[0];
