@@ -29,17 +29,17 @@
   </header>
 
   <main>
-    <div id="create-tunnel-form" style="background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; margin: 2rem auto;">
+    <div id="create-tunnel-form" style="background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin: 2rem auto;">
       <h2>Créer un contenu</h2>
       <form id="tunnel-form">
-        <label>Identifiant public *</label><br>
+        <label for="folderName">Identifiant public *</label><br>
         <input type="text" id="folderName" required><br><br>
 
-        <label>Nom de la page *</label><br>
+        <label for="slug">Nom de la page *</label><br>
         <input type="text" id="slug" required><br>
         <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
 
-        <label>Type de contenu *</label><br>
+        <label for="tunnel-type">Type de contenu *</label><br>
         <select id="tunnel-type" required>
           <option value="" disabled selected>Choisir...</option>
           <option value="complet">Tunnel Complet</option>
@@ -50,64 +50,65 @@
 
         <div id="form-content-fields"></div>
 
-        <label>Couleur principale du bouton</label><br>
+        <!-- Bloc email INCLUS dans le formulaire -->
+        <div id="form-email-fields" style="display: none; margin-top: 2rem; background: #2e2e2e; padding: 2rem; border-radius: 10px;">
+          <h2>Email de relance</h2>
+
+          <label for="linked-content">Associer à un tunnel ou une landing</label><br>
+          <select id="linked-content">
+            <option value="">Aucun</option>
+            <option value="tunnel-1">Tunnel : Formation Express</option>
+            <option value="landing-1">Landing : Ebook IA Gratuit</option>
+          </select><br><br>
+
+          <label for="manual-client-list">Ou cibler manuellement des leads</label><br>
+          <input type="text" id="manual-client-list" placeholder="Ex: jean@email.com, alice@email.com"><br>
+          <small style="color:#aaa;">(séparés par des virgules)</small><br><br>
+
+          <label for="email-type">Type de mail</label><br>
+          <select id="email-type">
+            <option value="relance1">Relance J+2</option>
+            <option value="relance2">Relance J+5</option>
+            <option value="relance3">Relance J+7</option>
+          </select><br><br>
+
+          <label for="email-send-mode">Envoi</label><br>
+          <select id="email-send-mode">
+            <option value="now">Envoyer maintenant</option>
+            <option value="schedule">Programmer</option>
+          </select><br><br>
+
+          <label for="email-schedule-date">Date d’envoi (si programmé)</label><br>
+          <input type="date" id="email-schedule-date"><br><br>
+        </div>
+
+        <label for="mainColor">Couleur principale du bouton</label><br>
         <input type="color" id="mainColor" value="#00ccff"><br><br>
 
-        <label>Couleur de fond</label><br>
+        <label for="backgroundColor">Couleur de fond</label><br>
         <input type="color" id="backgroundColor" value="#111111"><br><br>
 
         <button type="submit" id="generate-button">Générer <span id="loader-zone"></span></button>
       </form>
     </div>
 
-    <div id="form-email-fields" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin: 2rem auto;">
-  <h2>Email de relance</h2>
-
-  <label>Associer à un tunnel ou une landing</label><br>
-  <select id="linked-content">
-    <option value="">Aucun</option>
-    <option value="tunnel-1">Tunnel : Formation Express</option>
-    <option value="landing-1">Landing : Ebook IA Gratuit</option>
-    <!-- À remplir dynamiquement plus tard -->
-  </select><br><br>
-
-  <label>Ou cibler manuellement des leads</label><br>
-  <input type="text" id="manual-client-list" placeholder="Ex: jean@email.com, alice@email.com"><br>
-  <small style="color:#aaa;">(séparés par des virgules)</small><br><br>
-
-  <label>Type de mail</label><br>
-  <select id="email-type">
-    <option value="relance1">Relance J+2</option>
-    <option value="relance2">Relance J+5</option>
-    <option value="relance3">Relance J+7</option>
-  </select><br><br>
-
-  <label>Envoi</label><br>
-  <select id="email-send-mode">
-    <option value="now">Envoyer maintenant</option>
-    <option value="schedule">Programmer</option>
-  </select><br><br>
-
-  <label>Date d’envoi (si programmé)</label><br>
-  <input type="date" id="email-schedule-date"><br><br>
-</div>
-
+    <!-- Bloc complet à part -->
     <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin: 2rem auto;">
       <h2>Tunnel Complet – Pages personnalisées</h2>
 
-      <label>Logo de la marque</label><br>
+      <label for="full-logo">Logo de la marque</label><br>
       <input type="file" id="full-logo" accept="image/*"><br><br>
 
-      <label>Couleur de fond</label><br>
+      <label for="full-background-color">Couleur de fond</label><br>
       <input type="color" id="full-background-color" value="#121212"><br><br>
 
-      <label>Couleur du bouton</label><br>
+      <label for="full-button-color">Couleur du bouton</label><br>
       <input type="color" id="full-button-color" value="#ff9900"><br><br>
 
-      <label>Vidéo principale</label><br>
+      <label for="full-video">Vidéo principale</label><br>
       <input type="file" id="full-video" accept="video/*"><br><br>
 
-      <label>URL globale (bouton final)</label><br>
+      <label for="full-main-url">URL globale (bouton final)</label><br>
       <input type="url" id="full-main-url"><br><br>
 
       <div id="tunnel-pages-complet"></div>
@@ -123,7 +124,6 @@
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("tunnel") === "1") {
         alert("🛠️ Génération en cours… Votre tunnel sera visible dans quelques instants.");
-        // (optionnel : on peut aussi rediriger vers tunnels.html si tu veux)
       }
     });
   </script>
