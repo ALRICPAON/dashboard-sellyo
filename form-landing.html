@@ -31,38 +31,48 @@
       <form id="tunnel-form">
 
         <label>Identifiant public *</label><br>
-        <input type="text" id="folderName" required style="width:100%;padding:8px;"><br><br>
+<input type="text" id="folderName" required style="width:100%;padding:8px;"><br>
+<small style="color:#aaa;">Ex : formation-auto, tunnel-vitrine, guide-marketing</small><br><br>
 
-        <label>Nom de la page *</label><br>
-        <input type="text" id="slug" required style="width:100%;padding:8px;"><br>
-        <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
-
-        <label>Nom du contenu *</label><br>
-        <input type="text" id="tunnel-name" required style="width:100%;padding:8px;"><br><br>
+       <label>Nom de la page *</label><br>
+<input type="text" id="slug" required style="width:100%;padding:8px;"><br>
+<small style="color:#aaa;">Ex : offre-speciale, tunnel-ia, video-promo</small><br>
+<small style="color:#888;">L'extension <strong>.html</strong> sera ajoutée automatiquement</small><br><br>
+        
+       <label>Nom du contenu *</label><br>
+<input type="text" id="tunnel-name" required style="width:100%;padding:8px;"><br>
+<small style="color:#aaa;">Ex : Tunnel IA pour coach sportif / Landing d’inscription à la masterclass</small><br><br>
 
         <label>Objectif *</label><br>
-        <input type="text" id="tunnel-goal" style="width:100%;padding:8px;"><br><br>
+<input type="text" id="tunnel-goal" style="width:100%;padding:8px;"><br>
+<small style="color:#aaa;">Ex : Générer des leads pour une offre de formation</small><br><br>
 
-        <label>Secteur</label><br>
-        <input type="text" id="sector" style="width:100%;padding:8px;"><br><br>
+       <label>Secteur</label><br>
+<input type="text" id="sector" style="width:100%;padding:8px;"><br>
+<small style="color:#aaa;">Ex : Immobilier, Coaching, E-commerce...</small><br><br>
 
         <label>Description de l’offre *</label><br>
-        <textarea id="tunnel-desc" required style="width:100%;padding:8px;height:100px;"></textarea><br><br>
+<textarea id="tunnel-desc" required style="width:100%;padding:8px;height:100px;"></textarea><br>
+<small style="color:#aaa;">Ex : Cette formation gratuite vous montre comment automatiser vos ventes avec l’IA...</small><br><br>
 
         <label>Texte du bouton *</label><br>
-        <input type="text" id="cta-text" required style="width:100%;padding:8px;"><br><br>
+<input type="text" id="cta-text" required style="width:100%;padding:8px;"><br>
+<small style="color:#aaa;">Ex : Accéder à la formation / Télécharger le guide / Réserver ma place</small><br><br>
 
-        <!-- Logo -->
+ <!-- Logo -->
 <label>Logo</label><br>
-<input type="file" id="logo" accept="image/jpeg,image/png,image/webp"><br><br>
+<input type="file" id="logo" accept="image/jpeg,image/png,image/webp"><br>
+<small style="color:#aaa;">Formats acceptés : JPG, PNG, WEBP</small><br><br>
 
 <!-- Image de couverture -->
 <label>Image de couverture</label><br>
-<input type="file" id="cover-image" accept="image/jpeg,image/png,image/webp"><br><br>
+<input type="file" id="cover-image" accept="image/jpeg,image/png,image/webp"><br>
+<small style="color:#aaa;">Formats acceptés : JPG, PNG, WEBP</small><br><br>
 
 <!-- Vidéo -->
 <label>Vidéo</label><br>
-<input type="file" id="custom-video" accept="video/mp4"><br><br>
+<input type="file" id="custom-video" accept="video/mp4"><br>
+<small style="color:#aaa;">Format accepté : MP4 uniquement</small><br><br>
 
         <label>Champs à demander :</label><br>
         <label><input type="checkbox" name="fields" value="nom"> Nom</label>
