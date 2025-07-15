@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer un Email – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/submit-email.js"></script>
+</head>
+
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <header>
+    <a href="dashboard.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
+    <nav style="display: flex; align-items: center;">
+      <ul>
+        <li><a href="form-landing.html">Créer une landing</a></li>
+        <li><a href="form-email.html">Créer un email</a></li>
+        <li><a href="form-video.html">Créer un script vidéo</a></li>
+        <li><a href="form-tunnel.html">Créer un tunnel complet</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Mes clients</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div style="background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin: 2rem auto;">
+      <h2>Créer un Email</h2>
+      <form id="email-form">
+        <label>Identifiant public *</label><br>
+        <input type="text" id="folderName" required><br><br>
+
+        <label>Nom du mail *</label><br>
+        <input type="text" id="slug" required><br><br>
+
+        <label>Objet du mail *</label><br>
+        <input type="text" id="email-subject" required><br><br>
+
+        <label>Description de l’offre</label><br>
+        <textarea id="email-desc"></textarea><br><br>
+
+        <label>Lien produit (optionnel)</label><br>
+        <input type="url" id="product-link"><br><br>
+
+        <label>Prix du produit</label><br>
+        <input type="text" id="product-price"><br><br>
+
+        <label>Fichier joint (optionnel)</label><br>
+        <input type="file" id="attached-file"><br><br>
+
+        <label>Type d’envoi</label><br>
+        <select id="email-type">
+          <option value="relance1">Relance J+2</option>
+          <option value="relance2">Relance J+5</option>
+          <option value="relance3">Relance J+7</option>
+        </select><br><br>
+
+        <label>Associer à une landing existante (optionnel)</label><br>
+        <input type="text" id="linked-tunnel-id" placeholder="ID de la landing (facultatif)"><br><br>
+
+        <button type="submit">Générer l'email</button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
