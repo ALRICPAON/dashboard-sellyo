@@ -1,125 +1,82 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Créer une Landing Page – Sellyo</title>
-  <link rel="stylesheet" href="dashboard.css" />
+  <meta charset="UTF-8">
+  <title>Créer une landing – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
   <script type="module" src="js/firebase-auth-check.js"></script>
-  <style>
-    body {
-      background-color: #111;
-      color: white;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 2rem;
-    }
-
-    main {
-      max-width: 600px;
-      margin: auto;
-      background: #1c1c1c;
-      padding: 2rem;
-      border-radius: 10px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #00ccff;
-    }
-
-    label {
-      display: block;
-      margin-top: 1rem;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 0.6rem;
-      border: none;
-      border-radius: 5px;
-      background: #000;
-      color: white;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .checkbox-group {
-      margin-top: 1.5rem;
-    }
-
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    button {
-      background-color: #00ccff;
-      color: black;
-      font-weight: bold;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 6px;
-      margin-top: 2rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      width: 100%;
-    }
-
-    button:hover {
-      background-color: #009ecc;
-    }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>Créer une Landing Page</h1>
-    <form id="tunnel-form">
-      <label>Nom du tunnel</label>
-      <input type="text" name="nom" placeholder="Nom interne (ex : tunnel-chaud)" required />
-
-      <label>Objectif</label>
-      <input type="text" name="objectif" placeholder="Ex : Récolter des emails" required />
-
-      <label>Secteur</label>
-      <input type="text" name="secteur" placeholder="Ex : Coaching / E-commerce" required />
-
-      <label>Description</label>
-      <textarea name="description" placeholder="Courte description du service ou de l’offre" required></textarea>
-
-      <label>Texte du bouton</label>
-      <input type="text" name="texteBouton" placeholder="Ex : Je découvre l’offre gratuite" required />
-
-      <label>URL du logo (optionnel)</label>
-      <input type="url" name="logo" placeholder="https://..." />
-
-      <label>URL image principale</label>
-      <input type="url" name="image" placeholder="https://..." required />
-
-      <label>URL de la vidéo (optionnel)</label>
-      <input type="url" name="video" placeholder="https://..." />
-
-      <label>Couleur principale (fond de la page)</label>
-      <input type="text" name="couleur" placeholder="#111111" value="#111111" required />
-
-      <label>Couleur du bouton principal</label>
-      <input type="text" name="couleurBouton" placeholder="#00ccff" value="#00ccff" required />
-
-      <div class="checkbox-group">
-        <label><input type="checkbox" name="formFields" value="nom" checked /> Nom</label>
-        <label><input type="checkbox" name="formFields" value="prenom" checked /> Prénom</label>
-        <label><input type="checkbox" name="formFields" value="email" checked /> Email</label>
-        <label><input type="checkbox" name="formFields" value="telephone" /> Téléphone</label>
-        <label><input type="checkbox" name="formFields" value="adresse" /> Adresse</label>
-      </div>
-
-      <button type="submit">Générer ma landing</button>
-    </form>
-  </main>
-
   <script type="module" src="js/submit-landing.js"></script>
+</head>
+
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <header>
+    <a href="dashboard.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
+    <nav style="display: flex; align-items: center;">
+      <ul>
+        <li><a href="form-landing.html">Créer une landing</a></li>
+        <li><a href="form-email.html">Créer un email</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Clients</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div style="background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin: 2rem auto;">
+      <h2>Créer une Landing Page</h2>
+      <form id="tunnel-form">
+
+        <label>Identifiant public *</label><br>
+        <input type="text" id="folderName" required style="width:100%;padding:8px;"><br><br>
+
+        <label>Nom de la page *</label><br>
+        <input type="text" id="slug" required style="width:100%;padding:8px;"><br>
+        <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
+
+        <label>Nom du contenu *</label><br>
+        <input type="text" id="tunnel-name" required style="width:100%;padding:8px;"><br><br>
+
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal" style="width:100%;padding:8px;"><br><br>
+
+        <label>Secteur</label><br>
+        <input type="text" id="sector" style="width:100%;padding:8px;"><br><br>
+
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required style="width:100%;padding:8px;height:100px;"></textarea><br><br>
+
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required style="width:100%;padding:8px;"><br><br>
+
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
+
+        <label>Image de couverture</label><br>
+        <input type="file" id="cover-image" accept="image/*"><br><br>
+
+        <label>Vidéo</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
+
+        <label>Champs à demander :</label><br>
+        <label><input type="checkbox" name="fields" value="nom"> Nom</label>
+        <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
+        <label><input type="checkbox" name="fields" value="email"> Email</label>
+        <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
+        <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
+
+        <label>Couleur principale du bouton</label><br>
+        <input type="color" id="mainColor" value="#00ccff"><br><br>
+
+        <label>Couleur de fond</label><br>
+        <input type="color" id="backgroundColor" value="#111111"><br><br>
+
+        <button type="submit" style="padding: 1rem 2rem; font-size: 1rem;">Générer la landing</button>
+      </form>
+    </div>
+  </main>
 </body>
 </html>
