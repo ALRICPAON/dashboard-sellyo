@@ -46,10 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           <textarea id="tunnel-desc" required></textarea><br><br>
           <label>Texte du bouton *</label><br>
           <input type="text" id="cta-text" required><br><br>
-          <label>Prix (optionnel)</label><br>
-          <input type="text" id="price"><br><br>
-          <label>URL de paiement</label><br>
-          <input type="url" id="payment"><br><br>
           <label>Logo (optionnel)</label><br>
           <input type="file" id="logo" accept="image/*"><br><br>
           <label>Image de couverture (optionnel)</label><br>
