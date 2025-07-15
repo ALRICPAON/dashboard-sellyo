@@ -1,0 +1,82 @@
+<!-- ✅ form-landing.html – Formulaire propre pour créer une Landing Page -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer une landing – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/submit-landing.js"></script>
+</head>
+
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <header>
+    <a href="dashboard.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
+    <nav style="display: flex; align-items: center;">
+      <ul>
+        <li><a href="form-landing.html">Créer une landing</a></li>
+        <li><a href="form-email.html">Créer un email</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Clients</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div style="background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin: 2rem auto;">
+      <h2>Créer une Landing Page</h2>
+      <form id="tunnel-form">
+        <label>Identifiant public *</label><br>
+        <input type="text" id="folderName" required><br><br>
+
+        <label>Nom de la page *</label><br>
+        <input type="text" id="slug" required><br>
+        <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
+
+        <label>Nom du contenu *</label><br>
+        <input type="text" id="tunnel-name" required><br><br>
+
+        <label>Objectif *</label><br>
+        <input type="text" id="tunnel-goal"><br><br>
+
+        <label>Secteur</label><br>
+        <input type="text" id="sector"><br><br>
+
+        <label>Description de l’offre *</label><br>
+        <textarea id="tunnel-desc" required></textarea><br><br>
+
+        <label>Texte du bouton *</label><br>
+        <input type="text" id="cta-text" required><br><br>
+
+        <label>Logo</label><br>
+        <input type="file" id="logo" accept="image/*"><br><br>
+
+        <label>Image de couverture</label><br>
+        <input type="file" id="cover-image" accept="image/*"><br><br>
+
+        <label>Vidéo</label><br>
+        <input type="file" id="custom-video" accept="video/*"><br><br>
+
+        <label>Champs à demander :</label><br>
+        <label><input type="checkbox" name="fields" value="nom"> Nom</label>
+        <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
+        <label><input type="checkbox" name="fields" value="email"> Email</label>
+        <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
+        <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
+
+        <label>Couleur principale du bouton</label><br>
+        <input type="color" id="mainColor" value="#00ccff"><br><br>
+
+        <label>Couleur de fond</label><br>
+        <input type="color" id="backgroundColor" value="#111111"><br><br>
+
+        <button type="submit">Générer la landing</button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
