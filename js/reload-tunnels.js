@@ -52,12 +52,22 @@ export async function reloadTunnels() {
       grid.style.display = "grid";
       grid.style.gridTemplateColumns = "repeat(4, 1fr)";
       grid.style.gap = "1.5rem";
+      grid.style.margin = "0 auto";
+grid.style.maxWidth = "1200px";
+
 
       types.forEach(type => {
         const col = document.createElement("div");
         col.style.background = "#1a1a1a";
         col.style.padding = "1rem";
         col.style.borderRadius = "10px";
+       col.style.flex = "1";
+col.style.minWidth = "260px";
+col.style.maxWidth = "300px";
+col.style.display = "flex";
+col.style.flexDirection = "column";
+col.style.alignItems = "center";
+
 
         const title = document.createElement("h3");
         title.textContent = typeLabels[type];
@@ -73,6 +83,7 @@ export async function reloadTunnels() {
           card.style.padding = "1rem";
           card.style.borderRadius = "8px";
           card.style.boxShadow = "0 0 6px rgba(0,0,0,0.3)";
+          card.style.maxWidth = "280px";
 
           card.innerHTML = `
             <strong>${tunnel.name || "Tunnel"}</strong><br>
