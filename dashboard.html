@@ -2,39 +2,23 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard – Sellyo</title>
+  <title>Accueil – Dashboard Sellyo</title>
   <link rel="stylesheet" href="dashboard.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-.button-loader {
-  border: 4px solid #fff;
-  border-top: 4px solid #00ccff;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  animation: spin 1s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 10px;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
   <script type="module" src="js/firebase-auth-check.js"></script>
 </head>
+
 <body style="background-color: #111; color: white; font-family: sans-serif;">
   <header>
-    <a href="index.html"><img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;"></a>
+    <a href="index.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
     <nav style="display: flex; align-items: center;">
       <ul>
-        <li><a href="#" id="create-tunnel">Créer un tunnel</a></li>
-        <li><a href="#" id="view-tunnels">Mes tunnels</a></li>
-        <li><a href="#" id="view-clients">Clients</a></li>
-        <li><a href="#" id="stats">Statistiques</a></li>
-        <li><a href="#" id="upgrade">Passer Premium</a></li>
-        <li><a href="#" id="logout">Déconnexion</a></li>
+        <li><a href="formulaire.html">Créer un tunnel</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Clients</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
       </ul>
       <select id="lang-switch" style="margin-left: 1rem; background: #000; color: #fff; border: none; padding: 0.5rem;">
         <option value="fr">FR</option>
@@ -43,161 +27,50 @@
     </nav>
   </header>
 
-  <main>
-    <h1 id="welcome">Bienvenue 👋</h1>
+  <main style="padding: 4rem 2rem; text-align: center;">
+    <h1 style="font-size: 2.5rem;">Bienvenue sur votre dashboard Sellyo 👋</h1>
+    <p style="font-size: 1.2rem; color: #ccc;">Accédez à vos tunnels, vos clients ou créez du nouveau contenu.</p>
 
-    <!-- 🔥 Nouvelles données leads 7 jours -->
-    <section id="leads-section" style="display: flex; gap: 2rem; margin-top: 2rem; max-width: 100%;">
-  <!-- Graphique -->
-  <div style="flex: 3; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
-  <h2>Nouveaux leads (7 derniers jours)</h2>
-  <canvas id="leadsChart" width="600" height="300"></canvas>
-</div>
-
-<div style="flex: 2; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
-  <h2>Clients récents</h2>
-  <ul id="leadsList" style="padding-left: 1rem; margin: 0; list-style: none;"></ul>
-</div>
-</section>
-
-    <div id="dashboard-content"></div>
-    <div id="loading-message" style="display:none; margin-top: 1rem; background:#1c1c1c; padding:1rem; border-radius:8px; color:#00ccff; font-weight:bold;">
-  🛠️ Génération en cours… Votre tunnel sera prêt d’ici 1 à 2 minutes.
-</div>
-
-    <!-- Tunnels générés -->
-    <section id="user-tunnels" style="display: none; margin-top: 2rem;">
-      <h2>Mes tunnels générés</h2>
-      <div id="tunnels-by-type" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;"></div>
-    </section>
-    <section id="client-list-section" style="display: none; margin-top: 2rem;">
-  <h2>Mes clients</h2>
-  <div id="client-list" style="background: #1c1c1c; padding: 1.5rem; border-radius: 10px;"></div>
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-  <div>
-    <label for="filter-type">Filtrer :</label>
-    <select id="filter-type" style="background: #000; color: #fff; border: none; padding: 0.4rem;">
-      <option value="">Tous</option>
-      <option value="tunnel">Tunnel</option>
-      <option value="landing">Landing</option>
-      <option value="email">Email</option>
-      <option value="video">Vidéo</option>
-    </select>
-  </div>
-  <button id="export-csv" style="background: #00ccff; color: #000; padding: 0.5rem 1rem; border: none; border-radius: 6px;">📁 Exporter CSV</button>
-</div>
-</section>
-
-    <!-- Formulaire -->
-    <div id="create-tunnel-form" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
-      <h2>Créer un contenu</h2>
-      <form id="tunnel-form">
-        <label>Identifiant public *</label><br>
-        <input type="text" id="folderName" required><br><br>
-
-        <label>Nom de la page *</label><br>
-        <input type="text" id="slug" required><br>
-        <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
-
-        <label>Type de contenu *</label><br>
-        <select id="tunnel-type" required>
-          <option value="" disabled selected>Choisir...</option>
-          <option value="complet">Tunnel Complet</option>
-          <option value="landing">Landing page seule</option>
-          <option value="email">Email de relance</option>
-          <option value="video">Script vidéo</option>
-        </select><br><br>
-
-        <div id="form-content-fields"></div>
-
-        <label>Couleur principale du bouton</label><br>
-        <input type="color" id="mainColor" value="#00ccff"><br><br>
-
-        <label>Couleur de fond</label><br>
-        <input type="color" id="backgroundColor" value="#111111"><br><br>
-
-        <button type="submit" id="generate-button">Générer <span id="loader-zone"></span></button>
-      </form>
+    <div style="margin-top: 3rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
+      <a href="formulaire.html" style="background: #00ccff; color: black; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: bold;">
+        ➕ Créer un tunnel
+      </a>
+      <a href="tunnels.html" style="background: #222; color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none;">
+        📁 Mes tunnels
+      </a>
+      <a href="clients.html" style="background: #222; color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none;">
+        👥 Mes clients
+      </a>
+      <a href="stats.html" style="background: #222; color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none;">
+        📊 Statistiques
+      </a>
     </div>
 
-    <!-- Tunnel complet -->
-    <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin-top: 2rem;">
-      <h2>Tunnel Complet – Pages personnalisées</h2>
-
-      <label>Logo de la marque</label><br>
-      <input type="file" id="full-logo" accept="image/*"><br><br>
-
-      <label>Couleur de fond</label><br>
-      <input type="color" id="full-background-color" value="#121212"><br><br>
-
-      <label>Couleur du bouton</label><br>
-      <input type="color" id="full-button-color" value="#ff9900"><br><br>
-
-      <label>Vidéo principale</label><br>
-      <input type="file" id="full-video" accept="video/*"><br><br>
-
-      <label>URL globale (bouton final)</label><br>
-      <input type="url" id="full-main-url"><br><br>
-
-      <div id="tunnel-pages-complet"></div>
-
-      <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
-      <button type="button" id="submit-full-tunnel">Générer le tunnel complet</button>
+    <div id="loading-message" style="display:none; margin-top: 3rem; background:#1c1c1c; padding:1rem; border-radius:8px; color:#00ccff; font-weight:bold;">
+      🛠️ Génération en cours… Votre tunnel sera prêt d’ici 1 à 2 minutes.
     </div>
   </main>
 
-  <script type="module" src="js/tunnel-submit.js"></script>
-  <script type="module" src="js/dashboard.js"></script>
-
   <script>
-  document.getElementById("create-tunnel").addEventListener("click", () => {
-    const form = document.getElementById("tunnel-form");
-    const fullForm = document.getElementById("form-tunnel-complet");
-    const formFields = document.getElementById("form-content-fields");
-    const tunnelPages = document.getElementById("tunnel-pages-complet");
+    // ✅ Affiche le message si on arrive avec ?tunnel=1
+    window.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("tunnel") === "1") {
+        const loadingMsg = document.getElementById("loading-message");
+        if (loadingMsg) {
+          loadingMsg.innerHTML = "🛠️ Génération en cours… Votre tunnel sera visible dans moins de 2 minutes...";
+          loadingMsg.style.display = "block";
 
-    if (form) form.reset();
-    if (formFields) formFields.innerHTML = "";
-    if (tunnelPages) tunnelPages.innerHTML = "";
-    if (fullForm) fullForm.style.display = "none";
+          setTimeout(() => {
+            loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur l’onglet <strong>Mes tunnels</strong> pour le découvrir.";
+          }, 90000);
 
-    // 👉 Cacher le graphique + leads
-    document.getElementById("leads-section").style.display = "none";
-
-    document.getElementById("create-tunnel-form").style.display = "block";
-    window.scrollTo(0, 0);
-  });
-</script>
-<script>
-  // ✅ Affiche le message si on arrive avec ?tunnel=1
-  window.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("tunnel") === "1") {
-      const loadingMsg = document.getElementById("loading-message");
-      const leadsSection = document.getElementById("leads-section");
-      if (loadingMsg) {
-        // 👉 Cacher le bloc graphique et clients
-        if (leadsSection) leadsSection.style.display = "none";
-
-        // 👉 Afficher le message de génération
-        loadingMsg.innerHTML = "🛠️ Génération en cours… Votre tunnel sera visible dans moins de 2 minutes...";
-        loadingMsg.style.display = "block";
-
-        // ⏱️ Après 1min30 : second message + recharge des tunnels
-        setTimeout(() => {
-          loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur l’onglet <strong>Mes tunnels</strong> pour le découvrir.";
-          import('./js/reload-tunnels.js').then(module => {
-            module.reloadTunnels();
-          });
-        }, 90000);
-
-        // 🚫 Supprime le paramètre de l’URL
-        const url = new URL(window.location);
-        url.searchParams.delete('tunnel');
-        window.history.replaceState({}, document.title, url);
+          const url = new URL(window.location);
+          url.searchParams.delete('tunnel');
+          window.history.replaceState({}, document.title, url);
+        }
       }
-    }
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
