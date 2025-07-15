@@ -48,7 +48,23 @@
         </button>
       </div>
 
-      <div id="client-list" style="background: #1c1c1c; padding: 1.5rem; border-radius: 10px;"></div>
+     <div style="overflow-x: auto;">
+  <table id="client-table" style="width: 100%; border-collapse: collapse; background: #1c1c1c; border-radius: 10px; overflow: hidden;">
+    <thead>
+      <tr style="background: #333;">
+        <th style="padding: 1rem;">Nom</th>
+        <th>Prénom</th>
+        <th>Email</th>
+        <th>Téléphone</th>
+        <th>Adresse</th>
+        <th>Type</th>
+        <th>Date</th>
+        <th>Page</th>
+      </tr>
+    </thead>
+    <tbody id="client-table-body"></tbody>
+  </table>
+</div>
     </section>
   </main>
 </body>
