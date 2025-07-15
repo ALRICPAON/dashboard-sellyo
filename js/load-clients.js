@@ -4,7 +4,6 @@ import { getFirestore, collection, query, where, getDocs } from "https://www.gst
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 let allLeads = [];
 
 onAuthStateChanged(auth, async (user) => {
@@ -18,56 +17,65 @@ onAuthStateChanged(auth, async (user) => {
     const data = doc.data();
     allLeads.push({
       ...data,
-      id: doc.id
+      id: doc.id,
+      createdAt: formatDate(data.createdAt),
     });
   });
 
-  renderLeads(allLeads);
+  renderTable(allLeads);
 });
 
-function renderLeads(leads) {
-  const container = document.getElementById("client-list");
-  container.innerHTML = "";
+function renderTable(leads) {
+  const tbody = document.getElementById("client-table-body");
+  tbody.innerHTML = "";
 
   if (!leads.length) {
-    container.innerHTML = "<p>Aucun lead trouvé.</p>";
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 1rem;">Aucun lead trouvé.</td></tr>`;
     return;
   }
 
   leads.forEach((lead) => {
-    const div = document.createElement("div");
-    div.style.background = "#2b2b2b";
-    div.style.padding = "1rem";
-    div.style.marginBottom = "1rem";
-    div.style.borderRadius = "8px";
-
-    div.innerHTML = `
-      <strong>${lead.name || "Client anonyme"}</strong><br>
-      Email : ${lead.email || "non fourni"}<br>
-      Type : ${lead.type || "-"}<br>
-      Page liée : <a href="${lead.pageUrl || '#'}" target="_blank" style="color: #00ccff;">voir</a>
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td style="padding: 0.8rem;">${lead.nom || ""}</td>
+      <td>${lead.prenom || ""}</td>
+      <td>${lead.email || ""}</td>
+      <td>${lead.telephone || ""}</td>
+      <td>${lead.adresse || ""}</td>
+      <td>${lead.type || ""}</td>
+      <td>${lead.createdAt || ""}</td>
+      <td><a href="${lead.pageUrl || "#"}" target="_blank" style="color: #00ccff;">voir</a></td>
     `;
-
-    container.appendChild(div);
+    tbody.appendChild(row);
   });
 }
 
-// 🎯 Filtrer selon le type
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("fr-FR") + " " + date.toLocaleTimeString("fr-FR");
+}
+
+// 🔍 Filtrage par type
 document.getElementById("filter-type").addEventListener("change", (e) => {
   const value = e.target.value;
   const filtered = value ? allLeads.filter(lead => lead.type === value) : allLeads;
-  renderLeads(filtered);
+  renderTable(filtered);
 });
 
-// 📁 Exporter en CSV
+// 📁 Export CSV
 document.getElementById("export-csv").addEventListener("click", () => {
   if (!allLeads.length) return;
 
-  const headers = ["Nom", "Email", "Type", "URL"];
+  const headers = ["Nom", "Prénom", "Email", "Téléphone", "Adresse", "Type", "Date", "Page"];
   const rows = allLeads.map(lead => [
-    `"${lead.name || ""}"`,
+    `"${lead.nom || ""}"`,
+    `"${lead.prenom || ""}"`,
     `"${lead.email || ""}"`,
+    `"${lead.telephone || ""}"`,
+    `"${lead.adresse || ""}"`,
     `"${lead.type || ""}"`,
+    `"${lead.createdAt || ""}"`,
     `"${lead.pageUrl || ""}"`
   ]);
 
