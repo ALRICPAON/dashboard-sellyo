@@ -1,151 +1,122 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Créer une Landing Page – Sellyo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="dashboard.css" />
   <script type="module" src="js/firebase-auth-check.js"></script>
   <style>
     body {
       background-color: #111;
-      color: #fff;
+      color: white;
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background: #000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.6);
-    }
-
-    .logo {
-      height: 40px;
-    }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-      margin: 0;
-      padding: 0;
-    }
-
-    nav ul li a {
-      text-decoration: none;
-      color: #fff;
-      font-weight: bold;
-      padding: 0.5rem 1rem;
-      transition: all 0.3s;
-    }
-
-    nav ul li a:hover {
-      background: #00ccff;
-      color: #000;
-      border-radius: 5px;
+      padding: 2rem;
     }
 
     main {
-      max-width: 800px;
+      max-width: 600px;
       margin: auto;
-      padding: 3rem 1rem;
+      background: #1c1c1c;
+      padding: 2rem;
+      border-radius: 10px;
     }
 
     h1 {
-      font-size: 2rem;
       text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
+      color: #00ccff;
     }
 
     label {
-      font-weight: bold;
+      display: block;
+      margin-top: 1rem;
     }
 
     input, textarea {
-      padding: 0.7rem;
-      border-radius: 6px;
+      width: 100%;
+      padding: 0.6rem;
       border: none;
-      font-size: 1rem;
-      background: #222;
-      color: #fff;
+      border-radius: 5px;
+      background: #000;
+      color: white;
     }
 
-    input[type="submit"] {
-      background: #00ccff;
-      color: #000;
-      cursor: pointer;
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .checkbox-group {
+      margin-top: 1.5rem;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button {
+      background-color: #00ccff;
+      color: black;
       font-weight: bold;
-      transition: 0.3s;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      margin-top: 2rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      width: 100%;
     }
 
-    input[type="submit"]:hover {
-      background: #009fcc;
+    button:hover {
+      background-color: #009ecc;
     }
   </style>
 </head>
-
 <body>
-  <header>
-    <a href="dashboard.html">
-      <img src="assets/logo.png" alt="Logo Sellyo" class="logo">
-    </a>
-    <nav>
-      <ul>
-        <li><a href="dashboard.html">Accueil</a></li>
-        <li><a href="tunnels.html">Mes tunnels</a></li>
-        <li><a href="clients.html">Mes clients</a></li>
-        <li><a href="emails.html">Mes emails</a></li>
-        <li><a href="stats.html">Statistiques</a></li>
-        <li><a href="index.html">Déconnexion</a></li>
-      </ul>
-    </nav>
-  </header>
-
   <main>
     <h1>Créer une Landing Page</h1>
-    <form id="form-landing">
+    <form id="tunnel-form">
       <label>Nom du tunnel</label>
-      <input type="text" name="name" required placeholder="Ex : Agence IA Express">
+      <input type="text" name="nom" placeholder="Nom interne (ex : tunnel-chaud)" required />
 
       <label>Objectif</label>
-      <input type="text" name="goal" required placeholder="Ex : récolter des emails">
+      <input type="text" name="objectif" placeholder="Ex : Récolter des emails" required />
 
-      <label>Secteur d'activité</label>
-      <input type="text" name="sector" required placeholder="Ex : Immobilier, Coaching, E-commerce...">
+      <label>Secteur</label>
+      <input type="text" name="secteur" placeholder="Ex : Coaching / E-commerce" required />
 
       <label>Description</label>
-      <textarea name="description" required placeholder="Courte description du service ou de l'offre"></textarea>
+      <textarea name="description" placeholder="Courte description du service ou de l’offre" required></textarea>
 
       <label>Texte du bouton</label>
-      <input type="text" name="ctaText" required placeholder="Ex : Je découvre l’offre gratuite">
+      <input type="text" name="texteBouton" placeholder="Ex : Je découvre l’offre gratuite" required />
 
       <label>URL du logo (optionnel)</label>
-      <input type="url" name="logoUrl" placeholder="https://...">
+      <input type="url" name="logo" placeholder="https://..." />
 
       <label>URL image principale</label>
-      <input type="url" name="imageUrl" required placeholder="https://...">
+      <input type="url" name="image" placeholder="https://..." required />
 
       <label>URL de la vidéo (optionnel)</label>
-      <input type="url" name="videoUrl" placeholder="https://...">
+      <input type="url" name="video" placeholder="https://..." />
 
-      <label>Couleur principale (ex : #00ccff)</label>
-      <input type="text" name="mainColor" placeholder="#00ccff" required>
+      <label>Couleur principale (fond de la page)</label>
+      <input type="text" name="couleur" placeholder="#111111" value="#111111" required />
 
-      <input type="submit" value="Générer ma landing">
+      <label>Couleur du bouton principal</label>
+      <input type="text" name="couleurBouton" placeholder="#00ccff" value="#00ccff" required />
+
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="formFields" value="nom" checked /> Nom</label>
+        <label><input type="checkbox" name="formFields" value="prenom" checked /> Prénom</label>
+        <label><input type="checkbox" name="formFields" value="email" checked /> Email</label>
+        <label><input type="checkbox" name="formFields" value="telephone" /> Téléphone</label>
+        <label><input type="checkbox" name="formFields" value="adresse" /> Adresse</label>
+      </div>
+
+      <button type="submit">Générer ma landing</button>
     </form>
   </main>
 
