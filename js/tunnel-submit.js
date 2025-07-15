@@ -144,15 +144,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
         await addDoc(collection(db, "tunnels"), firestoreData);
 
-        // 🔄 Loader visuel
-        const submitBtn = form.querySelector("button[type='submit'], input[type='submit']");
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = `Génération en cours <span class="button-loader"></span>`;
-        }
+      // 🔄 Affiche la popup de chargement
+const popup = document.createElement("div");
+popup.id = "tunnel-loading-overlay";
+popup.innerHTML = `
+  <div style="
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    font-family: sans-serif;
+  ">
+    <div class="loader" style="
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #00ccff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    "></div>
+    <p style="margin-top: 1rem; font-size: 1rem; text-align: center;">
+      ⏳ Création de votre tunnel en cours…<br><small>Merci de patienter jusqu’à 2 minutes.</small>
+    </p>
+  </div>
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+`;
+document.body.appendChild(popup);
 
-        // ✅ Redirection avec message dashboard
-        window.location.href = "dashboard.html?tunnel=1";
+// 🕒 Redirection vers la page des tunnels après 90 secondes max (sécurité si Make prend du temps)
+setTimeout(() => {
+  window.location.href = "tunnels.html";
+}, 90000);
 
       } catch (err) {
         console.error("❌ Erreur Make ou Firestore :", err);
