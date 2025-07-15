@@ -81,5 +81,23 @@
       </form>
     </div>
   </main>
+  <script>
+function validateFile(inputId, validTypes, message) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (file && !validTypes.includes(file.type)) {
+      alert(message);
+      e.target.value = "";
+    }
+  });
+}
+
+// Appliquer les validations sur chaque fichier
+validateFile("logo", ["image/jpeg", "image/png", "image/webp"], "Logo invalide. Utilisez JPG, PNG ou WEBP.");
+validateFile("cover-image", ["image/jpeg", "image/png", "image/webp"], "Image invalide. Utilisez JPG, PNG ou WEBP.");
+validateFile("custom-video", ["video/mp4"], "Vidéo invalide. Seul le format MP4 est accepté.");
+</script>
 </body>
 </html>
