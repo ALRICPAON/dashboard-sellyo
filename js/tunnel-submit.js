@@ -1,4 +1,4 @@
-// ✅ tunnel-submit.js – version finale avec redirection via dashboard
+// ✅ tunnel-submit.js – version corrigée avec affichage des bons blocs et prise en charge des emails
 
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -27,50 +27,44 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
- typeField.addEventListener("change", () => {
-  const selected = typeField.value.trim().toLowerCase();
-  dynamicFieldsContainer.innerHTML = "";
+  if (typeField && dynamicFieldsContainer) {
+    typeField.addEventListener("change", () => {
+      const selected = typeField.value.trim().toLowerCase();
+      dynamicFieldsContainer.innerHTML = "";
 
-  // Bloc landing / video
-  if (["landing", "landing page", "video"].includes(selected)) {
-    dynamicFieldsContainer.innerHTML = `
-      <label>Nom du contenu *</label><br>
-      <input type="text" id="tunnel-name" name="name" required><br><br>
-      <label>Objectif *</label><br>
-      <input type="text" id="tunnel-goal" name="goal"><br><br>
-      <label>Secteur</label><br>
-      <input type="text" id="sector" name="sector"><br><br>
-      <label>Logo</label><br>
-      <input type="file" id="logo" name="logo" accept="image/*"><br><br>
-      <label>Image de couverture</label><br>
-      <input type="file" id="cover-image" name="cover" accept="image/*"><br><br>
-      <label>Vidéo</label><br>
-      <input type="file" id="custom-video" name="video" accept="video/*"><br><br>
-      <label>Description de l’offre *</label><br>
-      <textarea id="tunnel-desc" name="desc" required></textarea><br><br>
-      <label>Texte du bouton *</label><br>
-      <input type="text" id="cta-text" name="cta" required><br><br>
-      <label>Champs à demander :</label><br>
-      <label><input type="checkbox" name="fields" value="nom"> Nom</label>
-      <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
-      <label><input type="checkbox" name="fields" value="email"> Email</label>
-      <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
-      <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
-    `;
-  }
+      if (["landing", "landing page", "video"].includes(selected)) {
+        dynamicFieldsContainer.innerHTML = `
+          <label>Nom du contenu *</label><br>
+          <input type="text" id="tunnel-name" name="name" required><br><br>
+          <label>Objectif *</label><br>
+          <input type="text" id="tunnel-goal" name="goal"><br><br>
+          <label>Secteur</label><br>
+          <input type="text" id="sector" name="sector"><br><br>
+          <label>Logo</label><br>
+          <input type="file" id="logo" name="logo" accept="image/*"><br><br>
+          <label>Image de couverture</label><br>
+          <input type="file" id="cover-image" name="cover" accept="image/*"><br><br>
+          <label>Vidéo</label><br>
+          <input type="file" id="custom-video" name="video" accept="video/*"><br><br>
+          <label>Description de l’offre *</label><br>
+          <textarea id="tunnel-desc" name="desc" required></textarea><br><br>
+          <label>Texte du bouton *</label><br>
+          <input type="text" id="cta-text" name="cta" required><br><br>
+          <label>Champs à demander :</label><br>
+          <label><input type="checkbox" name="fields" value="nom"> Nom</label>
+          <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
+          <label><input type="checkbox" name="fields" value="email"> Email</label>
+          <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
+          <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
+        `;
+      }
 
-  // ✅ Affichage dynamique du bloc Email
-  const emailBlock = document.getElementById("form-email-fields");
-  if (selected === "email") {
-    if (emailBlock) emailBlock.style.display = "block";
-  } else {
-    if (emailBlock) emailBlock.style.display = "none";
-  }
+      const emailBlock = document.getElementById("form-email-fields");
+      if (emailBlock) {
+        emailBlock.style.display = selected === "email" ? "block" : "none";
+      }
+    });
 
-  // Tu peux ajouter d'autres blocs ici si besoin (ex: full-tunnel)
-});
-
-    // 🔁 Affiche le bon bloc au chargement
     typeField.dispatchEvent(new Event("change"));
   }
 
@@ -89,7 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Popup loading
       const popup = document.createElement("div");
       popup.id = "tunnel-loading-overlay";
       popup.innerHTML = `
@@ -115,13 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       document.body.appendChild(popup);
 
-      const submitBtn = form.querySelector("button[type='submit'], input[type='submit']");
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Génération en cours...";
-      }
-
-      const type = document.getElementById("tunnel-type")?.value || "tunnel";
+      const type = typeField?.value || "tunnel";
       const name = document.getElementById("tunnel-name")?.value || "";
       const goal = document.getElementById("tunnel-goal")?.value || "";
       const sector = document.getElementById("sector")?.value || "";
@@ -134,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const slugFinal = `${slug}-${slugCounter}`;
       const createdAt = new Date().toISOString();
 
-      // Champs email
       let linkedContent = "";
       let manualClientList = "";
       let emailType = "";
@@ -212,7 +198,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cover) formData.append("cover", cover);
       if (video) formData.append("video", video);
 
-      // Redirection après 90s
       setTimeout(() => {
         window.location.href = "tunnels.html";
       }, 90000);
