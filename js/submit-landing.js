@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await fetch(webhookURL, { method: "POST", body: formData });
       await addDoc(collection(db, "tunnels"), firestoreData);
-      window.location.href = "tunnels.html";
+      window.location.href = "dashboard.html?tunnel=1";
     } catch (err) {
       alert("Erreur : " + err.message);
     }
