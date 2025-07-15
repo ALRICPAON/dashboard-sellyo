@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer un tunnel – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/tunnel-submit.js"></script>
+</head>
+
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <header>
+    <a href="index.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
+    <nav style="display: flex; align-items: center;">
+      <ul>
+        <li><a href="formulaire.html">Créer un tunnel</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Clients</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+      <select id="lang-switch" style="margin-left: 1rem; background: #000; color: #fff; border: none; padding: 0.5rem;">
+        <option value="fr">FR</option>
+        <option value="en">EN</option>
+      </select>
+    </nav>
+  </header>
+
+  <main>
+    <div id="create-tunnel-form" style="background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 600px; width: 100%; margin: 2rem auto;">
+      <h2>Créer un contenu</h2>
+      <form id="tunnel-form">
+        <label>Identifiant public *</label><br>
+        <input type="text" id="folderName" required><br><br>
+
+        <label>Nom de la page *</label><br>
+        <input type="text" id="slug" required><br>
+        <small style="color:#aaa;">L'extension <strong>.html</strong> sera gérée automatiquement</small><br><br>
+
+        <label>Type de contenu *</label><br>
+        <select id="tunnel-type" required>
+          <option value="" disabled selected>Choisir...</option>
+          <option value="complet">Tunnel Complet</option>
+          <option value="landing">Landing page seule</option>
+          <option value="email">Email de relance</option>
+          <option value="video">Script vidéo</option>
+        </select><br><br>
+
+        <div id="form-content-fields"></div>
+
+        <label>Couleur principale du bouton</label><br>
+        <input type="color" id="mainColor" value="#00ccff"><br><br>
+
+        <label>Couleur de fond</label><br>
+        <input type="color" id="backgroundColor" value="#111111"><br><br>
+
+        <button type="submit" id="generate-button">Générer <span id="loader-zone"></span></button>
+      </form>
+    </div>
+
+    <div id="form-tunnel-complet" style="display: none; background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin: 2rem auto;">
+      <h2>Tunnel Complet – Pages personnalisées</h2>
+
+      <label>Logo de la marque</label><br>
+      <input type="file" id="full-logo" accept="image/*"><br><br>
+
+      <label>Couleur de fond</label><br>
+      <input type="color" id="full-background-color" value="#121212"><br><br>
+
+      <label>Couleur du bouton</label><br>
+      <input type="color" id="full-button-color" value="#ff9900"><br><br>
+
+      <label>Vidéo principale</label><br>
+      <input type="file" id="full-video" accept="video/*"><br><br>
+
+      <label>URL globale (bouton final)</label><br>
+      <input type="url" id="full-main-url"><br><br>
+
+      <div id="tunnel-pages-complet"></div>
+
+      <button type="button" id="add-page-full">+ Ajouter une page</button><br><br>
+      <button type="button" id="submit-full-tunnel">Générer le tunnel complet</button>
+    </div>
+  </main>
+
+  <script>
+    // ✅ Affiche le message si on arrive avec ?tunnel=1
+    window.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("tunnel") === "1") {
+        alert("🛠️ Génération en cours… Votre tunnel sera visible dans quelques instants.");
+        // (optionnel : on peut aussi rediriger vers tunnels.html si tu veux)
+      }
+    });
+  </script>
+</body>
+</html>
