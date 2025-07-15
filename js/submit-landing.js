@@ -46,6 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const slug = slugInput?.value || "";
     const slugFinal = `${slug}-${slugCounter}`;
     const createdAt = new Date().toISOString();
+    const customField = document.getElementById("customField")?.value || "";
+const extraText = document.getElementById("extraText")?.value || "";
+
 
     const fields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => ({
       label: el.value.charAt(0).toUpperCase() + el.value.slice(1),
@@ -55,21 +58,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }));
 
     const firestoreData = {
-      userId: user.uid,
-      type: "landing",
-      name,
-      goal,
-      sector,
-      desc,
-      cta,
-      mainColor,
-      backgroundColor,
-      folder,
-      slug: slugFinal,
-      createdAt,
-      pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,
-      fields
-    };
+  userId: user.uid,
+  type: "landing",
+  name,
+  goal,
+  sector,
+  desc,
+  cta,
+  mainColor,
+  backgroundColor,
+  folder,
+  slug: slugFinal,
+  createdAt,
+  pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,
+  fields,
+  customField,
+  extraText
+};
 
     const formData = new FormData();
     Object.entries(firestoreData).forEach(([key, val]) => formData.append(key, typeof val === "object" ? JSON.stringify(val) : val));
