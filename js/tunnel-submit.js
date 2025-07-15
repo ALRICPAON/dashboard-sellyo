@@ -29,11 +29,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // Affiche ou masque les bons champs selon le type
   if (typeField && dynamicFieldsContainer) {
     typeField.addEventListener("change", () => {
       const selected = typeField.value.trim().toLowerCase();
       dynamicFieldsContainer.innerHTML = "";
-
       if (["landing", "landing page", "video"].includes(selected)) {
         dynamicFieldsContainer.innerHTML = `
           <label>Nom du contenu *</label><br>
@@ -44,19 +44,20 @@ document.addEventListener("DOMContentLoaded", async () => {
           <input type="text" id="sector"><br><br>
           <label>Description de l’offre *</label><br>
           <textarea id="tunnel-desc" required></textarea><br><br>
+          <label>Texte du bouton *</label><br>
+          <input type="text" id="cta-text" required><br><br>
           <label>Prix (optionnel)</label><br>
           <input type="text" id="price"><br><br>
           <label>URL de paiement</label><br>
           <input type="url" id="payment"><br><br>
-          <label>Logo (URL ou fichier)</label><br>
-          <input type="file" id="logo" accept="image/*"><br><br>
-          <label>Image principale (URL ou fichier)</label><br>
-          <input type="file" id="cover-image" accept="image/*"><br><br>
-          <label>Vidéo (URL ou fichier)</label><br>
-          <input type="file" id="custom-video" accept="video/*"><br><br>
+          <label>Champs à demander :</label><br>
+          <label><input type="checkbox" name="fields" value="nom"> Nom</label>
+          <label><input type="checkbox" name="fields" value="prenom"> Prénom</label>
+          <label><input type="checkbox" name="fields" value="email"> Email</label>
+          <label><input type="checkbox" name="fields" value="telephone"> Téléphone</label>
+          <label><input type="checkbox" name="fields" value="adresse"> Adresse</label><br><br>
         `;
       }
-
       if (selected === "email") {
         if (emailBlock) emailBlock.style.display = "block";
       } else {
@@ -66,6 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     typeField.dispatchEvent(new Event("change"));
   }
 
+  // Injection dynamique des tunnels existants dans le menu email
   onAuthStateChanged(auth, async (user) => {
     if (user && linkedContent) {
       const q = query(collection(db, "tunnels"), where("userId", "==", user.uid));
@@ -82,6 +84,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  // Soumission du formulaire
   const observer = new MutationObserver(() => {
     const form = document.getElementById("tunnel-form");
     if (!form) return;
@@ -119,6 +122,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sendDate = document.getElementById("email-schedule-date")?.value || "";
       const sendHour = document.getElementById("email-schedule-hour")?.value || "";
 
+      const fields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => ({
+        label: el.value.charAt(0).toUpperCase() + el.value.slice(1),
+        name: el.value,
+        type: el.value === "email" ? "email" : "text",
+        placeholder: `Votre ${el.value}`
+      }));
+
       const firestoreData = {
         userId: user.uid,
         type,
@@ -140,11 +150,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         emailType,
         sendMode,
         sendDate,
-        sendHour
+        sendHour,
+        fields
       };
 
       const formData = new FormData();
-      Object.entries(firestoreData).forEach(([key, val]) => formData.append(key, val));
+      Object.entries(firestoreData).forEach(([key, val]) => formData.append(key, typeof val === "object" ? JSON.stringify(val) : val));
 
       try {
         await fetch(webhookURL, { method: "POST", body: formData });
