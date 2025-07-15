@@ -2,68 +2,149 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Accueil – Dashboard Sellyo</title>
+  <title>Dashboard – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css">
   <script type="module" src="js/firebase-auth-check.js"></script>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+
+    .logo {
+      height: 40px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #fff;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s;
+    }
+
+    nav ul li a:hover {
+      background: #00ccff;
+      color: #000;
+      border-radius: 5px;
+    }
+
+    main {
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #ccc;
+      font-size: 1.2rem;
+    }
+
+    .card-container {
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .card {
+      background: #1e1e1e;
+      padding: 2rem;
+      border-radius: 15px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00ccff99;
+      border-color: #00ccff;
+    }
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
-<body style="background-color: #111; color: white; font-family: sans-serif;">
- 
+<body>
+  <header>
+    <a href="dashboard.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo">
+    </a>
+    <nav>
+      <ul>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Mes clients</a></li>
+        <li><a href="emails.html">Mes emails</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  <main style="padding: 4rem 2rem; text-align: center;">
-    <h1 style="font-size: 2.5rem;">Bienvenue sur votre dashboard Sellyo 👋</h1>
-    <p style="font-size: 1.2rem; color: #ccc;">Accédez à vos tunnels, vos clients ou créez du nouveau contenu.</p>
+  <main>
+    <h1>Bienvenue sur votre dashboard Sellyo 👋</h1>
+    <p>Accédez à vos tunnels, vos clients ou créez du nouveau contenu.</p>
 
-    <div style="margin-top: 3rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
-     <a href="form-landing.html" style="background: #00ccff; color: black; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: bold;">
-  🧲 Créer une Landing Page
-</a>
-<a href="form-email.html" style="background: #00ccff; color: black; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: bold;">
-  📧 Créer un Email
-</a>
-<a href="form-video.html" style="background: #00ccff; color: black; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: bold;">
-  🎥 Créer un Script Vidéo
-</a>
-<a href="form-tunnel.html" style="background: #00ccff; color: black; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: bold;">
-  🚀 Créer un Tunnel Complet
-</a>
+    <div class="card-container">
+      <a class="card" href="form-landing.html">
+        <div class="card-icon">🔴</div>
+        <div class="card-title">Créer une Landing Page</div>
       </a>
-      <a href="tunnels.html" style="background: #222; color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none;">
-        📁 Mes tunnels
-      </a>
-      <a href="clients.html" style="background: #222; color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none;">
-        👥 Mes clients
-      </a>
-      <a href="stats.html" style="background: #222; color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none;">
-        📊 Statistiques
-      </a>
-    </div>
 
-    <div id="loading-message" style="display:none; margin-top: 3rem; background:#1c1c1c; padding:1rem; border-radius:8px; color:#00ccff; font-weight:bold;">
-      🛠️ Génération en cours… Votre tunnel sera prêt d’ici 1 à 2 minutes.
+      <a class="card" href="form-email.html">
+        <div class="card-icon">✉️</div>
+        <div class="card-title">Créer un Email</div>
+      </a>
+
+      <a class="card" href="form-video.html">
+        <div class="card-icon">🎬</div>
+        <div class="card-title">Créer un Script Vidéo</div>
+      </a>
+
+      <a class="card" href="form-tunnel.html">
+        <div class="card-icon">🚀</div>
+        <div class="card-title">Créer un Tunnel Complet</div>
+      </a>
     </div>
   </main>
-
-  <script>
-    // ✅ Affiche le message si on arrive avec ?tunnel=1
-    window.addEventListener("DOMContentLoaded", () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("tunnel") === "1") {
-        const loadingMsg = document.getElementById("loading-message");
-        if (loadingMsg) {
-          loadingMsg.innerHTML = "🛠️ Génération en cours… Votre tunnel sera visible dans moins de 2 minutes...";
-          loadingMsg.style.display = "block";
-
-          setTimeout(() => {
-            loadingMsg.innerHTML = "✅ Votre tunnel est prêt ! Cliquez sur l’onglet <strong>Mes tunnels</strong> pour le découvrir.";
-          }, 90000);
-
-          const url = new URL(window.location);
-          url.searchParams.delete('tunnel');
-          window.history.replaceState({}, document.title, url);
-        }
-      }
-    });
-  </script>
 </body>
 </html>
