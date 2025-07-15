@@ -37,21 +37,25 @@ function renderTable(leads) {
   leads.forEach((lead) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td style="padding: 0.8rem;">${lead.nom || ""}</td>
-      <td>${lead.prenom || ""}</td>
-      <td>${lead.email || ""}</td>
-      <td>${lead.telephone || ""}</td>
-      <td>${lead.adresse || ""}</td>
-      <td>${lead.type || ""}</td>
-      <td>${lead.createdAt || ""}</td>
-      <td><a href="${lead.pageUrl || "#"}" target="_blank" style="color: #00ccff;">voir</a></td>
+      <td style="padding: 0.8rem; border-top: 1px solid #333;">${lead.nom || ""}</td>
+      <td style="padding: 0.8rem; border-top: 1px solid #333;">${lead.prenom || ""}</td>
+      <td style="padding: 0.8rem; border-top: 1px solid #333;">${lead.email || ""}</td>
+      <td style="padding: 0.8rem; border-top: 1px solid #333;">${lead.telephone || ""}</td>
+      <td style="padding: 0.8rem; border-top: 1px solid #333;">${lead.adresse || ""}</td>
+      <td style="padding: 0.8rem; border-top: 1px solid #333;">${lead.type || ""}</td>
+      <td style="padding: 0.8rem; border-top: 1px solid #333;">${lead.createdAt || ""}</td>
+      <td style="padding: 0.8rem; border-top: 1px solid #333;">
+        <button onclick="navigator.clipboard.writeText('${lead.email || ""}')" style="background:#00ccff; color:#000; border:none; padding:0.4rem 0.8rem; border-radius:5px; cursor:pointer;">
+          Copier l'email
+        </button>
+      </td>
     `;
     tbody.appendChild(row);
   });
 }
 
 function formatDate(dateString) {
-  if (!dateString) return "";
+  if (!dateString || isNaN(Date.parse(dateString))) return "";
   const date = new Date(dateString);
   return date.toLocaleDateString("fr-FR") + " " + date.toLocaleTimeString("fr-FR");
 }
@@ -67,7 +71,7 @@ document.getElementById("filter-type").addEventListener("change", (e) => {
 document.getElementById("export-csv").addEventListener("click", () => {
   if (!allLeads.length) return;
 
-  const headers = ["Nom", "Prénom", "Email", "Téléphone", "Adresse", "Type", "Date", "Page"];
+  const headers = ["Nom", "Prénom", "Email", "Téléphone", "Adresse", "Type", "Date"];
   const rows = allLeads.map(lead => [
     `"${lead.nom || ""}"`,
     `"${lead.prenom || ""}"`,
@@ -75,8 +79,7 @@ document.getElementById("export-csv").addEventListener("click", () => {
     `"${lead.telephone || ""}"`,
     `"${lead.adresse || ""}"`,
     `"${lead.type || ""}"`,
-    `"${lead.createdAt || ""}"`,
-    `"${lead.pageUrl || ""}"`
+    `"${lead.createdAt || ""}"`
   ]);
 
   let csvContent = "data:text/csv;charset=utf-8," 
