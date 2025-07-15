@@ -67,131 +67,124 @@ document.addEventListener("DOMContentLoaded", () => {
 
     observer.disconnect();
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+   form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-      const user = auth.currentUser;
-      if (!user) {
-        alert("Vous devez être connecté.");
-        return;
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Vous devez être connecté.");
+    return;
+  }
+
+  // 🔄 Affiche la popup immédiatement
+  const popup = document.createElement("div");
+  popup.id = "tunnel-loading-overlay";
+  popup.innerHTML = `
+    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0, 0, 0, 0.85); color: white;
+                display: flex; flex-direction: column;
+                align-items: center; justify-content: center;
+                z-index: 9999; font-family: sans-serif;">
+      <div class="loader" style="border: 6px solid #f3f3f3;
+                  border-top: 6px solid #00ccff;
+                  border-radius: 50%; width: 40px; height: 40px;
+                  animation: spin 1s linear infinite;"></div>
+      <p style="margin-top: 1rem; font-size: 1rem; text-align: center;">
+        ⏳ Création de votre tunnel en cours…<br><small>Merci de patienter jusqu’à 2 minutes.</small>
+      </p>
+    </div>
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
+    </style>
+  `;
+  document.body.appendChild(popup);
 
-      const type = document.getElementById("tunnel-type")?.value || "tunnel";
-      const name = document.getElementById("tunnel-name")?.value || "";
-      const goal = document.getElementById("tunnel-goal")?.value || "";
-      const sector = document.getElementById("sector")?.value || "";
-      const desc = document.getElementById("tunnel-desc")?.value || "";
-      const cta = document.getElementById("cta-text")?.value || "";
-      const mainColor = document.getElementById("mainColor")?.value || "";
-      const backgroundColor = document.getElementById("backgroundColor")?.value || "";
-      const folder = folderInput?.value || "";
-      const slug = slugInput?.value || "";
-      const slugFinal = `${slug}-${slugCounter}`;
-      const createdAt = new Date().toISOString();
+  // Désactive le bouton tout de suite aussi
+  const submitBtn = form.querySelector("button[type='submit'], input[type='submit']");
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Génération en cours...";
+  }
 
-      const fields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => ({
-        label: el.value.charAt(0).toUpperCase() + el.value.slice(1),
-        name: el.value,
-        type: el.value === "email" ? "email" : "text",
-        placeholder: `Votre ${el.value}`
-      }));
+  // Prépare les données ici (firestoreData + formData)
+  const type = document.getElementById("tunnel-type")?.value || "tunnel";
+  const name = document.getElementById("tunnel-name")?.value || "";
+  const goal = document.getElementById("tunnel-goal")?.value || "";
+  const sector = document.getElementById("sector")?.value || "";
+  const desc = document.getElementById("tunnel-desc")?.value || "";
+  const cta = document.getElementById("cta-text")?.value || "";
+  const mainColor = document.getElementById("mainColor")?.value || "";
+  const backgroundColor = document.getElementById("backgroundColor")?.value || "";
+  const folder = folderInput?.value || "";
+  const slug = slugInput?.value || "";
+  const slugFinal = `${slug}-${slugCounter}`;
+  const createdAt = new Date().toISOString();
 
-      const firestoreData = {
-        userId: user.uid,
-        name,
-        goal,
-        sector,
-        desc,
-        cta,
-        type,
-        folder,
-        slug: slugFinal,
-        mainColor,
-        backgroundColor,
-        createdAt,
-        pageUrl: `https://cdn.sellyo.fr/${["landing", "email", "video"].includes(type) ? type : "tunnel"}/${folder}/${slugFinal}.html`,
-        fields
-      };
+  const fields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => ({
+    label: el.value.charAt(0).toUpperCase() + el.value.slice(1),
+    name: el.value,
+    type: el.value === "email" ? "email" : "text",
+    placeholder: `Votre ${el.value}`
+  }));
 
-      const formData = new FormData();
-      formData.append("type", type);
-      formData.append("name", name);
-      formData.append("goal", goal);
-      formData.append("sector", sector);
-      formData.append("desc", desc);
-      formData.append("cta", cta);
-      formData.append("mainColor", mainColor);
-      formData.append("backgroundColor", backgroundColor);
-      formData.append("userId", user.uid);
-      formData.append("folder", folder);
-      formData.append("slug", slugFinal);
-      formData.append("createdAt", createdAt);
-      formData.append("fields", JSON.stringify(fields));
+  const firestoreData = {
+    userId: user.uid,
+    name,
+    goal,
+    sector,
+    desc,
+    cta,
+    type,
+    folder,
+    slug: slugFinal,
+    mainColor,
+    backgroundColor,
+    createdAt,
+    pageUrl: `https://cdn.sellyo.fr/${["landing", "email", "video"].includes(type) ? type : "tunnel"}/${folder}/${slugFinal}.html`,
+    fields
+  };
 
-      const logo = document.getElementById("logo")?.files[0];
-      const cover = document.getElementById("cover-image")?.files[0];
-      const video = document.getElementById("custom-video")?.files[0];
+  const formData = new FormData();
+  formData.append("type", type);
+  formData.append("name", name);
+  formData.append("goal", goal);
+  formData.append("sector", sector);
+  formData.append("desc", desc);
+  formData.append("cta", cta);
+  formData.append("mainColor", mainColor);
+  formData.append("backgroundColor", backgroundColor);
+  formData.append("userId", user.uid);
+  formData.append("folder", folder);
+  formData.append("slug", slugFinal);
+  formData.append("createdAt", createdAt);
+  formData.append("fields", JSON.stringify(fields));
 
-      if (logo) formData.append("logo", logo);
-      if (cover) formData.append("cover", cover);
-      if (video) formData.append("video", video);
+  const logo = document.getElementById("logo")?.files[0];
+  const cover = document.getElementById("cover-image")?.files[0];
+  const video = document.getElementById("custom-video")?.files[0];
 
-      try {
-        await fetch(webhookURL, {
-          method: "POST",
-          body: formData
-        });
+  if (logo) formData.append("logo", logo);
+  if (cover) formData.append("cover", cover);
+  if (video) formData.append("video", video);
 
-        await addDoc(collection(db, "tunnels"), firestoreData);
+  // Redirection automatique après 90 secondes
+  setTimeout(() => {
+    window.location.href = "tunnels.html";
+  }, 90000);
 
-      // 🔄 Affiche la popup de chargement
-const popup = document.createElement("div");
-popup.id = "tunnel-loading-overlay";
-popup.innerHTML = `
-  <div style="
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    font-family: sans-serif;
-  ">
-    <div class="loader" style="
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #00ccff;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    "></div>
-    <p style="margin-top: 1rem; font-size: 1rem; text-align: center;">
-      ⏳ Création de votre tunnel en cours…<br><small>Merci de patienter jusqu’à 2 minutes.</small>
-    </p>
-  </div>
-  <style>
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
-`;
-document.body.appendChild(popup);
-
-// 🕒 Redirection vers la page des tunnels après 90 secondes max (sécurité si Make prend du temps)
-setTimeout(() => {
-  window.location.href = "tunnels.html";
-}, 90000);
-
-      } catch (err) {
-        console.error("❌ Erreur Make ou Firestore :", err);
-        alert("Erreur lors de l'envoi : " + err.message);
-      }
+  try {
+    await fetch(webhookURL, {
+      method: "POST",
+      body: formData
     });
-  });
 
-  observer.observe(document.body, { childList: true, subtree: true });
+    await addDoc(collection(db, "tunnels"), firestoreData);
+
+  } catch (err) {
+    console.error("❌ Erreur Make ou Firestore :", err);
+    alert("Erreur lors de l'envoi : " + err.message);
+  }
 });
