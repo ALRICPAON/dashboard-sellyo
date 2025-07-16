@@ -60,8 +60,10 @@
         <label>Date et heure d’envoi (optionnel)</label><br>
 <input type="datetime-local" id="send-at"><br><br>
 
-        <label>Associer à une landing existante (optionnel)</label><br>
-        <input type="text" id="linked-tunnel-id" placeholder="ID de la landing (facultatif)"><br><br>
+       <label>Associer à une landing ou un tunnel (optionnel)</label><br>
+<select id="linked-tunnel-id">
+  <option value="">Aucun</option>
+</select><br><br>
 
         <button type="submit">Générer l'email</button>
       </form>
