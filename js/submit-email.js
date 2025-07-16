@@ -7,33 +7,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = getFirestore(app);
   const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp"; // 🔁 Ton webhook
 
-  const form = document.getElementById("email-form");
-  if (!form) return;
+ const form = document.getElementById("email-form");
+if (!form) return;
 
-  // Auto-remplissage du champ date selon le type
-  document.getElementById("email-type").addEventListener("change", function () {
-    const delayMap = {
-      "relance1": 2,
-      "relance2": 5,
-      "relance3": 7
-    };
+// 📌 Auto-remplissage du champ date selon le type
+const emailTypeField = document.getElementById("email-type");
+const sendAtField = document.getElementById("send-at");
 
-    const selectedType = this.value;
-    const sendAtField = document.getElementById("send-at");
+emailTypeField.addEventListener("change", function () {
+  const delayMap = {
+    "relance1": 2,
+    "relance2": 5,
+    "relance3": 7
+  };
 
-    if (delayMap[selectedType]) {
-      const now = new Date();
-      now.setDate(now.getDate() + delayMap[selectedType));
-      sendAtField.value = now.toISOString().slice(0, 16); // Format 'YYYY-MM-DDTHH:mm'
-    }
-  });
+  const selected = this.value;
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  if (delayMap[selected]) {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // 🔁 Corrige le fuseau pour datetime-local
+    now.setDate(now.getDate() + delayMap[selected]);
 
-    const user = auth.currentUser;
-    if (!user) return alert("Vous devez être connecté.");
+    // Format pour input type="datetime-local"
+    const formatted = now.toISOString().slice(0, 16); // 'YYYY-MM-DDTHH:mm'
+    sendAtField.value = formatted;
+  }
+});
 
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const user = auth.currentUser;
+  if (!user) return alert("Vous devez être connecté.");
     // Popup de chargement
     const popup = document.createElement("div");
     popup.id = "email-loading-overlay";
