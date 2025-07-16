@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const slug = slugInput?.value || "";
     const slugFinal = `${slug}-${slugCounter}`;
     const createdAt = new Date().toISOString();
-    const customField = document.getElementById("customField")?.value || "";
 const extraText = document.getElementById("extraText")?.value || "";
 
 
@@ -72,7 +71,6 @@ const extraText = document.getElementById("extraText")?.value || "";
   createdAt,
   pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,
   fields,
-  customField,
   extraText
 };
 
