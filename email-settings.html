@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Paramètres Email – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="js/firebase-auth-check.js"></script>
+</head>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <header>
+    <a href="dashboard.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
+    <nav>
+      <ul>
+        <li><a href="dashboard.html">Accueil</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Mes clients</a></li>
+        <li><a href="emails.html">Mes emails</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="email-settings.html">Paramètres Email</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div style="background:#2e2e2e; padding:2rem; border-radius:10px; max-width:800px; margin:2rem auto;">
+      <h2>Configurer votre adresse email professionnelle</h2>
+      <p>Pour envoyer des emails professionnels avec votre propre domaine (ex. contact@monagence.com), vous devez ajouter ces deux entrées DNS dans votre hébergeur (ex : OVH, IONOS, etc.) :</p>
+
+      <h3>📄 Entrée SPF</h3>
+      <pre style="background:#1e1e1e; padding:10px; border-radius:5px;">Type : TXT
+Nom : @
+Valeur : v=spf1 include:_spf.mailersend.net ~all</pre>
+
+      <h3>📄 Entrée DKIM</h3>
+      <pre style="background:#1e1e1e; padding:10px; border-radius:5px;">Type : TXT
+Nom : mailersend._domainkey
+Valeur : v=DKIM1; k=rsa; p=MIIBIjANBgkq... (clé à générer)</pre>
+
+      <p>Après avoir ajouté ces enregistrements, cliquez sur le bouton ci-dessous pour vérifier votre configuration.</p>
+
+      <button id="verify-domain" style="margin-top:1rem; padding:10px 20px; font-size:1rem; background:#00ccff; color:white; border:none; border-radius:6px;">🔍 Vérifier mon domaine</button>
+
+      <p id="verification-result" style="margin-top:1rem;"></p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { app } from "./js/firebase-init.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById("verify-domain").addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return alert("Vous devez être connecté.");
+
+      // Appel fictif (à adapter avec Make ou un endpoint MailerSend)
+      const result = await fetch("https://hook.eu2.make.com/ton-endpoint-verification", {
+        method: "POST",
+        body: JSON.stringify({ userId: user.uid }),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const data = await result.json();
+      const output = document.getElementById("verification-result");
+
+      if (data.status === "verified") {
+        output.textContent = "✅ Votre domaine est correctement configuré.";
+        output.style.color = "lightgreen";
+      } else {
+        output.textContent = "❌ Votre domaine n'est pas encore configuré ou la propagation DNS est incomplète.";
+        output.style.color = "orange";
+      }
+    });
+  </script>
+</body>
+</html>
