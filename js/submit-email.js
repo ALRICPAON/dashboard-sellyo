@@ -7,7 +7,7 @@ import { getFirestore, collection, doc, getDoc, addDoc } from "https://www.gstat
 document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const webhookURL = "https://hook.eu2.make.com/your-webhook-url"; // 🔁 Remplace par ton URL Make
+  const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
   const form = document.getElementById("email-form");
   if (!form) return;
