@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const file = document.getElementById("attached-file")?.files[0];
     const emailType = document.getElementById("email-type")?.value || "";
     const linkedTunnelId = document.getElementById("linked-tunnel-id")?.value || "";
+    const sendAt = document.getElementById("send-at")?.value || "";
 
     const createdAt = new Date().toISOString();
     const slugFinal = `${slug}-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -47,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       productPrice,
       emailType,
       linkedTunnelId,
+      sendAt,
       createdAt,
       pageUrl: `https://cdn.sellyo.fr/emails/${folder}/${slugFinal}.html`
     };
