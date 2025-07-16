@@ -68,8 +68,9 @@ form.addEventListener("submit", async (e) => {
     const productPrice = document.getElementById("product-price")?.value || "";
     const file = document.getElementById("attached-file")?.files[0];
     const emailType = document.getElementById("email-type")?.value || "";
-    const sendAtRaw = document.getElementById("send-at")?.value || "";
-    const linkedTunnelId = document.getElementById("linked-tunnel-id")?.value || "";
+   const sendAtRaw = document.getElementById("send-at")?.value || "";
+const sendAtDate = new Date(sendAtRaw);
+const sendAtTimestamp = Math.floor(sendAtDate.getTime() / 1000); // timestamp en secondes
 
     // Formatage de la date sans le "T"
     const sendAtFormatted = sendAtRaw.replace("T", " ");
