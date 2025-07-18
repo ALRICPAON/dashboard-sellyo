@@ -29,41 +29,34 @@
   <main>
     <div style="background: #2e2e2e; padding: 2rem; border-radius: 10px; max-width: 700px; width: 100%; margin: 2rem auto;">
       <h2>Créer un Email</h2>
-      <form id="email-form">
+      <form id="email-form" enctype="multipart/form-data" method="POST">
 
-        <label>Nom du mail *</label><br>
+        <label for="slug">Nom du mail *</label><br>
         <input type="text" id="slug" name="slug" required><br><br>
 
-        <label>Objet du mail *</label><br>
-        <input type="text" id="email-subject" name="subject" required><br><br>
+        <label for="subject">Objet du mail *</label><br>
+        <input type="text" id="subject" name="subject" required><br><br>
 
-        <label>Description de l’offre</label><br>
-        <textarea id="email-desc" name="desc"></textarea><br><br>
+        <label for="desc">Description (brief contenu brut)</label><br>
+        <textarea id="desc" name="desc" rows="5" placeholder="Décrivez ici ce que vous souhaitez dire dans votre email…" required></textarea><br><br>
 
-        <label>Lien produit (optionnel)</label><br>
-        <input type="url" id="product-link" name="productLink"><br><br>
-
-        <label>Prix du produit</label><br>
-        <input type="text" id="product-price" name="productPrice"><br><br>
-
-        <label>Fichier joint (optionnel)</label><br>
-        <input type="file" id="attached-file" name="file"><br><br>
-
-        <label>Type d’envoi</label><br>
-        <select id="email-type" name="emailType">
-          <option value="first">1er mail</option>
-          <option value="relance1">Relance J+2</option>
-          <option value="relance2">Relance J+5</option>
-          <option value="relance3">Relance J+7</option>
+        <label for="tone">Ton souhaité *</label><br>
+        <select id="tone" name="tone" required>
+          <option value="professionnel">Professionnel</option>
+          <option value="amical">Amical</option>
+          <option value="drôle">Drôle</option>
+          <option value="urgent">Urgent</option>
+          <option value="sérieux">Sérieux</option>
         </select><br><br>
 
-        <label>Date et heure d’envoi (optionnel)</label><br>
-        <input type="datetime-local" id="send-at" name="sendAt"><br><br>
+        <label for="productLink">Lien produit (optionnel)</label><br>
+        <input type="url" id="productLink" name="productLink" placeholder="https://"><br><br>
 
-        <label>Associer à une landing ou un tunnel (optionnel)</label><br>
-        <select id="linked-tunnel-id" name="linkedTunnelId">
-          <option value="">Aucun</option>
-        </select><br><br>
+        <label for="productPrice">Prix du produit (optionnel)</label><br>
+        <input type="text" id="productPrice" name="productPrice" placeholder="Ex : 39€"><br><br>
+
+        <label for="file">Fichier joint (optionnel)</label><br>
+        <input type="file" id="file" name="file" accept=".jpg,.png,.pdf,.docx"><br><br>
 
         <button type="submit">Générer l'email</button>
       </form>
