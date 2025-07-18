@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Données à envoyer
     const formData = new FormData();
     formData.append("userId", user.uid);
+    formData.append("type", "email");
     formData.append("slug", slugFinal);
     formData.append("subject", subject);
     formData.append("desc", desc);
