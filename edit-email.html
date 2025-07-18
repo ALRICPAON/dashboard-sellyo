@@ -4,11 +4,7 @@
   <meta charset="UTF-8">
   <title>Modifier l'Email – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css">
-  <script type="module" src="js/firebase-auth-check.js"></script>
-
-  <!-- GrapesJS CSS -->
   <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet"/>
-
   <style>
     body {
       margin: 0;
@@ -23,15 +19,32 @@
       font-size: 1.2rem;
       text-align: center;
     }
+    #save-email-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4caf50;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 9999;
+    }
   </style>
 </head>
 
 <body>
   <div id="editor" class="gjs-dark"></div>
 
-  <!-- GrapesJS lib -->
+  <!-- ✅ Bouton de sauvegarde -->
+  <button id="save-email-btn">💾 Enregistrer</button>
+
+  <!-- ✅ Librairie GrapesJS -->
   <script src="https://unpkg.com/grapesjs"></script>
-  <!-- Ton script personnalisé -->
+  <!-- ✅ Auth + Script de sauvegarde -->
+  <script type="module" src="js/firebase-auth-check.js"></script>
   <script type="module" src="js/edit-email.js"></script>
 </body>
 </html>
