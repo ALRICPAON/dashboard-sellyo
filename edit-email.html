@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Modifier l'Email</title>
+  <script type="module" src="js/edit-email.js"></script>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    form {
+      max-width: 600px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    input, select, textarea, button {
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Modifier l'email</h2>
+  <form id="edit-email-form">
+    <input type="text" id="name" placeholder="Nom de l'email" required>
+    <input type="text" id="subject" placeholder="Objet" required>
+    <textarea id="desc" placeholder="Description"></textarea>
+    <input type="text" id="product" placeholder="Lien du produit">
+    <input type="number" id="price" placeholder="Prix (facultatif)">
+    <select id="type">
+      <option value="">Sélectionnez le type d'envoi</option>
+      <option value="relance-j2">Relance J+2</option>
+      <option value="relance-j5">Relance J+5</option>
+      <option value="relance-j7">Relance J+7</option>
+    </select>
+    <button type="submit">Mettre à jour</button>
+  </form>
+</body>
+</html>
