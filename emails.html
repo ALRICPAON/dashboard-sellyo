@@ -1,5 +1,35 @@
-<h2>Mes Emails</h2>
-<div id="emails-list"></div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mes Emails – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/load-emails.js"></script>
+</head>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <header>
+    <a href="dashboard.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
+    <nav style="display: flex; align-items: center;">
+      <ul>
+        <li><a href="dashboard.html">Accueil</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Mes clients</a></li>
+        <li><a href="emails.html" class="active">Mes emails</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="email-settings.html">Paramètres Email</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<script type="module" src="js/firebase-auth-check.js"></script>
-<script type="module" src="js/load-emails.js"></script>
+  <main>
+    <div style="padding: 2rem; max-width: 1000px; margin: auto;">
+      <h2 style="text-align: center;">📬 Mes Emails</h2>
+      <div id="emails-list" style="margin-top: 2rem;"></div>
+    </div>
+  </main>
+</body>
+</html>
