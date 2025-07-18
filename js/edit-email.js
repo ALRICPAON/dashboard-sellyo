@@ -1,19 +1,19 @@
-// ✅ edit-email.js – Gère l'édition d'un email existant
+// ✅ edit-email.js – Chargement de l'éditeur GrapesJS avec le contenu HTML existant
 
 import { app } from "./firebase-init.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-const form = document.getElementById("edit-email-form");
-const params = new URLSearchParams(window.location.search);
-const emailId = params.get("id");
-
-if (!emailId) {
-  alert("Aucun ID fourni pour l'email.");
-  window.location.href = "emails.html";
-}
+const editorContainer = document.getElementById("editor");
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -21,38 +21,32 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // Chargement des données existantes
-  const docRef = doc(db, "emails", emailId);
-  const docSnap = await getDoc(docRef);
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  if (!id) return (editorContainer.innerHTML = "ID d'email introuvable.");
 
-  if (!docSnap.exists()) {
-    alert("Email introuvable.");
-    window.location.href = "emails.html";
-    return;
-  }
+  const docRef = doc(db, "emails", id);
+  const snap = await getDoc(docRef);
+  if (!snap.exists()) return (editorContainer.innerHTML = "Email introuvable.");
 
-  const data = docSnap.data();
-  form.name.value = data.name || "";
-  form.subject.value = data.subject || "";
-  form.desc.value = data.desc || "";
-  form.productLink.value = data.productLink || "";
-  form.price.value = data.price || "";
-  form.type.value = data.type || "relance";
+  const emailData = snap.data();
+  const emailURL = emailData.url;
 
-  // Soumission du formulaire
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  if (!emailURL) return (editorContainer.innerHTML = "Aucun contenu HTML à charger.");
 
-    await updateDoc(docRef, {
-      name: form.name.value.trim(),
-      subject: form.subject.value.trim(),
-      desc: form.desc.value.trim(),
-      productLink: form.productLink.value.trim(),
-      price: form.price.value.trim(),
-      type: form.type.value.trim(),
-    });
+  // Récupère le HTML du mail depuis GitHub
+  const html = await fetch(emailURL).then(res => res.text());
 
-    alert("Email mis à jour avec succès.");
-    window.location.href = "emails.html";
+  // Initialise GrapesJS
+  const editor = grapesjs.init({
+    container: '#editor',
+    fromElement: false,
+    height: '100vh',
+    width: '100%',
+    storageManager: false,
+    plugins: [],
+    pluginsOpts: {},
+    components: html,
+    style: ''
   });
 });
