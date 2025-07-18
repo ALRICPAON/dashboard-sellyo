@@ -53,8 +53,14 @@ if (saveBtn) {
     try {
       const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
       const formData = new FormData();
-      formData.append("name", fileName);     // ✅ nom du fichier HTML à mettre à jour
-      formData.append("html", updatedHTML);  // ✅ contenu HTML mis à jour
+      formData.append("id", id);
+      formData.append("html", updatedHTML);
+
+      // Affiche un message visuel temporaire
+      const messageDiv = document.createElement("div");
+      messageDiv.innerHTML = "💾 Enregistrement en cours… Veuillez patienter quelques secondes...";
+      messageDiv.style.cssText = "color:white;text-align:center;padding:2rem;font-size:1.2rem;";
+      document.body.appendChild(messageDiv);
 
       const res = await fetch(webhookURL, {
         method: "POST",
@@ -62,8 +68,10 @@ if (saveBtn) {
       });
 
       if (res.ok) {
-        alert("✅ Email mis à jour avec succès !");
-        window.location.href = "emails.html";
+        // Patiente 20 secondes avant de rediriger
+        setTimeout(() => {
+          window.location.href = "emails.html";
+        }, 20000);
       } else {
         throw new Error("Erreur lors de la sauvegarde");
       }
@@ -71,4 +79,6 @@ if (saveBtn) {
       alert("❌ Échec de l'enregistrement : " + err.message);
     }
   });
+}
+
 }
