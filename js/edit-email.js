@@ -28,7 +28,9 @@ if (!emailURL || !fileName) {
 }
 
 // Charger le HTML depuis GitHub
-const response = await fetch(emailURL);
+const response = await fetch(emailURL + '?v=' + Date.now(), {
+  cache: 'no-store'
+});
 const htmlContent = await response.text();
 
 // Initialiser l'éditeur GrapesJS
