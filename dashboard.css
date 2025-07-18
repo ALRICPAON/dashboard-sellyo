@@ -214,14 +214,27 @@ form button:hover {
 }
 /* ✅ Encadrer chaque email dans une carte stylée */
 .email-card {
-  background-color: #1a1a1a;
+  position: relative;
+  background-color: #1f1f1f;
   border-radius: 12px;
-  padding: 16px;
+  padding: 16px 16px 16px 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  border: 1px solid #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  border: 1px solid #444;
   transition: transform 0.2s ease;
 }
+
+.email-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 6px;
+  background: #00ccff;
+  border-radius: 4px;
+}
+
 
 .email-card:hover {
   transform: scale(1.01);
