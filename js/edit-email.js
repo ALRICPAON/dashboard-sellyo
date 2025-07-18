@@ -53,8 +53,10 @@ if (saveBtn) {
     try {
       const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
       const formData = new FormData();
-      formData.append("id", id);
-      formData.append("html", updatedHTML);
+      formData.append("id", id);              // l'identifiant Firestore
+formData.append("html", updatedHTML);   // le HTML modifié
+formData.append("name", fileName);      // ✅ ajoute bien ça si ce n’est pas déjà présent
+
 
       // Affiche un message visuel temporaire
       const messageDiv = document.createElement("div");
