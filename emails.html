@@ -1,26 +1,36 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Modifier l'Email – Sellyo</title>
-  <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" />
-  <script src="https://unpkg.com/grapesjs"></script>
+  <meta charset="UTF-8">
+  <title>Mes Emails – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
   <script type="module" src="js/firebase-auth-check.js"></script>
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      color: white;
-      font-family: sans-serif;
-    }
-    #editor {
-      height: 100vh;
-    }
-  </style>
+  <script type="module" src="js/load-emails.js"></script>
 </head>
-<body>
-  <div id="editor">Chargement de l'éditeur...</div>
-  <script type="module" src="js/edit-email.js"></script>
+
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <header>
+    <a href="dashboard.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
+    <nav>
+      <ul>
+        <li><a href="dashboard.html">Accueil</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Mes clients</a></li>
+        <li><a href="emails.html" class="active">Mes emails</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="email-settings.html">Paramètres Email</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div style="padding: 2rem; max-width: 900px; margin: auto;">
+      <h2 style="margin-bottom: 1rem;">Mes Emails</h2>
+      <div id="emails-list"></div>
+    </div>
+  </main>
 </body>
 </html>
-
