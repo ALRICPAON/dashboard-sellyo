@@ -1,4 +1,4 @@
-// ✅ load-emails.js – Affiche la liste des emails avec actions (boutons opérationnels)
+// ✅ load-emails.js – Affiche la liste des emails avec actions (correctif inclus)
 
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -8,6 +8,14 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const emailsList = document.getElementById("emails-list");
 
+// 🔧 Ajoute cette fonction manquante
+function extractSlugFromURL(url) {
+  if (!url) return "";
+  const parts = url.split("/");
+  const file = parts[parts.length - 1];
+  return file.replace(".html", "");
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -16,6 +24,8 @@ onAuthStateChanged(auth, async (user) => {
 
   const q = query(collection(db, "emails"), where("userId", "==", user.uid));
   const querySnapshot = await getDocs(q);
+
+  emailsList.innerHTML = ""; // Nettoyage
 
   querySnapshot.forEach((docSnap) => {
     const data = docSnap.data();
@@ -38,7 +48,7 @@ onAuthStateChanged(auth, async (user) => {
     emailsList.appendChild(container);
   });
 
-  // Gestion des clics boutons (upload, edit, delete)
+  // 🔁 Gestion des clics boutons
   emailsList.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!id) return;
@@ -55,4 +65,7 @@ onAuthStateChanged(auth, async (user) => {
       const confirmed = confirm("Confirmer la suppression de cet email ?");
       if (!confirmed) return;
       await deleteDoc(doc(db, "emails", id));
-      e.target.closes
+      e.target.closest(".email-card").remove(); // 🔥 supprime visuellement
+    }
+  });
+});
