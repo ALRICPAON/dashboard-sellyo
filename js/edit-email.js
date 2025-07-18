@@ -20,17 +20,18 @@ if (!docSnap.exists()) {
 
 const data = docSnap.data();
 const emailURL = data.url;
+const fileName = data.name; // ✅ nouveau : le nom du fichier HTML
 
-if (!emailURL) {
-  document.body.innerHTML = "<p style='color: white; padding: 2rem;'>Aucune URL d'email trouvée dans les données.</p>";
-  throw new Error("Pas d'URL");
+if (!emailURL || !fileName) {
+  document.body.innerHTML = "<p style='color: white; padding: 2rem;'>Email incomplet : URL ou nom manquant.</p>";
+  throw new Error("Pas d'URL ou nom");
 }
 
-// Charger le HTML du mail depuis GitHub
+// Charger le HTML depuis GitHub
 const response = await fetch(emailURL);
 const htmlContent = await response.text();
 
-// Initialiser GrapesJS avec ce contenu
+// Initialiser l'éditeur GrapesJS
 const editor = grapesjs.init({
   container: "#editor",
   fromElement: false,
@@ -40,18 +41,18 @@ const editor = grapesjs.init({
   components: htmlContent,
 });
 
-// ✅ Ajouter la gestion du bouton "Enregistrer"
+// Gestion du bouton "Enregistrer"
 const saveBtn = document.getElementById("save-email-btn");
 
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
-    const updatedHTML = editor.getHtml(); // Le contenu modifié
+    const updatedHTML = editor.getHtml();
 
     try {
-      const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59"; // Ton webhook Make
+      const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
       const formData = new FormData();
-      formData.append("id", id);
-      formData.append("html", updatedHTML);
+      formData.append("name", fileName);     // ✅ nom du fichier HTML à mettre à jour
+      formData.append("html", updatedHTML);  // ✅ contenu HTML mis à jour
 
       const res = await fetch(webhookURL, {
         method: "POST",
