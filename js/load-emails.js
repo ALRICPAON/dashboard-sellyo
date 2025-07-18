@@ -1,80 +1,43 @@
+// ✅ load-emails.js – Affiche tous les mails du user connecté avec contenu GitHub
+
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 const emailsList = document.getElementById("emails-list");
 
-// URL GitHub brute du dossier /emails/
-const githubApiUrl = "https://api.github.com/repos/ALRICPAON/sellyo-hosting/contents/emails";
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return (window.location.href = "index.html");
 
-async function loadEmails(user) {
-  try {
-    const res = await fetch(githubApiUrl);
-    const data = await res.json();
+  const q = query(collection(db, "emails"), where("userId", "==", user.uid));
+  const querySnapshot = await getDocs(q);
 
-    if (!Array.isArray(data)) throw new Error("Données invalides");
-
-    emailsList.innerHTML = "";
-
-    for (const file of data) {
-      const name = file.name.replace(".html", "");
-      const url = `https://alricpaon.github.io/sellyo-hosting/emails/${file.name}`;
-
-      const container = document.createElement("div");
-      container.style.marginBottom = "1rem";
-      container.style.padding = "1rem";
-      container.style.background = "#222";
-      container.style.borderRadius = "8px";
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.target = "_blank";
-      link.textContent = `📧 ${name}`;
-      link.style.color = "#00ccff";
-      link.style.marginRight = "1rem";
-
-      const btn = document.createElement("button");
-      btn.textContent = "📩 Enregistrer dans Firebase";
-      btn.style.padding = "6px 12px";
-      btn.style.background = "#00ccff";
-      btn.style.color = "black";
-      btn.style.border = "none";
-      btn.style.borderRadius = "5px";
-      btn.style.cursor = "pointer";
-
-      btn.addEventListener("click", async () => {
-        try {
-          await addDoc(collection(db, "emails"), {
-            name,
-            url,
-            userId: user.uid,
-            type: "email",
-            createdAt: new Date().toISOString(),
-          });
-          alert("Email enregistré dans Firebase !");
-        } catch (err) {
-          alert("Erreur Firebase : " + err.message);
-        }
-      });
-
-      container.appendChild(link);
-      container.appendChild(btn);
-      emailsList.appendChild(container);
-    }
-  } catch (err) {
-    emailsList.innerHTML = "<p>Erreur de chargement des emails.</p>";
-    console.error(err);
+  if (querySnapshot.empty) {
+    emailsList.innerHTML = "<p>Aucun email trouvé.</p>";
+    return;
   }
-}
 
-// Vérifier si l'utilisateur est connecté
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    loadEmails(user);
-  } else {
-    emailsList.innerHTML = "<p>Veuillez vous connecter pour voir vos emails.</p>";
-  }
+  emailsList.innerHTML = "";
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const mailURL = `https://alricpaon.github.io/sellyo-hosting/emails/${data.slug}.html`;
+
+    const card = document.createElement("div");
+    card.className = "email-card";
+    card.style = `background:#222;padding:20px;border-radius:10px;margin-bottom:20px;`;
+
+    card.innerHTML = `
+      <h3>${data.slug}</h3>
+      <p><strong>Objet :</strong> ${data.subject}</p>
+      <p><strong>Ton :</strong> ${data.tone} &nbsp; | &nbsp; <strong>Prix :</strong> ${data.productPrice || "-"}</p>
+      <p><strong>Date :</strong> ${new Date(data.createdAt).toLocaleString()}</p>
+      <a href="${mailURL}" target="_blank">👁️ Voir le mail</a><br><br>
+      <button onclick="navigator.clipboard.writeText('${mailURL}')">📋 Copier lien</button>
+      <a href="email-settings.html?slug=${data.slug}"><button>⚙️ Modifier</button></a>
+    `;
+
+    emailsList.appendChild(card);
+  });
 });
