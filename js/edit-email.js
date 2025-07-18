@@ -1,52 +1,41 @@
-// ✅ edit-email.js – Chargement de l'éditeur GrapesJS avec le contenu HTML existant
-
 import { app } from "./firebase-init.js";
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const auth = getAuth(app);
 const db = getFirestore(app);
-const editorContainer = document.getElementById("editor");
+const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get("id");
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
+if (!id) {
+  document.body.innerHTML = "<p style='color: white; padding: 2rem;'>Aucun email trouvé.</p>";
+  throw new Error("Pas d'ID dans l'URL");
+}
 
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-  if (!id) return (editorContainer.innerHTML = "ID d'email introuvable.");
+const docRef = doc(db, "emails", id);
+const docSnap = await getDoc(docRef);
 
-  const docRef = doc(db, "emails", id);
-  const snap = await getDoc(docRef);
-  if (!snap.exists()) return (editorContainer.innerHTML = "Email introuvable.");
+if (!docSnap.exists()) {
+  document.body.innerHTML = "<p style='color: white; padding: 2rem;'>Email introuvable.</p>";
+  throw new Error("Document Firebase non trouvé");
+}
 
-  const emailData = snap.data();
-  const emailURL = emailData.url;
+const data = docSnap.data();
+const emailURL = data.url;
 
-  if (!emailURL) return (editorContainer.innerHTML = "Aucun contenu HTML à charger.");
+if (!emailURL) {
+  document.body.innerHTML = "<p style='color: white; padding: 2rem;'>Aucune URL d'email trouvée dans les données.</p>";
+  throw new Error("Pas d'URL");
+}
 
-  // Récupère le HTML du mail depuis GitHub
-  const html = await fetch(emailURL).then(res => res.text());
+// Charger le HTML du mail depuis GitHub
+const response = await fetch(emailURL);
+const htmlContent = await response.text();
 
-  // Initialise GrapesJS
-  const editor = grapesjs.init({
-    container: '#editor',
-    fromElement: false,
-    height: '100vh',
-    width: '100%',
-    storageManager: false,
-    plugins: [],
-    pluginsOpts: {},
-    components: html,
-    style: ''
-  });
+// Initialiser GrapesJS avec ce contenu
+const editor = grapesjs.init({
+  container: "#editor",
+  fromElement: false,
+  height: "100vh",
+  width: "auto",
+  storageManager: false,
+  components: htmlContent,
 });
