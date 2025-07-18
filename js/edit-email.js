@@ -39,3 +39,33 @@ const editor = grapesjs.init({
   storageManager: false,
   components: htmlContent,
 });
+
+// ✅ Ajouter la gestion du bouton "Enregistrer"
+const saveBtn = document.getElementById("save-email-btn");
+
+if (saveBtn) {
+  saveBtn.addEventListener("click", async () => {
+    const updatedHTML = editor.getHtml(); // Le contenu modifié
+
+    try {
+      const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59"; // Ton webhook Make
+      const formData = new FormData();
+      formData.append("id", id);
+      formData.append("html", updatedHTML);
+
+      const res = await fetch(webhookURL, {
+        method: "POST",
+        body: formData
+      });
+
+      if (res.ok) {
+        alert("✅ Email mis à jour avec succès !");
+        window.location.href = "emails.html";
+      } else {
+        throw new Error("Erreur lors de la sauvegarde");
+      }
+    } catch (err) {
+      alert("❌ Échec de l'enregistrement : " + err.message);
+    }
+  });
+}
