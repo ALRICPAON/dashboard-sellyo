@@ -67,13 +67,12 @@ document.addEventListener("DOMContentLoaded", () => {
       // Affiche un message de création en cours
 popup.innerHTML = `
   <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);color:white;display:flex;align-items:center;justify-content:center;z-index:9999;padding:2rem;text-align:center;font-size:1.2rem;">
-    ⏳ Création de votre email...<br><br>Merci de patienter jusqu’à 1 minute.<br>Ne fermez pas cette page.
+    ⏳ Création de votre email...<br><br>Merci de patienter jusqu’à <strong>1min30</strong>.<br>Ne fermez pas cette page.
   </div>`;
-
 // Redirection après 60 secondes
 setTimeout(() => {
   window.location.href = "emails.html";
-}, 60000);
+}, 90000); // 1min30
     } catch (err) {
       alert("Erreur : " + err.message);
     }
