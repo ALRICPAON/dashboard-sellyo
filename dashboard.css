@@ -1,5 +1,9 @@
 /* --- Styles de base --- */
 body {
+  border: 5px solid limegreen !important;
+}
+
+body {
   background: #111;
   color: #fff;
   font-family: 'Segoe UI', sans-serif;
