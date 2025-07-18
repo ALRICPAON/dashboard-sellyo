@@ -1,34 +1,5 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Mes Emails – Sellyo</title>
-  <link rel="stylesheet" href="dashboard.css">
-  <script type="module" src="js/firebase-auth-check.js"></script>
-  <script type="module" src="js/emails.js"></script>
-</head>
+<h2>Mes Emails</h2>
+<div id="emails-list"></div>
 
-<body style="background-color: #111; color: white; font-family: sans-serif;">
-  <header>
-    <a href="dashboard.html">
-      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
-    </a>
-    <nav>
-      <ul>
-        <li><a href="dashboard.html">Accueil</a></li>
-        <li><a href="tunnels.html">Mes tunnels</a></li>
-        <li><a href="clients.html">Mes clients</a></li>
-        <li><a href="emails.html">Mes emails</a></li>
-        <li><a href="stats.html">Statistiques</a></li>
-        <li><a href="email-settings.html">Paramètres Email</a></li>
-        <li><a href="index.html">Déconnexion</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <main style="padding: 2rem;">
-    <h2>Mes Emails générés</h2>
-    <div id="email-list" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem;"></div>
-  </main>
-</body>
-</html>
+<script type="module" src="js/firebase-auth-check.js"></script>
+<script type="module" src="js/load-emails.js"></script>
