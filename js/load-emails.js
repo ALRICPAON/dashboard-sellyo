@@ -1,5 +1,10 @@
+// ✅ load-emails.js – avec tous les boutons et cartes stylées
+
 import { app } from "./firebase-init.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore,
   collection,
@@ -10,37 +15,40 @@ import {
 
 const auth = getAuth(app);
 const db = getFirestore(app);
+const container = document.getElementById("emails-list");
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return;
+  if (!user) return (window.location.href = "index.html");
 
-  const emailsRef = collection(db, "emails");
-  const q = query(emailsRef, where("userId", "==", user.uid), where("type", "==", "email"));
-  const querySnapshot = await getDocs(q);
+  const q = query(
+    collection(db, "emails"),
+    where("userId", "==", user.uid)
+  );
 
-  const emailsList = document.getElementById("emails-list");
-  if (!emailsList) return;
+  const snapshot = await getDocs(q);
+  container.innerHTML = "";
 
-  if (querySnapshot.empty) {
-    emailsList.innerHTML = "<p>Aucun email trouvé.</p>";
-    return;
-  }
-
-  querySnapshot.forEach((doc) => {
+  snapshot.forEach((doc) => {
     const data = doc.data();
-    const container = document.createElement("div");
-    container.style = "background:#222;padding:1rem;margin-bottom:1rem;border-radius:8px;";
+    const htmlFile = `https://alricpaon.github.io/sellyo-hosting/emails/${data.slug}.html`;
 
-    const name = data.name || "Sans titre";
-    const createdAt = new Date(data.createdAt).toLocaleString("fr-FR");
-    const url = data.url;
-
-    container.innerHTML = `
-      <h3 style="margin: 0 0 0.5rem 0;">${name}</h3>
-      <p style="margin: 0.5rem 0;">🕒 Créé le : ${createdAt}</p>
-      ${url ? `<a href="${url}" target="_blank" style="color:#00ccff;">📧 Voir l'email</a>` : ""}
+    const card = document.createElement("div");
+    card.className = "email-card";
+    card.innerHTML = `
+      <h3>📧 ${data.name || data.slug}</h3>
+      <p><strong>Objet :</strong> ${data.subject}</p>
+      <p><strong>Date :</strong> ${new Date(data.createdAt).toLocaleString()}</p>
+      <div class="email-actions">
+        <a href="${htmlFile}" target="_blank">👁️ Voir l’email</a>
+        <button onclick="editEmail('${doc.id}')">📝 Modifier</button>
+        <button onclick="uploadFile('${doc.id}')">📎 Uploader un fichier</button>
+        <button onclick="sendEmail('${doc.id}')">📨 Envoyer</button>
+        <button onclick="scheduleEmail('${doc.id}')">⏰ Programmer</button>
+        <button onclick="linkEmail('${doc.id}')">🔗 Associer</button>
+        <button onclick="deleteEmail('${doc.id}')">🗑️ Supprimer</button>
+      </div>
     `;
 
-    emailsList.appendChild(container);
+    container.appendChild(card);
   });
 });
