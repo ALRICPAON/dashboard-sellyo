@@ -40,6 +40,18 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  const statusText = {
+    sent: "✅ Envoyé",
+    scheduled: "🕓 Programmé",
+    draft: "📝 Brouillon"
+  };
+
+  const statusClass = {
+    sent: "sent",
+    scheduled: "scheduled",
+    draft: "draft"
+  };
+
   const q = query(collection(db, "emails"), where("userId", "==", user.uid));
   const querySnapshot = await getDocs(q);
   emailsList.innerHTML = "";
@@ -53,6 +65,9 @@ onAuthStateChanged(auth, async (user) => {
     container.className = "email-card";
     container.innerHTML = `
       <div class="email-header">
+        <span class="email-status ${statusClass[data.status] || "draft"}">
+          ${statusText[data.status] || "📝 Brouillon"}
+        </span>
         <h3>${data.name || slug || "(sans nom)"}</h3>
         <p><strong>Objet :</strong> ${data.subject || "-"}</p>
         <p><strong>Description :</strong> ${data.desc || "-"}</p>
