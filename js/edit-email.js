@@ -53,16 +53,27 @@ if (saveBtn) {
     try {
       const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
       const formData = new FormData();
-      formData.append("id", id);              // l'identifiant Firestore
-formData.append("html", updatedHTML);   // le HTML modifié
-formData.append("name", fileName);      // ✅ ajoute bien ça si ce n’est pas déjà présent
+      formData.append("id", id);
+      formData.append("html", updatedHTML);
+      formData.append("name", fileName); // ✅ important
 
-
-      // Affiche un message visuel temporaire
-      const messageDiv = document.createElement("div");
-      messageDiv.innerHTML = "💾 Enregistrement en cours… Veuillez patienter quelques secondes...";
-      messageDiv.style.cssText = "color:white;text-align:center;padding:2rem;font-size:1.2rem;";
-      document.body.appendChild(messageDiv);
+      // ✅ Affiche une popup visuelle
+      const popup = document.createElement("div");
+      popup.innerHTML = "⏳ Sauvegarde en cours... Veuillez patienter 20 secondes.";
+      popup.style.cssText = `
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #222;
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        z-index: 9999;
+        text-align: center;
+      `;
+      document.body.appendChild(popup);
 
       const res = await fetch(webhookURL, {
         method: "POST",
@@ -70,7 +81,6 @@ formData.append("name", fileName);      // ✅ ajoute bien ça si ce n’est pas
       });
 
       if (res.ok) {
-        // Patiente 20 secondes avant de rediriger
         setTimeout(() => {
           window.location.href = "emails.html";
         }, 20000);
@@ -82,4 +92,3 @@ formData.append("name", fileName);      // ✅ ajoute bien ça si ce n’est pas
     }
   });
 }
-
