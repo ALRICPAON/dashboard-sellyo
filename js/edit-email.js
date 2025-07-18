@@ -81,12 +81,16 @@ if (saveBtn) {
       });
 
       if (res.ok) {
-        setTimeout(() => {
-          window.location.href = "emails.html";
-        }, 20000);
-      } else {
-        throw new Error("Erreur lors de la sauvegarde");
-      }
+  messageDiv.innerHTML = `
+    <div style="text-align:center;margin-top:1rem;font-size:1.2rem;">
+      ✅ Email modifié avec succès.<br><br>Redirection dans quelques instants...<br>Merci de patienter jusqu’à 1 minute.
+    </div>`;
+
+  // Attendre 1 minute avant de rediriger
+  setTimeout(() => {
+    window.location.href = "emails.html";
+  }, 60000);
+}
     } catch (err) {
       alert("❌ Échec de l'enregistrement : " + err.message);
     }
