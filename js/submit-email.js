@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const tone = document.getElementById("tone")?.value || "";
     const productLink = document.getElementById("productLink")?.value || "";
     const productPrice = document.getElementById("productPrice")?.value || "";
-    const file = document.getElementById("file")?.files[0];
 
     const createdAt = new Date().toISOString();
     const slugFinal = `${slug}-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -43,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("productLink", productLink);
     formData.append("productPrice", productPrice);
     formData.append("createdAt", createdAt);
-    if (file) formData.append("file", file);
 
     try {
       await fetch(webhookURL, {
