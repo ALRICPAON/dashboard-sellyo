@@ -219,4 +219,28 @@ form button:hover {
 .email-actions button:hover {
   background: #555;
 }
+/* ✅ Encadrer chaque email dans une carte stylée */
+.email-card {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  border: 1px solid #333;
+  transition: transform 0.2s ease;
+}
+
+.email-card:hover {
+  transform: scale(1.01);
+}
+
+/* ✅ Lien des pièces jointes plus visibles */
+.attachments a {
+  color: #3fa9f5;
+  text-decoration: none;
+}
+
+.attachments a:hover {
+  text-decoration: underline;
+}
 
