@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Uploader un fichier – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body style="background-color: #111; color: white; font-family: sans-serif; padding: 2rem;">
+  <h2>📤 Uploader un fichier pour l’email</h2>
+  <form id="upload-form">
+    <input type="file" id="file-input" required /><br><br>
+    <button type="submit">📎 Uploader</button>
+  </form>
+  <p id="status" style="margin-top: 1rem;"></p>
+
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/upload-email.js"></script>
+</body>
+</html>
