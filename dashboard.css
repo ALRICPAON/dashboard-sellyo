@@ -168,4 +168,55 @@ form button:hover {
 .delete-btn:hover {
   background: #cc0000;
 }
+.email-card {
+  background: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.email-card h3 {
+  margin: 0 0 0.5rem;
+  color: #66ccff;
+}
+
+.email-card p {
+  margin: 0.3rem 0;
+}
+
+.attachments ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.attachments li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.email-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.email-actions button {
+  background: #333;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.email-actions button:hover {
+  background: #555;
+}
 
