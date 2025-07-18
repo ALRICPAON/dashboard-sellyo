@@ -81,16 +81,15 @@ if (saveBtn) {
       });
 
       if (res.ok) {
-  messageDiv.innerHTML = `
-    <div style="text-align:center;margin-top:1rem;font-size:1.2rem;">
-      ✅ Email modifié avec succès.<br><br>Redirection dans quelques instants...<br>Merci de patienter jusqu’à 1 minute.
-    </div>`;
+ messageDiv.innerHTML = `
+  <div style="text-align:center;margin-top:1rem;font-size:1.2rem;">
+    ✅ Email modifié avec succès.<br><br>Redirection dans <strong>1min30</strong>...<br>Merci de ne pas fermer la page.
+  </div>`;
 
-  // Attendre 1 minute avant de rediriger
-  setTimeout(() => {
-    window.location.href = "emails.html";
-  }, 60000);
-}
+setTimeout(() => {
+  window.location.href = "emails.html";
+}, 90000); // 1min30
+
     } catch (err) {
       alert("❌ Échec de l'enregistrement : " + err.message);
     }
