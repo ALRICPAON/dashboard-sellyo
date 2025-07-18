@@ -38,8 +38,12 @@ onAuthStateChanged(auth, async (user) => {
       <h3>${data.name || slug || "(sans nom)"}</h3>
       <p><strong>Objet :</strong> ${data.subject || "-"}</p>
       <p><strong>Description :</strong> ${data.desc || "-"}</p>
-      ${Array.isArray(data.attachments) && data.attachments.length > 0
-  ? `<div><strong>📎 Fichiers joints :</strong><br>${data.attachments.map(f => `<a href="${f.url}" target="_blank">${f.name}</a>`).join("<br>")}</div>`
+     ${Array.isArray(data.attachments) && data.attachments.length > 0
+  ? `<div><strong>📎 Fichiers joints :</strong><br>${data.attachments.map(f => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+      <a href="${f.url}" target="_blank">${f.name}</a>
+      <button class="delete-attachment-btn" data-email-id="${id}" data-file-name="${f.name}" style="background:red;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;">🗑️</button>
+    </div>`).join("")}</div>`
   : ""
 }
       <div class="email-actions">
