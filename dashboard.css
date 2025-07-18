@@ -252,4 +252,27 @@ form button:hover {
 .attachments a:hover {
   text-decoration: underline;
 }
+.email-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #fff;
+  background-color: #555;
+}
+
+.email-status.sent {
+  background-color: #2ecc71; /* vert */
+}
+
+.email-status.scheduled {
+  background-color: #f39c12; /* orange */
+}
+
+.email-status.draft {
+  background-color: #3498db; /* bleu */
+}
 
