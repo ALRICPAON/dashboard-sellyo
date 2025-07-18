@@ -1,9 +1,11 @@
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
-  const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp"; // Ton webhook Make
+  const db = getFirestore(app); // ✅ init Firestore
+  const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
   const form = document.getElementById("email-form");
   if (!form) return;
@@ -14,13 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = auth.currentUser;
     if (!user) return alert("Vous devez être connecté.");
 
-    // Affichage popup de chargement
     const popup = document.createElement("div");
     popup.id = "email-loading-overlay";
     popup.innerHTML = `<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);color:white;display:flex;align-items:center;justify-content:center;z-index:9999;"><p>⏳ Génération de votre email…</p></div>`;
     document.body.appendChild(popup);
 
-    // Lecture des champs
     const slug = document.getElementById("slug")?.value || "";
     const subject = document.getElementById("subject")?.value || "";
     const desc = document.getElementById("desc")?.value || "";
@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const createdAt = new Date().toISOString();
     const slugFinal = `${slug}-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    // Données à envoyer
     const formData = new FormData();
     formData.append("userId", user.uid);
     formData.append("type", "email");
@@ -44,12 +43,27 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("createdAt", createdAt);
 
     try {
+      // ✅ 1. Envoi à Make
       await fetch(webhookURL, {
         method: "POST",
         body: formData
       });
 
-      // Redirection après succès
+      // ✅ 2. Enregistrement dans Firestore
+      await addDoc(collection(db, "emails"), {
+        name: slugFinal,
+        subject,
+        desc,
+        tone,
+        productLink,
+        productPrice,
+        userId: user.uid,
+        createdAt: createdAt,
+        url: `https://alricpaon.github.io/sellyo-hosting/emails/${slugFinal}.html`, // 🔗 GitHub path
+        type: "email"
+      });
+
+      // ✅ Redirection
       window.location.href = "emails.html";
     } catch (err) {
       alert("Erreur : " + err.message);
