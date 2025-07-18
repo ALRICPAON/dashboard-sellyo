@@ -38,6 +38,7 @@ onAuthStateChanged(auth, async (user) => {
       <h3>${data.name || slug || "(sans nom)"}</h3>
       <p><strong>Objet :</strong> ${data.subject || "-"}</p>
       <p><strong>Description :</strong> ${data.desc || "-"}</p>
+      ${data.fileURL ? `<p><a href="${data.fileURL}" target="_blank">📎 Fichier joint</a></p>` : ""}
       <div class="email-actions">
         <a href="${data.url}" target="_blank">📩 Voir l’email</a>
         <button class="upload-btn" data-id="${id}">📤 Uploader un fichier</button>
