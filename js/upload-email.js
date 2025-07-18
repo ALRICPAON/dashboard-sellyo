@@ -1,6 +1,6 @@
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const auth = getAuth(app);
@@ -26,24 +26,28 @@ onAuthStateChanged(auth, (user) => {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const file = fileInput.files[0];
-    if (!file) return;
+    const files = fileInput.files;
+    if (!files.length) return;
 
-    const storageRef = ref(storage, `email-attachments/${user.uid}/${emailId}/${file.name}`);
+    statusText.innerHTML = "⏳ Upload en cours...<br>";
 
-    try {
-      statusText.textContent = "⏳ Upload en cours...";
+    const uploadedLinks = [];
+
+    for (const file of files) {
+      const storageRef = ref(storage, `email-attachments/${user.uid}/${emailId}/${file.name}`);
       await uploadBytes(storageRef, file);
-
       const fileURL = await getDownloadURL(storageRef);
-      await updateDoc(doc(db, "emails", emailId), {
-        fileURL: fileURL,
-        fileName: file.name
-      });
-
-      statusText.innerHTML = `✅ Fichier joint ajouté avec succès !<br><a href="${fileURL}" target="_blank" style="color:lime;">📎 Voir le fichier</a>`;
-    } catch (err) {
-      statusText.textContent = "❌ Erreur d’upload : " + err.message;
+      uploadedLinks.push({ name: file.name, url: fileURL });
     }
+
+    // 🔁 Sauvegarde dans Firestore en liste (array)
+    const docRef = doc(db, "emails", emailId);
+    await updateDoc(docRef, {
+      attachments: arrayUnion(...uploadedLinks)
+    });
+
+    // ✅ Message
+    statusText.innerHTML = `<span style="color:limegreen;">✅ ${uploadedLinks.length} fichier(s) ajouté(s) avec succès !</span><br><br>` +
+      uploadedLinks.map(f => `📎 <a href="${f.url}" target="_blank">${f.name}</a>`).join("<br>");
   });
 });
