@@ -1,9 +1,5 @@
 /* --- Styles de base --- */
 body {
-  border: 5px solid limegreen !important;
-}
-
-body {
   background: #111;
   color: #fff;
   font-family: 'Segoe UI', sans-serif;
@@ -171,13 +167,6 @@ form button:hover {
 
 .delete-btn:hover {
   background: #cc0000;
-}
-.email-card {
-  background: #1a1a1a;
-  padding: 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 .email-card h3 {
