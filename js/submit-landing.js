@@ -1,4 +1,4 @@
-// ✅ submit-landing.js – Script dédié au formulaire Landing Page
+// ✅ Version avec popup + délai de génération Make
 
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -30,9 +30,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = auth.currentUser;
     if (!user) return alert("Vous devez être connecté.");
 
+    // ⏳ Affiche la popup de génération
     const popup = document.createElement("div");
     popup.id = "tunnel-loading-overlay";
-    popup.innerHTML = `<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);color:white;display:flex;align-items:center;justify-content:center;z-index:9999;"><p>⏳ Création de votre landing page…</p></div>`;
+    popup.innerHTML = `
+      <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;text-align:center;padding:2rem;">
+        <div class="loader" style="border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top:20px;font-size:18px;">⏳ Génération de votre tunnel en cours...<br>Cette opération peut prendre jusqu'à 2 minutes.</p>
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `;
     document.body.appendChild(popup);
 
     const name = document.getElementById("tunnel-name")?.value || "";
@@ -40,12 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const sector = document.getElementById("sector")?.value || "";
     const desc = document.getElementById("tunnel-desc")?.value || "";
     const cta = document.getElementById("cta-text")?.value || "";
+    const paymentUrl = document.getElementById("payment-url")?.value || "";
     const mainColor = document.getElementById("mainColor")?.value || "";
     const backgroundColor = document.getElementById("backgroundColor")?.value || "";
     const folder = folderInput?.value || "";
     const slug = slugInput?.value || "";
     const slugFinal = `${slug}-${slugCounter}`;
     const createdAt = new Date().toISOString();
+
     const customField = document.getElementById("customField")?.value || "";
     const extraText = document.getElementById("extraText")?.value || "";
 
@@ -58,19 +72,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const firestoreData = {
       userId: user.uid,
-      type: "landing",
+      type: "tunnel",
       name,
       goal,
       sector,
       desc,
       cta,
+      paymentUrl,
       mainColor,
       backgroundColor,
       folder,
       slug: slugFinal,
       htmlFileName: `${slugFinal}.html`,
       createdAt,
-      pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,
+      pageUrl: `https://cdn.sellyo.fr/tunnel/${folder}/${slugFinal}.html`,
       fields,
       customField,
       extraText
@@ -91,7 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await addDoc(collection(db, "tunnels"), firestoreData);
       await fetch(webhookURL, { method: "POST", body: formData });
-      window.location.href = "dashboard.html?tunnel=1";
+
+      // ⏱ Attendre 90 secondes avant redirection
+      setTimeout(() => {
+        window.location.href = "dashboard.html?tunnel=1";
+      }, 90000);
     } catch (err) {
       alert("Erreur : " + err.message);
     }
