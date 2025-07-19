@@ -150,3 +150,5 @@ const statusClass = {
       statusElem.className = "email-status scheduled";
     }
   });
+  }); ← fermeture du eventListener
+// ❌ mais il manque la fermeture du onAuthStateChanged ici
