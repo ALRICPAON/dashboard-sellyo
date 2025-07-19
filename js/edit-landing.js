@@ -63,6 +63,8 @@ const url = `https://alricpaon.github.io/sellyo-hosting/landing/${folder}/${html
           formData.append("html", updatedHTML);
           formData.append("name", fileName);
           formData.append("type", "landing");
+          formData.append("folder", folder);
+formData.append("htmlFileName", htmlFileName);
 
           const popup = document.createElement("div");
           popup.id = "popup-message";
