@@ -5,36 +5,24 @@
   <title>Mes tunnels – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css">
   <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/load-tunnels.js"></script> <!-- ✅ nouveau script -->
 </head>
 
 <body style="background-color: #111; color: white; font-family: sans-serif;">
   <div id="navbar-container"></div>
-<script>
-  fetch('navbar.html')
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById('navbar-container').innerHTML = html;
-    });
-</script>
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      });
+  </script>
 
   <main>
     <section style="margin-top: 2rem; padding: 2rem;">
-      <h2 style="font-size: 2rem; color: #00ccff;">Mes tunnels générés</h2>
-      <div id="tunnels-by-type" style="
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  max-width: 1200px;
-  margin: auto;
-">
-</div>
+      <h2 style="font-size: 2rem; color: #00ccff; text-align:center;">🚀 Mes tunnels complets</h2>
+      <div id="tunnel-list" class="card-list"></div>
     </section>
   </main>
-
-  <script type="module">
-    import { reloadTunnels } from "./js/reload-tunnels.js";
-    reloadTunnels();
-  </script>
 </body>
 </html>
