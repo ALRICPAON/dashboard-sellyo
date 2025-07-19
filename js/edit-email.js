@@ -1,6 +1,6 @@
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -104,6 +104,21 @@ onAuthStateChanged(auth, async (user) => {
         }
       });
     }
+
+    // ✅ ENVOI du mail (mise à jour statut Firestore)
+    const sendBtn = document.getElementById("send-email-btn");
+    if (sendBtn) {
+      sendBtn.addEventListener("click", async () => {
+        try {
+          await updateDoc(doc(db, "emails", id), { status: "ready" });
+
+          alert("📨 Le mail est maintenant prêt à être envoyé.");
+        } catch (err) {
+          alert("❌ Erreur lors de l'envoi : " + err.message);
+        }
+      });
+    }
+
   } catch (err) {
     document.body.innerHTML = `<div class="message">❌ Erreur : ${err.message}</div>`;
   }
