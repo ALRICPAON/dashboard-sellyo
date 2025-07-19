@@ -55,11 +55,12 @@ onAuthStateChanged(auth, async (user) => {
         const updatedHTML = editor.getHtml();
 
         try {
-          const webhookURL = "https://hook.eu2.make.com/TON-WEBHOOK"; // 🔁 remplace par ton vrai webhook Make
+         const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
           const formData = new FormData();
           formData.append("id", id);
           formData.append("html", updatedHTML);
           formData.append("name", fileName);
+          formData.append("type", "landing");
 
           const popup = document.createElement("div");
           popup.id = "popup-message";
