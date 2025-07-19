@@ -107,8 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ⏱ Attente avant redirection
       setTimeout(() => {
-        window.location.href = "dashboard.html?tunnel=1"; // ✅ inchangé
-      }, 90000);
+  window.location.href = "dashboard.html?landing=1";
+}, 90000);
     } catch (err) {
       alert("Erreur : " + err.message);
     }
