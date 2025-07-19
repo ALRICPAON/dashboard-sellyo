@@ -105,21 +105,14 @@
 </head>
 
 <body>
-  <header>
-    <a href="dashboard.html">
-      <img src="assets/logo.png" alt="Logo Sellyo" class="logo">
-    </a>
-    <nav>
-      <ul>
-        <li><a href="tunnels.html">Mes tunnels</a></li>
-        <li><a href="clients.html">Mes clients</a></li>
-        <li><a href="emails.html">Mes emails</a></li>
-        <li><a href="stats.html">Statistiques</a></li>
-        <li><a href="email-settings.html">Paramètres Email</a></li>
-        <li><a href="index.html">Déconnexion</a></li>
-      </ul>
-    </nav>
-  </header>
+  <div id="navbar-container"></div>
+<script>
+  fetch('navbar.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('navbar-container').innerHTML = html;
+    });
+</script>
 
   <main>
     <h1>Bienvenue sur votre dashboard Sellyo 👋</h1>
