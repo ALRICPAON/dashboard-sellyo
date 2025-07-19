@@ -51,7 +51,7 @@ const url = `https://alricpaon.github.io/sellyo-hosting/landing/${folder}/${html
 
     editor.setComponents(html);
 
-    const saveBtn = document.getElementById("save-email-btn");
+    const saveBtn = document.getElementById("save-landing-btn");
     if (saveBtn) {
       saveBtn.addEventListener("click", async () => {
         const updatedHTML = editor.getHtml();
