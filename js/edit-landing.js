@@ -32,6 +32,7 @@ onAuthStateChanged(auth, async (user) => {
     const data = docSnap.data();
     fileName = data.name || "landing-sans-nom";
     const url = data.pageUrl;
+console.log("URL utilisée pour fetch :", url);
 
     // 🔄 Récupère le HTML de GitHub
     const res = await fetch(url);
