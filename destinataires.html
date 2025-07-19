@@ -70,53 +70,121 @@
   </select>
 </div>
 
-  <script type="module">
-    import { app } from "./firebase-init.js";
-    import {
-      getAuth,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+ <script type="module">
+  import { app } from "./firebase-init.js";
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    doc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    const emailId = new URLSearchParams(window.location.search).get("id");
-    const textarea = document.getElementById("manual-emails");
-    const saveBtn = document.getElementById("save-manual");
-    const feedback = document.getElementById("feedback");
+  const emailId = new URLSearchParams(window.location.search).get("id");
+  const textarea = document.getElementById("manual-emails");
+  const saveBtn = document.getElementById("save-manual");
+  const feedback = document.getElementById("feedback");
+  const leadsList = document.getElementById("leads-list");
+  const dropdown = document.getElementById("link-content");
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user || !emailId) {
-        window.location.href = "index.html";
+  let allLeads = [];
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user || !emailId) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    // 🔄 Charger les leads Firestore
+    const leadsQuery = query(collection(db, "leads"), where("userId", "==", user.uid));
+    const leadsSnap = await getDocs(leadsQuery);
+
+    leadsSnap.forEach(doc => {
+      const lead = doc.data();
+      lead.id = doc.id;
+      allLeads.push(lead);
+    });
+
+    // 🔄 Affichage des leads
+    function renderLeads(leadsToRender) {
+      leadsList.innerHTML = "";
+      leadsToRender.forEach(lead => {
+        const label = `${lead.name || "-"} (${lead.email}) [${lead?.source?.name || "-"}]`;
+        const container = document.createElement("div");
+        container.style.marginBottom = "0.5rem";
+        container.innerHTML = `
+          <label>
+            <input type="checkbox" value="${lead.email}" />
+            ${label}
+          </label>
+        `;
+        leadsList.appendChild(container);
+      });
+    }
+
+    // 🔄 Charger les tunnels ou landings
+    const tunnelsQuery = query(collection(db, "tunnels"), where("userId", "==", user.uid));
+    const tunnelsSnap = await getDocs(tunnelsQuery);
+
+    tunnelsSnap.forEach(doc => {
+      const data = doc.data();
+      const opt = document.createElement("option");
+      opt.value = doc.id;
+      opt.innerText = `${data.name} (${data.type || "tunnel"})`;
+      opt.dataset.type = data.type;
+      dropdown.appendChild(opt);
+    });
+
+    // 🔄 Filtrer leads selon tunnel sélectionné
+    dropdown.addEventListener("change", () => {
+      const selectedId = dropdown.value;
+      if (!selectedId) {
+        renderLeads(allLeads); // tous les leads
+        return;
+      }
+      const filtered = allLeads.filter(l => l.source?.refId === selectedId);
+      renderLeads(filtered);
+    });
+
+    // 🔘 Affichage initial = tous les leads
+    renderLeads(allLeads);
+
+    // ✅ Enregistrement quand clic bouton "Enregistrer"
+    saveBtn.addEventListener("click", async () => {
+      const raw = textarea.value;
+      const manualEmails = raw.split(",").map(e => e.trim()).filter(e => e.includes("@"));
+      const checkedEmails = [...leadsList.querySelectorAll("input[type='checkbox']:checked")].map(e => e.value);
+      const allRecipients = [...new Set([...manualEmails, ...checkedEmails])];
+
+      if (allRecipients.length === 0) {
+        feedback.innerText = "❌ Aucun destinataire sélectionné.";
         return;
       }
 
-      saveBtn.addEventListener("click", async () => {
-        const raw = textarea.value;
-        const emails = raw.split(",").map(e => e.trim()).filter(e => e.includes("@"));
-
-        if (emails.length === 0) {
-          feedback.innerText = "❌ Aucun email valide saisi.";
-          return;
-        }
-
-        try {
-          const ref = doc(db, "emails", emailId);
-          await updateDoc(ref, {
-            recipients: emails,
-            source: { type: "manual" }
-          });
-          feedback.innerText = `✅ ${emails.length} destinataire(s) enregistré(s).`;
-        } catch (err) {
-          feedback.innerText = "❌ Erreur : " + err.message;
-        }
-      });
+      try {
+        const ref = doc(db, "emails", emailId);
+        await updateDoc(ref, {
+          recipients: allRecipients,
+          source: {
+            type: dropdown.value ? "linkedContent" : (manualEmails.length ? "manual" : "leads"),
+            refId: dropdown.value || null
+          }
+        });
+        feedback.innerText = `✅ ${allRecipients.length} destinataire(s) enregistré(s).`;
+      } catch (err) {
+        feedback.innerText = "❌ Erreur : " + err.message;
+      }
     });
-  </script>
+  });
+</script>
 </body>
 </html>
