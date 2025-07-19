@@ -276,4 +276,74 @@ form button:hover {
 .email-status.draft {
   background-color: #3498db; /* bleu */
 }
+/* Navbar */
+.navbar {
+  background-color: #111;
+  color: white;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+  border-bottom: 1px solid #333;
+  font-family: sans-serif;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links > li {
+  position: relative;
+}
+
+.nav-links > li > a {
+  display: block;
+  color: white;
+  padding: 15px 20px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav-links > li > a:hover {
+  background-color: #222;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #222;
+  border: 1px solid #333;
+  min-width: 180px;
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+}
+
+.dropdown-menu li a {
+  display: block;
+  padding: 10px 15px;
+  color: white;
+  text-decoration: none;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #333;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+/* Pour éviter que le contenu passe sous la navbar */
+body {
+  padding-top: 60px;
+}
 
