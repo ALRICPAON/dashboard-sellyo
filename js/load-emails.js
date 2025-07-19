@@ -134,16 +134,16 @@ onAuthStateChanged(auth, async (user) => {
       await updateDoc(emailRef, { attachments: updated });
       window.location.reload();
     }
-    if (e.target.classList.contains("send-btn")) {
+  if (e.target.classList.contains("send-btn")) {
   const confirmed = confirm("Envoyer cet email maintenant ?");
   if (!confirmed) return;
 
   const emailRef = doc(db, "emails", id);
-  await updateDoc(emailRef, { status: "sent" });
+  await updateDoc(emailRef, { status: "ready" });
 
-  alert("✅ Email marqué comme envoyé. Il sera traité par le serveur.");
-  e.target.closest(".email-card").querySelector(".email-status").innerHTML = "✅ Envoyé";
-  e.target.closest(".email-card").querySelector(".email-status").className = "email-status sent";
+  alert("📨 Email en cours d'envoi. Il sera traité dans quelques secondes.");
+  e.target.closest(".email-card").querySelector(".email-status").innerHTML = "⏳ Envoi en cours";
+  e.target.closest(".email-card").querySelector(".email-status").className = "email-status draft";
 }
   });
 });
