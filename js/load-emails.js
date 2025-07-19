@@ -99,7 +99,7 @@ onAuthStateChanged(auth, async (user) => {
     emailsList.appendChild(container);
   });
 
-  emailsList.addEventListener("click", async (e) => {
+   emailsList.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!id) return;
 
@@ -134,16 +134,17 @@ onAuthStateChanged(auth, async (user) => {
       await updateDoc(emailRef, { attachments: updated });
       window.location.reload();
     }
-  if (e.target.classList.contains("send-btn")) {
-  const confirmed = confirm("Envoyer cet email maintenant ?");
-  if (!confirmed) return;
 
-  const emailRef = doc(db, "emails", id);
-  await updateDoc(emailRef, { status: "ready" });
+    if (e.target.classList.contains("send-btn")) {
+      const confirmed = confirm("Envoyer cet email maintenant ?");
+      if (!confirmed) return;
 
-  alert("📨 Email en cours d'envoi. Il sera traité dans quelques secondes.");
-  e.target.closest(".email-card").querySelector(".email-status").innerHTML = "⏳ Envoi en cours";
-  e.target.closest(".email-card").querySelector(".email-status").className = "email-status draft";
-}
+      const emailRef = doc(db, "emails", id);
+      await updateDoc(emailRef, { status: "ready" });
+
+      alert("📨 Email en cours d'envoi. Il sera traité dans quelques secondes.");
+      const statusElem = e.target.closest(".email-card").querySelector(".email-status");
+      statusElem.innerHTML = "⏳ Envoi en cours";
+      statusElem.className = "email-status scheduled";
+    }
   });
-});
