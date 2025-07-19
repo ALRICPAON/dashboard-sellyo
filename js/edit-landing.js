@@ -33,6 +33,7 @@ onAuthStateChanged(auth, async (user) => {
    const folder = data.folder || "default";
 const htmlFileName = data.htmlFileName || "default.html";
 const url = `https://alricpaon.github.io/sellyo-hosting/landing/${folder}/${htmlFileName}`;
+    fileName = data.name || "landing-sans-nom";
 
     // 🔁 Charge le HTML depuis GitHub
     const res = await fetch(url);
