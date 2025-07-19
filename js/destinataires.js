@@ -36,10 +36,11 @@ const tunnelsSnap = await getDocs(tunnelsQuery);
 tunnelsSnap.forEach(doc => {
   const data = doc.data();
   const opt = document.createElement("option");
-  opt.value = data.id || doc.id;
-  opt.innerText = `${data.name} (${data.type || "tunnel"})`;
-  opt.dataset.type = data.type;
-  dropdown.appendChild(opt);
+opt.value = data.name;
+opt.innerText = `${data.name} (${data.type || "tunnel"})`;
+opt.dataset.type = data.type;
+opt.dataset.name = data.name;
+dropdown.appendChild(opt);
 });
 
 // 🔄 Filtrer les leads selon contenu sélectionné
