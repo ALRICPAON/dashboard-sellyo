@@ -45,14 +45,24 @@ dropdown.appendChild(opt);
 
 // 🔄 Filtrer les leads selon contenu sélectionné
 dropdown.addEventListener("change", () => {
-  const selectedId = dropdown.value;
-  if (!selectedId) {
-    renderLeads(allLeads); // tous les leads
-    return;
-  }
-  const filtered = allLeads.filter(l => l.source?.refId === selectedId);
-  renderLeads(filtered);
-});
+ const selectedOption = dropdown.options[dropdown.selectedIndex];
+const selectedType = selectedOption.dataset.type;
+const selectedName = selectedOption.dataset.name;
+
+if (!selectedType || !selectedName) {
+  renderLeads(allLeads); // tous les leads si rien de sélectionné
+  return;
+}
+
+const filtered = allLeads.filter(
+  l => l.source?.type === selectedType && l.source?.name === selectedName
+);
+
+renderLeads(filtered);
+
+if (filtered.length === 0) {
+  leadsList.innerHTML = `<p style="color:gray;">Aucun lead trouvé pour ce contenu.</p>`;
+}
 
 // 👀 Rendu initial (tous les leads)
 renderLeads(allLeads);
@@ -73,10 +83,14 @@ saveBtn.addEventListener("click", async () => {
     const ref = doc(db, "emails", emailId);
     await updateDoc(ref, {
       recipients: allRecipients,
-      source: {
-        type: dropdown.value ? "linkedContent" : (manualEmails.length ? "manual" : "leads"),
-        refId: dropdown.value || null
-      }
+     source: dropdown.selectedIndex > 0
+  ? {
+      type: dropdown.options[dropdown.selectedIndex].dataset.type,
+      name: dropdown.options[dropdown.selectedIndex].dataset.name
+    }
+  : manualEmails.length > 0
+    ? { type: "manual" }
+    : { type: "leads" }
     });
     feedback.innerText = `✅ ${allRecipients.length} destinataire(s) enregistré(s).`;
   } catch (err) {
