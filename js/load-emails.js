@@ -113,6 +113,10 @@ onAuthStateChanged(auth, async (user) => {
     if (e.target.classList.contains("upload-btn")) {
       window.location.href = `upload-email.html?id=${id}`;
     }
+    
+    if (e.target.classList.contains("target-btn")) {
+  window.location.href = `destinataires.html?id=${id}`;
+}
 
     if (e.target.classList.contains("delete-btn")) {
       const confirmed = confirm("Confirmer la suppression de cet email ?");
