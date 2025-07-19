@@ -35,6 +35,23 @@
   </style>
 </head>
 <body>
+  <!-- ✅ Bouton Retour -->
+  <a href="dashboard.html?landing=1" style="
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #333;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    z-index: 9999;
+  ">
+    🔙 Retour à mes landings
+  </a>
+
+  <!-- ✅ Navbar -->
   <div id="navbar-container"></div>
   <script>
     fetch('navbar.html')
@@ -44,9 +61,13 @@
       });
   </script>
 
+  <!-- ✅ Bouton Enregistrer -->
   <button id="save-landing-btn">💾 Enregistrer</button>
+
+  <!-- ✅ Éditeur -->
   <div id="editor"></div>
 
+  <!-- ✅ Scripts -->
   <script src="https://unpkg.com/grapesjs"></script>
   <script type="module" src="js/edit-landing.js"></script>
 </body>
