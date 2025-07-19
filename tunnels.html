@@ -8,22 +8,14 @@
 </head>
 
 <body style="background-color: #111; color: white; font-family: sans-serif;">
-  <header>
-  <a href="dashboard.html">
-    <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="height: 40px; cursor: pointer;">
-  </a>
-  <nav>
-    <ul style="list-style: none; display: flex; gap: 1.5rem; margin: 0; padding: 0;">
-      <li><a href="dashboard.html" style="text-decoration: none; color: white; font-weight: bold;">Accueil</a></li>
-      <li><a href="tunnels.html" style="text-decoration: none; color: white; font-weight: bold;">Mes tunnels</a></li>
-      <li><a href="clients.html" style="text-decoration: none; color: white; font-weight: bold;">Mes clients</a></li>
-      <li><a href="emails.html" style="text-decoration: none; color: white; font-weight: bold;">Mes emails</a></li>
-      <li><a href="stats.html" style="text-decoration: none; color: white; font-weight: bold;">Statistiques</a></li>
-      <li><a href="email-settings.html">Paramètres Email</a></li>
-      <li><a href="index.html" style="text-decoration: none; color: white; font-weight: bold;">Déconnexion</a></li>
-    </ul>
-  </nav>
-</header>
+  <div id="navbar-container"></div>
+<script>
+  fetch('navbar.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('navbar-container').innerHTML = html;
+    });
+</script>
 
   <main>
     <section style="margin-top: 2rem; padding: 2rem;">
