@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Modifier la landing – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+    }
+    #editor {
+      height: 100vh;
+    }
+    .message {
+      padding: 2rem;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+    #save-landing-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #00ccff;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      });
+  </script>
+
+  <button id="save-landing-btn">💾 Enregistrer</button>
+  <div id="editor"></div>
+
+  <script src="https://unpkg.com/grapesjs"></script>
+  <script type="module" src="js/edit-landing.js"></script>
+</body>
+</html>
