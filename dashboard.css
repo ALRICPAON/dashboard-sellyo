@@ -276,24 +276,28 @@ form button:hover {
 .email-status.draft {
   background-color: #3498db; /* bleu */
 }
-/* Navbar */
 .navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: #111;
   color: white;
-  padding: 0;
+  padding: 0 20px;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 999;
   border-bottom: 1px solid #333;
-  font-family: sans-serif;
+}
+
+.nav-logo img {
+  height: 40px;
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  gap: 1rem;
   margin: 0;
   padding: 0;
 }
@@ -305,13 +309,14 @@ form button:hover {
 .nav-links > li > a {
   display: block;
   color: white;
-  padding: 15px 20px;
+  padding: 15px;
   text-decoration: none;
   font-weight: bold;
 }
 
 .nav-links > li > a:hover {
   background-color: #222;
+  border-radius: 6px;
 }
 
 .dropdown-menu {
@@ -342,8 +347,7 @@ form button:hover {
   display: block;
 }
 
-/* Pour éviter que le contenu passe sous la navbar */
 body {
-  padding-top: 60px;
+  padding-top: 70px;
 }
 
