@@ -88,8 +88,8 @@ const extraText = document.getElementById("extraText")?.value || "";
     if (video) formData.append("video", video);
 
     try {
-      await fetch(webhookURL, { method: "POST", body: formData });
-      await addDoc(collection(db, "tunnels"), firestoreData);
+    await addDoc(collection(db, "tunnels"), firestoreData);
+await fetch(webhookURL, { method: "POST", body: formData });
       window.location.href = "dashboard.html?tunnel=1";
     } catch (err) {
       alert("Erreur : " + err.message);
