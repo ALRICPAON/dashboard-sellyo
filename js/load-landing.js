@@ -1,6 +1,6 @@
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -21,16 +21,31 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   let html = '';
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    const id = docSnap.id;
+
     html += `
-      <div style="background:#1e1e1e; padding:1rem; border-radius:12px; box-shadow:0 0 10px rgba(0,0,0,0.4);">
-        <h3 style="margin:0 0 0.5rem 0;">${data.name || 'Sans nom'}</h3>
-        <p style="margin-bottom:1rem; opacity:0.8;">${data.goal || '—'}</p>
-        <a href="${data.url}" target="_blank" style="color:#00ccff; text-decoration:none;">🌐 Voir la page</a>
+      <div class="card">
+        <div class="card-content">
+          <h3>${data.name || 'Sans nom'}</h3>
+          <p>${data.goal || '—'}</p>
+          <div class="card-buttons">
+            <a href="${data.url}" target="_blank" class="btn">🌐 Voir</a>
+            <a href="edit-landing.html?id=${id}" class="btn">✏️ Modifier</a>
+            <button class="btn btn-danger" onclick="deleteLanding('${id}')">🗑 Supprimer</button>
+          </div>
+        </div>
       </div>
     `;
   });
 
   container.innerHTML = html;
 });
+
+window.deleteLanding = async function(id) {
+  if (confirm("Supprimer cette landing page ?")) {
+    await deleteDoc(doc(db, "tunnels", id));
+    location.reload();
+  }
+};
