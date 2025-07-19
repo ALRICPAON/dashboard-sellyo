@@ -69,9 +69,9 @@ const extraText = document.getElementById("extraText")?.value || "";
   backgroundColor,
   folder,
   slug: slugFinal,
+      htmlFileName: `${slugFinal}.html`,
   createdAt,
-  pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,
-  htmlFileName: `${slugFinal}.html`,    
+  pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,   
   fields,
   customField,
   extraText
