@@ -71,6 +71,7 @@ const extraText = document.getElementById("extraText")?.value || "";
   slug: slugFinal,
   createdAt,
   pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,
+  htmlFileName: `${slugFinal}.html`,    
   fields,
   customField,
   extraText
