@@ -1,6 +1,6 @@
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -10,7 +10,7 @@ const id = params.get("id");
 let fileName = "";
 
 if (!id) {
-  document.body.innerHTML = `<div class="message">❌ Aucune ID de landing fournie.</div>`;
+  document.body.innerHTML = `<div class="message">❌ Aucune ID fournie.</div>`;
   throw new Error("ID manquant");
 }
 
@@ -31,14 +31,17 @@ onAuthStateChanged(auth, async (user) => {
 
     const data = docSnap.data();
     fileName = data.name || "landing-sans-nom";
-    const url = data.pageUrl;
-console.log("URL utilisée pour fetch :", url);
+    const folder = data.folder || "default";
+    const type = data.type || "landing";
 
-    // 🔄 Récupère le HTML de GitHub
+    // 🔄 Construit l’URL GitHub
+    const url = `https://alricpaon.github.io/sellyo-hosting/${type}/${folder}/${fileName}.html`;
+
+    // 🔁 Charge le HTML depuis GitHub
     const res = await fetch(url);
     const html = await res.text();
 
-    // ✅ Initialise GrapesJS
+    // ✅ GrapesJS
     const editor = grapesjs.init({
       container: "#editor",
       fromElement: false,
@@ -50,8 +53,7 @@ console.log("URL utilisée pour fetch :", url);
 
     editor.setComponents(html);
 
-    // ✅ Sauvegarde
-    const saveBtn = document.getElementById("save-landing-btn");
+    const saveBtn = document.getElementById("save-email-btn");
     if (saveBtn) {
       saveBtn.addEventListener("click", async () => {
         const updatedHTML = editor.getHtml();
@@ -64,13 +66,9 @@ console.log("URL utilisée pour fetch :", url);
           formData.append("name", fileName);
           formData.append("type", "landing");
 
-          // ✅ Popup visuelle
           const popup = document.createElement("div");
           popup.id = "popup-message";
-          popup.innerHTML = `
-            <div style="text-align:center;">
-              ⏳ Sauvegarde en cours...<br><br>Merci de patienter <strong>1min30</strong> avant redirection.
-            </div>`;
+          popup.innerHTML = `<div style="text-align:center;">⏳ Sauvegarde en cours...<br><br>Merci de patienter <strong>1min30</strong>.</div>`;
           popup.style.cssText = `
             position: fixed;
             top: 30%;
@@ -82,8 +80,7 @@ console.log("URL utilisée pour fetch :", url);
             border-radius: 10px;
             font-size: 1.2rem;
             z-index: 9999;
-            text-align: center;
-          `;
+            text-align: center;`;
           document.body.appendChild(popup);
 
           const res = await fetch(webhookURL, {
@@ -92,9 +89,9 @@ console.log("URL utilisée pour fetch :", url);
           });
 
           if (res.ok) {
-            popup.innerHTML = `✅ Landing modifiée avec succès.<br><br>Redirection dans <strong>1min30</strong>...`;
+            popup.innerHTML = `✅ Landing modifiée.<br><br>Redirection dans <strong>1min30</strong>...`;
             setTimeout(() => {
-              window.location.href = "landings.html";
+              window.location.href = "landing.html";
             }, 90000);
           } else {
             throw new Error("Erreur Make : " + res.statusText);
