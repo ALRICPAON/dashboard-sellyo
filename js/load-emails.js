@@ -40,17 +40,19 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const statusText = {
-    sent: "✅ Envoyé",
-    scheduled: "🕓 Programmé",
-    draft: "📝 Brouillon"
-  };
+ const statusText = {
+  sent: "✅ Envoyé",
+  scheduled: "🕓 Programmé",
+  draft: "📝 Brouillon",
+  ready: "⏳ Envoi en cours"
+};
 
-  const statusClass = {
-    sent: "sent",
-    scheduled: "scheduled",
-    draft: "draft"
-  };
+const statusClass = {
+  sent: "sent",
+  scheduled: "scheduled",
+  draft: "draft",
+  ready: "scheduled"
+};
 
   const q = query(collection(db, "emails"), where("userId", "==", user.uid));
   const querySnapshot = await getDocs(q);
