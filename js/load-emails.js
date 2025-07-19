@@ -134,5 +134,16 @@ onAuthStateChanged(auth, async (user) => {
       await updateDoc(emailRef, { attachments: updated });
       window.location.reload();
     }
+    if (e.target.classList.contains("send-btn")) {
+  const confirmed = confirm("Envoyer cet email maintenant ?");
+  if (!confirmed) return;
+
+  const emailRef = doc(db, "emails", id);
+  await updateDoc(emailRef, { status: "sent" });
+
+  alert("✅ Email marqué comme envoyé. Il sera traité par le serveur.");
+  e.target.closest(".email-card").querySelector(".email-status").innerHTML = "✅ Envoyé";
+  e.target.closest(".email-card").querySelector(".email-status").className = "email-status sent";
+}
   });
 });
