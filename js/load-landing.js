@@ -31,7 +31,7 @@ onAuthStateChanged(auth, async (user) => {
           <h3>${data.name || 'Sans nom'}</h3>
           <p>${data.goal || '—'}</p>
           <div class="card-buttons">
-            <a href="${data.url}" target="_blank" class="btn">🌐 Voir</a>
+           <a href="${data.pageUrl}" target="_blank" class="btn">🌐 Voir</a>
             <a href="edit-landing.html?id=${id}" class="btn">✏️ Modifier</a>
             <button class="btn btn-danger" onclick="deleteLanding('${id}')">🗑 Supprimer</button>
           </div>
