@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tone = document.getElementById("tone")?.value || "";
     const productLink = document.getElementById("productLink")?.value || "";
     const productPrice = document.getElementById("productPrice")?.value || "";
+    const replyTo = document.getElementById("replyTo").value;
 
     const createdAt = new Date().toISOString();
     const slugFinal = `${slug}-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -53,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await addDoc(collection(db, "emails"), {
         name: slugFinal,
         subject,
+        replyTo: replyTo,
         desc,
         tone,
         productLink,
