@@ -56,11 +56,14 @@ main {
 }
 
 .nav-links > li > a {
-  display: block;
+  display: flex;
+  align-items: center;         /* ✅ aligne verticalement */
+  height: 60px;                /* ✅ hauteur uniforme */
+  padding: 0 15px;             /* ✅ padding horizontal uniquement */
   color: white;
-  padding: 15px;
   text-decoration: none;
   font-weight: bold;
+  line-height: 1;              /* ✅ évite les débordements verticaux */
 }
 
 .nav-links > li > a:hover {
