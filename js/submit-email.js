@@ -61,7 +61,7 @@ await addDoc(collection(db, "emails"), {
   productPrice,
   userId: user.uid,
   createdAt: createdAt,
-  url: `https://alricpaon.github.io/sellyo-hosting/emails/${slugFinal}.html`, // 🔗 GitHub path
+ url: `https://alricpaon.github.io/sellyo-hosting/emails/${encodeURIComponent(slugFinal)}.html`,
   type: "email",
   status: "draft" // ✅ Ajout du statut par défaut
 });
