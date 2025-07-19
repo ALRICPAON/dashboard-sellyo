@@ -40,19 +40,19 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
- const statusText = {
-  sent: "✅ Envoyé",
-  scheduled: "🕓 Programmé",
-  draft: "📝 Brouillon",
-  ready: "⏳ Envoi en cours"
-};
+  const statusText = {
+    sent: "✅ Envoyé",
+    scheduled: "🕓 Programmé",
+    draft: "📝 Brouillon",
+    ready: "⏳ Envoi en cours"
+  };
 
-const statusClass = {
-  sent: "sent",
-  scheduled: "scheduled",
-  draft: "draft",
-  ready: "scheduled"
-};
+  const statusClass = {
+    sent: "sent",
+    scheduled: "scheduled",
+    draft: "draft",
+    ready: "scheduled"
+  };
 
   const q = query(collection(db, "emails"), where("userId", "==", user.uid));
   const querySnapshot = await getDocs(q);
@@ -101,7 +101,8 @@ const statusClass = {
     emailsList.appendChild(container);
   });
 
-   emailsList.addEventListener("click", async (e) => {
+  // Gestion des clics
+  emailsList.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!id) return;
 
@@ -150,5 +151,4 @@ const statusClass = {
       statusElem.className = "email-status scheduled";
     }
   });
-  }); ← fermeture du eventListener
-// ❌ mais il manque la fermeture du onAuthStateChanged ici
+}); // 🔴 fermeture de onAuthStateChanged — essentielle !
