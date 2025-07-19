@@ -5,7 +5,6 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Récupère l'ID depuis l'URL
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 let fileName = "";
@@ -32,12 +31,13 @@ onAuthStateChanged(auth, async (user) => {
 
     const data = docSnap.data();
     fileName = data.name || "landing-sans-nom";
-    const url = data.pageUrl || data.url;
+    const url = data.pageUrl;
 
+    // 🔄 Récupère le HTML de GitHub
     const res = await fetch(url);
     const html = await res.text();
 
-    // GrapesJS
+    // ✅ Initialise GrapesJS
     const editor = grapesjs.init({
       container: "#editor",
       fromElement: false,
@@ -49,19 +49,21 @@ onAuthStateChanged(auth, async (user) => {
 
     editor.setComponents(html);
 
+    // ✅ Sauvegarde
     const saveBtn = document.getElementById("save-landing-btn");
     if (saveBtn) {
       saveBtn.addEventListener("click", async () => {
         const updatedHTML = editor.getHtml();
 
         try {
-         const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
+          const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
           const formData = new FormData();
           formData.append("id", id);
           formData.append("html", updatedHTML);
           formData.append("name", fileName);
           formData.append("type", "landing");
 
+          // ✅ Popup visuelle
           const popup = document.createElement("div");
           popup.id = "popup-message";
           popup.innerHTML = `
@@ -91,7 +93,7 @@ onAuthStateChanged(auth, async (user) => {
           if (res.ok) {
             popup.innerHTML = `✅ Landing modifiée avec succès.<br><br>Redirection dans <strong>1min30</strong>...`;
             setTimeout(() => {
-              window.location.href = "landing.html";
+              window.location.href = "landings.html";
             }, 90000);
           } else {
             throw new Error("Erreur Make : " + res.statusText);
