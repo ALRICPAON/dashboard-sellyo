@@ -24,52 +24,76 @@ document.addEventListener("DOMContentLoaded", () => {
     slugInput.value = slugInput.value.replace(/[^a-zA-Z0-9\-]/g, "");
   });
 
- form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      alert("Vous devez être connecté.");
-      return;
-    }
+    const user = auth.currentUser;
+    if (!user) return alert("Vous devez être connecté.");
 
-    // Ici, tu peux envoyer dans Firestore sans souci
-    console.log("✅ Utilisateur connecté :", user.uid);
+    const popup = document.createElement("div");
+    popup.id = "tunnel-loading-overlay";
+    popup.innerHTML = `<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);color:white;display:flex;align-items:center;justify-content:center;z-index:9999;"><p>⏳ Création de votre landing page…</p></div>`;
+    document.body.appendChild(popup);
+
+    const name = document.getElementById("tunnel-name")?.value || "";
+    const goal = document.getElementById("tunnel-goal")?.value || "";
+    const sector = document.getElementById("sector")?.value || "";
+    const desc = document.getElementById("tunnel-desc")?.value || "";
+    const cta = document.getElementById("cta-text")?.value || "";
+    const mainColor = document.getElementById("mainColor")?.value || "";
+    const backgroundColor = document.getElementById("backgroundColor")?.value || "";
+    const folder = folderInput?.value || "";
+    const slug = slugInput?.value || "";
+    const slugFinal = `${slug}-${slugCounter}`;
+    const createdAt = new Date().toISOString();
+    const customField = document.getElementById("customField")?.value || "";
+    const extraText = document.getElementById("extraText")?.value || "";
+
+    const fields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => ({
+      label: el.value.charAt(0).toUpperCase() + el.value.slice(1),
+      name: el.value,
+      type: el.value === "email" ? "email" : "text",
+      placeholder: `Votre ${el.value}`
+    }));
 
     const firestoreData = {
       userId: user.uid,
       type: "landing",
-      name: document.getElementById("tunnel-name")?.value || "",
-      goal: document.getElementById("tunnel-goal")?.value || "",
-      sector: document.getElementById("sector")?.value || "",
-      desc: document.getElementById("tunnel-desc")?.value || "",
-      cta: document.getElementById("cta-text")?.value || "",
-      mainColor: document.getElementById("mainColor")?.value || "",
-      backgroundColor: document.getElementById("backgroundColor")?.value || "",
-      folder: folderInput?.value || "",
-      slug: `${slugInput?.value || ""}-${slugCounter}`,
-      htmlFileName: `${slugInput?.value || ""}-${slugCounter}.html`,
-      pageUrl: `https://cdn.sellyo.fr/landing/${folderInput?.value || ""}/${slugInput?.value || ""}-${slugCounter}.html`,
-      createdAt: new Date().toISOString(),
-      fields: Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => ({
-        label: el.value.charAt(0).toUpperCase() + el.value.slice(1),
-        name: el.value,
-        type: el.value === "email" ? "email" : "text",
-        placeholder: `Votre ${el.value}`
-      })),
-      customField: document.getElementById("customField")?.value || "",
-      extraText: document.getElementById("extraText")?.value || ""
+      name,
+      goal,
+      sector,
+      desc,
+      cta,
+      mainColor,
+      backgroundColor,
+      folder,
+      slug: slugFinal,
+      htmlFileName: `${slugFinal}.html`,
+      createdAt,
+      pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,
+      fields,
+      customField,
+      extraText
     };
 
-    console.log("📤 Données envoyées à Firestore :", firestoreData);
+    const formData = new FormData();
+    Object.entries(firestoreData).forEach(([key, val]) =>
+      formData.append(key, typeof val === "object" ? JSON.stringify(val) : val)
+    );
+
+    const logo = document.getElementById("logo")?.files[0];
+    const cover = document.getElementById("cover-image")?.files[0];
+    const video = document.getElementById("custom-video")?.files[0];
+    if (logo) formData.append("logo", logo);
+    if (cover) formData.append("cover", cover);
+    if (video) formData.append("video", video);
 
     try {
-      const ref = await addDoc(collection(db, "tunnels"), firestoreData);
-      console.log("✅ Document créé avec ID :", ref.id);
-      // Appel webhook + redirection
+      await addDoc(collection(db, "tunnels"), firestoreData);
+      await fetch(webhookURL, { method: "POST", body: formData });
+      window.location.href = "dashboard.html?tunnel=1";
     } catch (err) {
-      console.error("❌ Erreur Firestore :", err);
-      alert("Erreur lors de la création : " + err.message);
+      alert("Erreur : " + err.message);
     }
   });
 });
