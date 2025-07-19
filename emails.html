@@ -9,22 +9,15 @@
 </head>
 
 <body style="background-color: #111; color: white; font-family: sans-serif;">
-  <header>
-    <a href="dashboard.html">
-      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
-    </a>
-    <nav>
-      <ul>
-        <li><a href="dashboard.html">Accueil</a></li>
-        <li><a href="tunnels.html">Mes tunnels</a></li>
-        <li><a href="clients.html">Mes clients</a></li>
-        <li><a href="emails.html" class="active">Mes emails</a></li>
-        <li><a href="stats.html">Statistiques</a></li>
-        <li><a href="email-settings.html">Paramètres Email</a></li>
-        <li><a href="index.html">Déconnexion</a></li>
-      </ul>
-    </nav>
-  </header>
+  <div id="navbar-container"></div>
+<script>
+  fetch('navbar.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('navbar-container').innerHTML = html;
+    });
+</script>
+
 
   <main>
     <div style="padding: 2rem; max-width: 900px; margin: auto;">
