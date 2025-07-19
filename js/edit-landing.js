@@ -30,15 +30,9 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const data = docSnap.data();
-    const rawName = data.name || "landing-sans-nom";
-    const folder = data.folder || "default";
-    const type = data.type || "landing";
-
-    // 🟢 Ajoute l'ID pour correspondre au fichier GitHub
-    fileName = `${rawName.trim().replace(/\s+/g, "-").toLowerCase()}-${id}`;
-
-    // 🔄 Construit l’URL GitHub complète
-    const url = `https://alricpaon.github.io/sellyo-hosting/${type}/${folder}/${fileName}.html`;
+   const folder = data.folder || "default";
+const htmlFileName = data.htmlFileName || "default.html";
+const url = `https://alricpaon.github.io/sellyo-hosting/landing/${folder}/${htmlFileName}`;
 
     // 🔁 Charge le HTML depuis GitHub
     const res = await fetch(url);
