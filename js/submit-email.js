@@ -50,20 +50,21 @@ document.addEventListener("DOMContentLoaded", () => {
         body: formData
       });
 
-      // ✅ 2. Enregistrement dans Firestore
-      await addDoc(collection(db, "emails"), {
-        name: slugFinal,
-        subject,
-        replyTo: replyTo,
-        desc,
-        tone,
-        productLink,
-        productPrice,
-        userId: user.uid,
-        createdAt: createdAt,
-        url: `https://alricpaon.github.io/sellyo-hosting/emails/${slugFinal}.html`, // 🔗 GitHub path
-        type: "email"
-      });
+   // ✅ 2. Enregistrement dans Firestore
+await addDoc(collection(db, "emails"), {
+  name: slugFinal,
+  subject,
+  replyTo: replyTo,
+  desc,
+  tone,
+  productLink,
+  productPrice,
+  userId: user.uid,
+  createdAt: createdAt,
+  url: `https://alricpaon.github.io/sellyo-hosting/emails/${slugFinal}.html`, // 🔗 GitHub path
+  type: "email",
+  status: "draft" // ✅ Ajout du statut par défaut
+});
 
       // ✅ Redirection
       // Affiche un message de création en cours
