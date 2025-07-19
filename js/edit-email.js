@@ -62,6 +62,7 @@ onAuthStateChanged(auth, async (user) => {
           formData.append("id", id);
           formData.append("html", updatedHTML);
           formData.append("name", fileName);
+          formData.append("type", "email");
 
           // ✅ Popup visuelle
           const popup = document.createElement("div");
