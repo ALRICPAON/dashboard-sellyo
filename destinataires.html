@@ -58,6 +58,18 @@
     <div class="message" id="feedback"></div>
   </div>
 
+  <div class="section">
+  <label>📋 Leads existants (coche ceux à qui envoyer)</label>
+  <div id="leads-list" style="margin-top:1rem;"></div>
+</div>
+
+<div class="section">
+  <label for="link-content">🔗 Associer à une landing ou tunnel</label>
+  <select id="link-content">
+    <option value="">-- Sélectionner --</option>
+  </select>
+</div>
+
   <script type="module">
     import { app } from "./firebase-init.js";
     import {
