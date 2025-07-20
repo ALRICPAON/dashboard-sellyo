@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Leads par Tunnel – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/leads-by-tunnel.js"></script>
+</head>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      });
+  </script>
+
+  <main>
+    <section style="margin-top: 2rem; padding: 2rem;">
+      <h2>Leads pour ce tunnel</h2>
+      <table style="width: 100%; border-collapse: collapse; background: #1c1c1c;">
+        <thead>
+          <tr style="background: #333;">
+            <th style="padding: 1rem;">Nom</th>
+            <th>Prénom</th>
+            <th>Email</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="tunnel-leads-body"></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
