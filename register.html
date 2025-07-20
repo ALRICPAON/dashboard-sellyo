@@ -7,30 +7,128 @@
   <link rel="stylesheet" href="assets/style.css" />
   <script type="module" src="js/firebase.js"></script>
   <script defer src="js/ui.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    .form-container {
+      max-width: 400px;
+      margin: 40px auto;
+      background: #222;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .form-container input,
+    .form-container button {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+    }
+    .form-container button {
+      background-color: #00ccff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 12px;
+      cursor: pointer;
+    }
+    .section {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    .section img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+    .section button {
+      margin-top: 20px;
+      background-color: #00ccff;
+      color: black;
+      font-weight: bold;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .anchor-btn {
+      scroll-behavior: smooth;
+    }
+  </style>
 </head>
 <body>
+  <div id="top"></div>
+
+  <!-- ✅ Formulaire d'inscription -->
   <div class="form-container">
     <img src="assets/logo.png" alt="Logo Sellyo" class="logo" />
     <h2>Créer un compte</h2>
-
     <form id="registerForm">
       <input type="text" id="name" placeholder="Nom complet" required />
       <input type="email" id="email" placeholder="Adresse email" required />
-      
       <div class="password-wrapper">
         <input type="password" id="password" placeholder="Mot de passe" required />
         <span class="toggle-password" onclick="togglePassword('password', this)">👁️</span>
       </div>
-
       <div class="password-wrapper">
         <input type="password" id="confirmPassword" placeholder="Confirmer le mot de passe" required />
         <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">👁️</span>
       </div>
-
       <button type="submit">Créer mon compte</button>
     </form>
-
     <p class="form-link">Déjà inscrit ? <a href="login.html">Se connecter</a></p>
+  </div>
+
+  <!-- ✅ Présentation Tunnel Complet -->
+  <div class="section">
+    <h2>Tunnel de Vente Complet</h2>
+    <p>Créez un tunnel 100% optimisé en 1 clic : landing page, email de relance, script vidéo, tout est généré automatiquement selon votre secteur et objectif.</p>
+    <img src="assets/tunnel.png" alt="Tunnel Complet">
+    <button class="anchor-btn" onclick="document.getElementById('top').scrollIntoView({ behavior: 'smooth' });">S'inscrire maintenant</button>
+  </div>
+
+  <!-- ✅ Présentation Landing Page -->
+  <div class="section">
+    <h2>Landing Pages Performantes</h2>
+    <p>Obtenez des pages d’atterrissage au design moderne, prêtes à capturer des leads efficacement. Formulaire intégré et entièrement personnalisable.</p>
+    <img src="assets/landing.png" alt="Landing Page">
+    <button class="anchor-btn" onclick="document.getElementById('top').scrollIntoView({ behavior: 'smooth' });">S'inscrire maintenant</button>
+  </div>
+
+  <!-- ✅ Présentation Emails de relance -->
+  <div class="section">
+    <h2>Emails de Relance Automatisés</h2>
+    <p>Générez des emails professionnels adaptés à votre audience. Personnalisez le ton, planifiez vos relances, et maximisez vos conversions.</p>
+    <img src="assets/email.png" alt="Emails">
+    <button class="anchor-btn" onclick="document.getElementById('top').scrollIntoView({ behavior: 'smooth' });">S'inscrire maintenant</button>
+  </div>
+
+  <!-- ✅ Présentation Scripts Vidéo -->
+  <div class="section">
+    <h2>Scripts Vidéo Engagés</h2>
+    <p>Vous recevez un script prêt à tourner pour vos vidéos de vente ou publicité. Ton convaincant, structure testée, résultats assurés.</p>
+    <img src="assets/video.png" alt="Script Vidéo">
+    <button class="anchor-btn" onclick="document.getElementById('top').scrollIntoView({ behavior: 'smooth' });">S'inscrire maintenant</button>
+  </div>
+
+  <!-- ✅ Présentation Formulaires personnalisés -->
+  <div class="section">
+    <h2>Formulaires Dynamiques</h2>
+    <p>Créez vos propres formulaires pour qualifier vos prospects. Ajoutez des champs personnalisés et connectez-les à vos tunnels.</p>
+    <img src="assets/formulaire.png" alt="Formulaire">
+    <button class="anchor-btn" onclick="document.getElementById('top').scrollIntoView({ behavior: 'smooth' });">S'inscrire maintenant</button>
   </div>
 </body>
 </html>
