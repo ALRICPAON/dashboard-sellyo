@@ -24,6 +24,9 @@ onAuthStateChanged(auth, async (user) => {
   querySnapshot.forEach((docSnap) => {
     const data = docSnap.data();
     const id = docSnap.id;
+    const folder = data.folder || "default";
+    const file = data.htmlFileName || "index.html";
+    const fullUrl = `https://cdn.sellyo.fr/landing/${folder}/${file}`;
 
     html += `
       <div class="card">
@@ -31,8 +34,9 @@ onAuthStateChanged(auth, async (user) => {
           <h3>${data.name || 'Sans nom'}</h3>
           <p>${data.goal || '—'}</p>
           <div class="card-buttons">
-           <a href="${data.pageUrl}" target="_blank" class="btn">🌐 Voir</a>
+            <a href="${data.pageUrl}" target="_blank" class="btn">🌐 Voir</a>
             <a href="edit-landing.html?id=${id}" class="btn">✏️ Modifier</a>
+            <button class="btn btn-copy" data-url="${fullUrl}">🔗 Copier le lien</button>
             <button class="btn btn-danger" onclick="deleteLanding('${id}')">🗑 Supprimer</button>
           </div>
         </div>
@@ -41,6 +45,18 @@ onAuthStateChanged(auth, async (user) => {
   });
 
   container.innerHTML = html;
+
+  // 🔁 Ajoute les événements pour copier le lien
+  document.querySelectorAll(".btn-copy").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const link = btn.getAttribute("data-url");
+      navigator.clipboard.writeText(link).then(() => {
+        alert("✅ Lien copié dans le presse-papiers !");
+      }).catch(() => {
+        alert("❌ Erreur lors de la copie.");
+      });
+    });
+  });
 });
 
 window.deleteLanding = async function(id) {
