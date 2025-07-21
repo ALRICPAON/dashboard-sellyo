@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Créer un Workflow – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin: 1rem 0 0.5rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 1rem;
+    }
+    .email-block {
+      background: #1c1c1c;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .email-block span {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #900;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      cursor: pointer;
+    }
+    .add-email-btn, .submit-btn {
+      padding: 0.7rem 1.5rem;
+      background: #0a84ff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .submit-btn {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Créer un Workflow Email</h1>
+
+  <form id="workflow-form">
+    <label for="workflowName">Nom du workflow</label>
+    <input type="text" id="workflowName" name="workflowName" required />
+
+    <label for="associatedId">Associer à une landing ou un tunnel (optionnel)</label>
+    <select id="associatedId" name="associatedId">
+      <option value="">Aucun</option>
+      <!-- Dynamique : ajouter les IDs disponibles -->
+    </select>
+
+    <div id="emails-list">
+      <!-- Blocs d'emails ajoutés ici -->
+    </div>
+
+    <button type="button" class="add-email-btn" onclick="addEmailBlock()">+ Ajouter un Email</button>
+
+    <button type="submit" class="submit-btn">Créer le workflow</button>
+  </form>
+
+  <script>
+    function addEmailBlock() {
+      const emailsList = document.getElementById('emails-list');
+      const block = document.createElement('div');
+      block.className = 'email-block';
+      block.innerHTML = `
+        <span>Email :
+          <select name="emailId[]">
+            <option value="">-- Sélectionner un email --</option>
+            <!-- Dynamique : options par script JS -->
+          </select>
+        </span>
+        <span>Délai d'envoi : J+ <input type="number" name="delayDays[]" min="0" value="0" style="width: 60px; display: inline-block; margin-left: 5px;" /></span>
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">🗑️</button>
+      `;
+      emailsList.appendChild(block);
+    }
+  </script>
+</body>
+</html>
