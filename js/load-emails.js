@@ -155,5 +155,8 @@ onAuthStateChanged(auth, async (user) => {
       statusElem.innerHTML = "⏳ Envoi en cours";
       statusElem.className = "email-status scheduled";
     }
+    if (e.target.classList.contains("schedule-btn")) {
+  openSchedulePopup(id);
+}
   });
 }); // 🔴 fermeture de onAuthStateChanged — essentielle !
