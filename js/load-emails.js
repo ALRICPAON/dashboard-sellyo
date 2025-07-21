@@ -94,6 +94,7 @@ onAuthStateChanged(auth, async (user) => {
         <button class="upload-btn" data-id="${id}">📤 Uploader</button>
         <button class="delete-btn" data-id="${id}">🧨 Supprimer</button>
         <button class="send-btn" data-id="${id}">📨 Envoyer</button>
+        <button class="schedule-btn" data-id="${id}">🕓 Programmer</button>
         <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
         <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
       </div>
