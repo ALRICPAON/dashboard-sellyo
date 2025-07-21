@@ -28,15 +28,21 @@
       border-radius: 5px;
       border: none;
       margin-bottom: 1rem;
+      background: #222;
+      color: #fff;
     }
     .email-block {
-  background: #1c1c1c;
-  padding: 1rem;
-  padding-right: 3rem; /* ✅ Ajout ici pour laisser la place au bouton */
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  position: relative;
-}
+      background: #1c1c1c;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .email-block select {
+      z-index: 1;
+      position: relative;
+    }
     .email-block span {
       display: block;
       margin-bottom: 0.5rem;
@@ -51,8 +57,9 @@
       border-radius: 4px;
       padding: 0.2rem 0.6rem;
       cursor: pointer;
+      z-index: 2;
     }
-    .add-email-btn, .submit-btn {
+    .add-email-btn, .submit-btn, .back-btn {
       padding: 0.7rem 1.5rem;
       background: #0a84ff;
       border: none;
@@ -60,9 +67,17 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 1rem;
+      margin-right: 1rem;
     }
-    .submit-btn {
-      margin-top: 2rem;
+    .workflow-section {
+      margin-top: 3rem;
+    }
+    .workflow-item {
+      background: #1c1c1c;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
@@ -74,22 +89,26 @@
     <input type="text" id="workflowName" name="workflowName" required />
 
     <label for="associatedId">Associer à une landing ou un tunnel (optionnel)</label>
-    <select id="associatedIdSelect" name="associatedId">
-  <option value="">Aucun</option>
-</select>
+    <select id="associatedId" name="associatedId">
+      <option value="">Aucun</option>
+      <!-- Dynamique : options ajoutées via JS -->
+    </select>
 
     <div id="emails-list">
       <!-- Blocs d'emails ajoutés ici -->
     </div>
 
     <button type="button" class="add-email-btn" onclick="addEmailBlock()">+ Ajouter un Email</button>
-
     <button type="submit" class="submit-btn">Créer le workflow</button>
-    <!-- Select caché à cloner dynamiquement pour chaque bloc email -->
-<select id="emailSelect" style="display: none;">
-  <option value="">-- Sélectionner un email --</option>
-</select>
+    <a href="emails.html" class="back-btn">← Retour à mes Emails</a>
   </form>
+
+  <div class="workflow-section">
+    <h2>Mes Workflows</h2>
+    <div id="existing-workflows">
+      <!-- Liste dynamique des workflows -->
+    </div>
+  </div>
 
   <script>
     function addEmailBlock() {
@@ -100,7 +119,7 @@
         <span>Email :
           <select name="emailId[]">
             <option value="">-- Sélectionner un email --</option>
-            <!-- Dynamique : options par script JS -->
+            <!-- Options ajoutées dynamiquement -->
           </select>
         </span>
         <span>Délai d'envoi : J+ <input type="number" name="delayDays[]" min="0" value="0" style="width: 60px; display: inline-block; margin-left: 5px;" /></span>
