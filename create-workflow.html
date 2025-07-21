@@ -73,10 +73,9 @@
     <input type="text" id="workflowName" name="workflowName" required />
 
     <label for="associatedId">Associer à une landing ou un tunnel (optionnel)</label>
-    <select id="associatedId" name="associatedId">
-      <option value="">Aucun</option>
-      <!-- Dynamique : ajouter les IDs disponibles -->
-    </select>
+    <select id="associatedIdSelect" name="associatedId">
+  <option value="">Aucun</option>
+</select>
 
     <div id="emails-list">
       <!-- Blocs d'emails ajoutés ici -->
@@ -85,6 +84,10 @@
     <button type="button" class="add-email-btn" onclick="addEmailBlock()">+ Ajouter un Email</button>
 
     <button type="submit" class="submit-btn">Créer le workflow</button>
+    <!-- Select caché à cloner dynamiquement pour chaque bloc email -->
+<select id="emailSelect" style="display: none;">
+  <option value="">-- Sélectionner un email --</option>
+</select>
   </form>
 
   <script>
