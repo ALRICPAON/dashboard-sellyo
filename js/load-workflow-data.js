@@ -11,29 +11,31 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // Chargement des emails de l'utilisateur
-  const emailSelects = document.querySelectorAll(".email-select");
+  // 🔁 Récupération des emails
+  const emailSelect = document.getElementById("emailSelect");
   const qEmails = query(collection(db, "emails"), where("userId", "==", user.uid));
-  const emailSnap = await getDocs(qEmails);
+  const emailsSnap = await getDocs(qEmails);
 
-  emailSnap.forEach(doc => {
+  emailsSnap.forEach((doc) => {
     const data = doc.data();
     const option = document.createElement("option");
     option.value = doc.id;
-    option.textContent = data.subject || "(Sans objet)";
-    emailSelects.forEach(select => select.appendChild(option.cloneNode(true)));
+    option.textContent = data.name || "(Sans nom)";
+    emailSelect.appendChild(option);
   });
 
-  // Chargement des tunnels/landings de l'utilisateur
-  const select = document.getElementById("associatedId");
-  const qTunnels = query(collection(db, "tunnels"), where("userId", "==", user.uid));
-  const tunnelSnap = await getDocs(qTunnels);
+  // 🔁 Récupération des landings et tunnels
+  const assocSelect = document.getElementById("associatedIdSelect");
+  const tunnelsRef = collection(db, "tunnels");
+  const tunnelsSnap = await getDocs(tunnelsRef);
 
-  tunnelSnap.forEach(doc => {
+  tunnelsSnap.forEach((doc) => {
     const data = doc.data();
-    const option = document.createElement("option");
-    option.value = doc.id;
-    option.textContent = data.name || "(Tunnel sans nom)";
-    select.appendChild(option);
+    if (data.userId === user.uid) {
+      const option = document.createElement("option");
+      option.value = doc.id;
+      option.textContent = data.name || "(Sans nom)";
+      assocSelect.appendChild(option);
+    }
   });
 });
