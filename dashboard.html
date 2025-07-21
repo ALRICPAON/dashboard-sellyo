@@ -2,183 +2,56 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard – Sellyo</title>
+  <title>Créer un Workflow – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css">
-  <script type="module" src="js/firebase-auth-check.js"></script>
-  <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background: #000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.6);
-    }
-
-    .logo {
-      height: 40px;
-    }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-      margin: 0;
-      padding: 0;
-    }
-
-    nav ul li a {
-      text-decoration: none;
-      color: #fff;
-      font-weight: bold;
-      padding: 0.5rem 1rem;
-      transition: all 0.3s;
-    }
-
-    nav ul li a:hover {
-      background: #00ccff;
-      color: #000;
-      border-radius: 5px;
-    }
-
-    main {
-      padding: 4rem 2rem;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      color: #ccc;
-      font-size: 1.2rem;
-    }
-
-    .card-container {
-      margin-top: 3rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      max-width: 1000px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .card {
-      background: #1e1e1e;
-      padding: 2rem;
-      border-radius: 15px;
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-      border: 2px solid transparent;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #00ccff99;
-      border-color: #00ccff;
-    }
-
-    .card-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .card-title {
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-  </style>
+  <script type="module" src="js/firebase-init.js"></script>
+  <script type="module" src="js/load-workflow-data.js"></script>
 </head>
-
-<body>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
   <div id="navbar-container"></div>
-<script>
-  fetch('navbar.html')
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById('navbar-container').innerHTML = html;
-    });
-</script>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("navbar-container").innerHTML = html;
+      });
+  </script>
 
-  <main>
-    <h1>Bienvenue sur votre dashboard Sellyo 👋</h1>
-    <p>Accédez à vos tunnels, vos clients ou créez du nouveau contenu.</p>
+  <main style="padding: 2rem;">
+    <h1>Créer un Workflow Email</h1>
 
-    <div class="card-container">
-      <a class="card" href="form-landing.html">
-        <div class="card-icon">🔴</div>
-        <div class="card-title">Créer une Landing Page</div>
-      </a>
+    <!-- Nom du workflow -->
+    <label for="workflowName">Nom du workflow :</label>
+    <input type="text" id="workflowName" placeholder="Ex. Séquence relance promo" style="width: 100%; margin-bottom: 1rem;" />
 
-      <a class="card" href="form-email.html">
-        <div class="card-icon">✉️</div>
-        <div class="card-title">Créer un Email</div>
-      </a>
+    <!-- Association à un tunnel ou landing -->
+    <label for="associatedId">Associer à un tunnel ou une landing (optionnel) :</label>
+    <select id="associatedId" style="width: 100%; margin-bottom: 2rem;">
+      <option value="">-- Choisir --</option>
+    </select>
 
-      <a class="card" href="form-video.html">
-        <div class="card-icon">🎬</div>
-        <div class="card-title">Créer un Script Vidéo</div>
-      </a>
-
-      <a class="card" href="form-tunnel.html">
-        <div class="card-icon">🚀</div>
-        <div class="card-title">Créer un Tunnel Complet</div>
-      </a>
+    <!-- Bloc pour ajouter les emails de la séquence -->
+    <h2>Séquence d'emails</h2>
+    <div id="emails-container">
+      <!-- Un email par bloc -->
+      <div class="email-block" style="border: 1px solid #444; padding: 1rem; margin-bottom: 1rem;">
+        <label>Email :</label>
+        <select class="email-select" style="width: 100%; margin-bottom: 0.5rem;">
+          <option value="">-- Choisir un email --</option>
+        </select>
+        <label>Délai (J+)</label>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span>J+</span>
+          <input type="number" class="delay-input" value="0" min="0" style="width: 60px;" />
+        </div>
+        <button class="remove-email" style="margin-top: 0.5rem;">❌ Supprimer</button>
+      </div>
     </div>
+
+    <button id="add-email" style="margin-top: 1rem;">➕ Ajouter un email à la séquence</button>
+
+    <br /><br />
+    <button id="submit-workflow">✅ Créer le workflow</button>
   </main>
-<script>
-  // ✅ Affiche un message plein écran + redirection après 1min30 si ?tunnel=1
-  window.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("tunnel") === "1") {
-      const popup = document.createElement("div");
-      popup.id = "tunnel-loading";
-      popup.style.cssText = `
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.95);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        font-weight: bold;
-        z-index: 9999;
-        text-align: center;
-        padding: 2rem;
-      `;
-      popup.innerHTML = `
-        ⏳ Génération de votre landing page…<br><br>
-        Cela peut prendre jusqu’à 2 minutes.<br><br>
-        Merci de patienter, nous préparons tout pour vous.
-      `;
-      document.body.appendChild(popup);
-
-      setTimeout(() => {
-        window.location.href = "tunnels.html";
-      }, 95000); // 1min35 pour être sûr que Make a le temps
-
-      // Nettoyer l’URL
-      const url = new URL(window.location);
-      url.searchParams.delete("tunnel");
-      window.history.replaceState({}, document.title, url);
-    }
-  });
-</script>
 </body>
 </html>
