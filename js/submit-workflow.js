@@ -1,5 +1,4 @@
 // ✅ Script complet : submit-workflow.js
-// Crée le workflow + duplique les mails avec scheduledAt et destinataires
 
 import { app } from "./firebase-init.js";
 import {
@@ -57,28 +56,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 2. Récupérer les leads liés à la landing ou tunnel
     let leads = [];
-    if (landingId || tunnelId) {
-   const leadsRef = collection(db, "leads");
-let q = null;
 
-console.log("🔍 landingId sélectionné :", landingId);
-console.log("🔍 tunnelId sélectionné :", tunnelId);
+    const leadsRef = collection(db, "leads");
+    let q = null;
 
-if (landingId) {
-  q = query(leadsRef, where("slug", "==", landingId));
-} else if (tunnelId) {
-  q = query(leadsRef, where("slug", "==", tunnelId));
-}
+    console.log("🔍 landingId sélectionné :", landingId);
+    console.log("🔍 tunnelId sélectionné :", tunnelId);
 
-if (q) {
-  const snap = await getDocs(q);
-  console.log("📦 Nombre de leads trouvés :", snap.size);
-  snap.forEach(doc => {
-    const data = doc.data();
-    console.log("✅ Lead trouvé :", data);
-    if (data.email) leads.push(data.email);
-  });
-}
+    if (landingId) {
+      q = query(leadsRef, where("slug", "==", landingId));
+    } else if (tunnelId) {
+      q = query(leadsRef, where("slug", "==", tunnelId));
+    }
+
+    if (q) {
+      const snap = await getDocs(q);
+      console.log("📦 Nombre de leads trouvés :", snap.size);
+      snap.forEach(doc => {
+        const data = doc.data();
+        console.log("✅ Lead trouvé :", data);
+        if (data.email) leads.push(data.email);
+      });
+    }
 
     console.log("✅ Leads récupérés :", leads);
 
@@ -122,3 +121,4 @@ if (q) {
     window.location.href = "emails.html";
   });
 });
+
