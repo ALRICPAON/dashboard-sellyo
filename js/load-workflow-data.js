@@ -42,3 +42,32 @@ onAuthStateChanged(auth, async (user) => {
   // Optionnel : ajouter automatiquement un premier bloc email
   addEmailBlock();
 });
+import {
+  doc, getDoc, getDocs, collection, query, where, deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Charger les workflows existants
+const workflowContainer = document.getElementById("existing-workflows");
+const qWorkflows = query(collection(db, "workflows"), where("userId", "==", user.uid));
+const workflowsSnap = await getDocs(qWorkflows);
+
+for (const workflowDoc of workflowsSnap.docs) {
+  const wf = workflowDoc.data();
+  const div = document.createElement("div");
+  div.className = "workflow-item";
+
+  const assocName = wf.associatedId ? `(lié à ${wf.associatedId})` : "(non lié)";
+  const emailList = (wf.emails || []).map(email => `📧 ${email.emailId} → J+${email.delayDays}`).join("<br>");
+
+  div.innerHTML = `
+    <strong>${wf.name}</strong> <br>
+    <em>${assocName}</em><br>
+    <div style="margin-top: 0.5rem;">${emailList}</div>
+    <div style="margin-top: 1rem;">
+      <button class="submit-btn" onclick="editWorkflow('${workflowDoc.id}')">✏️ Modifier</button>
+      <button class="remove-btn" onclick="deleteWorkflow('${workflowDoc.id}', this)">🗑️ Supprimer</button>
+    </div>
+  `;
+
+  workflowContainer.appendChild(div);
+}
