@@ -3,7 +3,8 @@ import {
   getAuth, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, serverTimestamp, doc, getDoc
+  getFirestore, collection, addDoc, serverTimestamp,
+  doc, getDoc, getDocs, query, where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -41,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        // 🔹 Étape 1 : création du workflow
         const workflowRef = await addDoc(collection(db, "workflows"), {
           userId: user.uid,
           name,
@@ -52,57 +52,58 @@ document.addEventListener("DOMContentLoaded", () => {
           ready: true
         });
 
-        // 🔹 Étape 2 : création des mails liés
-      import { doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        const now = new Date();
 
-const now = new Date();
+        for (const { emailId, delayDays } of emails) {
+          const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
+          const originalDoc = await getDoc(doc(db, "emails", emailId));
+          if (!originalDoc.exists()) continue;
+          const originalData = originalDoc.data();
 
-for (const { emailId, delayDays } of emails) {
-  const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
+          const leadsQuery = query(
+            collection(db, "leads"),
+            where(landingId ? "landingId" : "tunnelId", "==", landingId || tunnelId)
+          );
+          const leadsSnapshot = await getDocs(leadsQuery);
 
-  const originalDoc = await getDoc(doc(db, "emails", emailId));
-  if (!originalDoc.exists()) continue;
-  const originalData = originalDoc.data();
+          if (leadsSnapshot.empty) {
+            await addDoc(collection(db, "emails"), {
+              userId: user.uid,
+              emailId,
+              workflowId: workflowRef.id,
+              scheduledAt,
+              status: "scheduled",
+              subject: originalData.subject || "",
+              url: originalData.url || "",
+              attachments: originalData.attachments || [],
+              associatedId: landingId || tunnelId || null
+            });
+          } else {
+            for (const leadDoc of leadsSnapshot.docs) {
+              const leadData = leadDoc.data();
+              await addDoc(collection(db, "emails"), {
+                userId: user.uid,
+                emailId,
+                workflowId: workflowRef.id,
+                scheduledAt,
+                status: "scheduled",
+                subject: originalData.subject || "",
+                url: originalData.url || "",
+                attachments: originalData.attachments || [],
+                associatedId: landingId || tunnelId || null,
+                recipientEmail: leadData.email || ""
+              });
+            }
+          }
+        }
 
-  // 🔍 Rechercher les leads existants associés à ce workflow
-  const leadsQuery = query(
-    collection(db, "leads"),
-    where(landingId ? "landingId" : "tunnelId", "==", landingId || tunnelId)
-  );
-  const leadsSnapshot = await getDocs(leadsQuery);
+        alert("✅ Workflow créé avec succès !");
+        window.location.reload();
 
-  if (leadsSnapshot.empty) {
-    // Aucun lead trouvé, on crée l'email sans destinataire
-    await addDoc(collection(db, "emails"), {
-      userId: user.uid,
-      emailId,
-      workflowId: workflowRef.id,
-      scheduledAt: scheduledAt,
-      status: "scheduled",
-      subject: originalData.subject || "",
-      url: originalData.url || "",
-      attachments: originalData.attachments || [],
-      associatedId: landingId || tunnelId || null
+      } catch (err) {
+        console.error("Erreur Firestore :", err);
+        alert("❌ Une erreur est survenue.");
+      }
     });
-  } else {
-    // Pour chaque lead trouvé → créer un email programmé avec destinataire
-    for (const leadDoc of leadsSnapshot.docs) {
-      const leadData = leadDoc.data();
-      await addDoc(collection(db, "emails"), {
-        userId: user.uid,
-        emailId,
-        workflowId: workflowRef.id,
-        scheduledAt: scheduledAt,
-        status: "scheduled",
-        subject: originalData.subject || "",
-        url: originalData.url || "",
-        attachments: originalData.attachments || [],
-        associatedId: landingId || tunnelId || null,
-        recipientEmail: leadData.email || ""
-      });
-    }
-  }
-}
-
-alert("✅ Workflow créé avec succès !");
-window.location.reload();
+  });
+});
