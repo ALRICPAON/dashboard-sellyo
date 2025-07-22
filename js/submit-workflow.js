@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
             emailId: emailId,
             workflowId: workflowRef.id,
             scheduledAt: scheduledAt,
-            status: "ready"
+           status: "draft"
           });
         }
 
