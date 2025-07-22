@@ -72,8 +72,7 @@ onAuthStateChanged(auth, async (user) => {
       ${assoc}
       <div style="margin-top: 0.5rem;">${emails}</div>
       <div style="margin-top: 1rem;">
-        <button class="submit-btn" onclick="editWorkflow('${doc.id}')">✏️ Modifier</button>
-        <button class="remove-btn" onclick="deleteWorkflow('${doc.id}', this)">🗑️ Supprimer</button>
+       <button class="submit-btn" onclick="editWorkflow('${doc.id}')">✏️ Modifier</button>
       </div>
     `;
 
