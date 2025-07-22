@@ -1,25 +1,29 @@
 import { app } from "./firebase-init.js";
-import { getFirestore, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getFirestore, doc, deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const db = getFirestore(app);
 
-// ✅ Supprimer un workflow
+/**
+ * Supprime un workflow et retire la carte du DOM
+ */
 export async function deleteWorkflow(id, button) {
   if (!confirm("❌ Supprimer ce workflow ?")) return;
 
-  button.disabled = true;
-
   try {
     await deleteDoc(doc(db, "workflows", id));
-    button.closest(".workflow-item").remove(); // retire la carte du DOM
+    const card = button.closest(".workflow-item");
+    if (card) card.remove();
   } catch (err) {
-    console.error("Erreur suppression workflow :", err);
-    alert("Erreur lors de la suppression.");
-    button.disabled = false;
+    console.error("Erreur suppression :", err);
+    alert("❌ Impossible de supprimer le workflow.");
   }
 }
 
-// ✅ Modifier (rediriger vers page édition)
+/**
+ * Redirige vers la page de modification du workflow
+ */
 export function editWorkflow(id) {
   window.location.href = `edit-workflow.html?id=${id}`;
 }
