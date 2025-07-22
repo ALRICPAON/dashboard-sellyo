@@ -6,13 +6,11 @@ import {
 import {
   getFirestore,
   collection,
-  addDoc,
-  serverTimestamp,
-  doc,
-  getDoc,
-  getDocs,
   query,
-  where
+  where,
+  getDocs,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -21,7 +19,7 @@ const db = getFirestore(app);
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("workflow-form");
 
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
       return;
@@ -30,98 +28,75 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById("workflowName").value.trim();
-      const landingId = document.getElementById("landingSelect").value || null;
-      const tunnelId = document.getElementById("tunnelSelect").value || null;
-      const blocks = document.querySelectorAll("#mail-blocks-container .mail-block");
+      const workflowName = document.getElementById("workflow-name").value;
+      const selectedLanding = document.getElementById("landingSelect").value;
+      const selectedTunnel = document.getElementById("tunnelSelect").value;
+      const userId = user.uid;
+
+      const emailBlocks = document.querySelectorAll(".email-block");
 
       const emails = [];
-      blocks.forEach((block) => {
-        const emailId = block.querySelector("select").value;
-        const delayDays = parseInt(block.querySelector("input").value || "0");
+
+      for (const block of emailBlocks) {
+        const emailId = block.querySelector(".email-select").value;
+        const delayDays = parseInt(block.querySelector(".delay-days").value || "0");
+
         if (emailId) {
           emails.push({ emailId, delayDays });
         }
+      }
+
+      const workflowRef = await addDoc(collection(db, "workflows"), {
+        name: workflowName,
+        userId,
+        createdAt: serverTimestamp(),
+        emails,
+        landingId: selectedLanding || null,
+        tunnelId: selectedTunnel || null,
+        ready: true
       });
 
-      if (!name || emails.length === 0) {
-        alert("Le nom du workflow et au moins un email sont obligatoires.");
-        return;
-      }
+      console.log("Workflow enregistré avec ID :", workflowRef.id);
 
-      try {
-        // 🔹 Étape 1 : création du workflow
-        const workflowRef = await addDoc(collection(db, "workflows"), {
-          userId: user.uid,
-          name,
-          landingId,
-          tunnelId,
-          emails,
-          createdAt: serverTimestamp(),
-          ready: true
-        });
+      // 🔍 Récupération des leads associés
+      const leadsRef = collection(db, "leads");
+      const leadsQuery = query(leadsRef, where("userId", "==", userId), where("type", "==", "landing"));
+      const leadsSnapshot = await getDocs(leadsQuery);
 
-        // 🔹 Étape 2 : pour chaque email programmé
-        const now = new Date();
+      console.log("Nombre de leads trouvés :", leadsSnapshot.size);
 
-        for (const { emailId, delayDays } of emails) {
-          const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
+      for (const leadDoc of leadsSnapshot.docs) {
+        const leadData = leadDoc.data();
 
-          const originalDoc = await getDoc(doc(db, "emails", emailId));
-          if (!originalDoc.exists()) continue;
-          const originalData = originalDoc.data();
-
-          // 🔍 Cherche les leads associés
-          const leadsQuery = query(
-            collection(db, "leads"),
-            where(landingId ? "landingId" : "tunnelId", "==", landingId || tunnelId)
-          );
-          const leadsSnapshot = await getDocs(leadsQuery);
-
-          if (leadsSnapshot.empty) {
-            // Aucun lead : créer un email générique sans destinataire
-            await addDoc(collection(db, "emails"), {
-              userId: user.uid,
-              emailId,
-              workflowId: workflowRef.id,
-              scheduledAt,
-              status: "scheduled",
-              subject: originalData.subject || "",
-              url: originalData.url || "",
-              attachments: originalData.attachments || [],
-              associatedId: landingId || tunnelId || null,
-              recipientEmail: null
-            });
-          } else {
-            // Pour chaque lead : créer un email programmé avec destinataire
-            for (const leadDoc of leadsSnapshot.docs) {
-              const leadData = leadDoc.data();
-             console.log("lead complet =", leadData);
-console.log("email récupéré =", leadData.email);
-
-              await addDoc(collection(db, "emails"), {
-                userId: user.uid,
-                emailId,
-                workflowId: workflowRef.id,
-                scheduledAt,
-                status: "scheduled",
-                subject: originalData.subject || "",
-                url: originalData.url || "",
-                attachments: originalData.attachments || [],
-                associatedId: landingId || tunnelId || null,
-                recipientEmail: leadData.email ? leadData.email : "undefined@bug.com"
-              });
-            }
-          }
+        if (!leadData.email) {
+          console.warn("Lead sans email :", leadDoc.id);
+          continue;
         }
 
-        alert("✅ Workflow créé avec succès !");
-        window.location.reload();
+        for (const emailEntry of emails) {
+          const scheduledDate = new Date();
+          scheduledDate.setDate(scheduledDate.getDate() + emailEntry.delayDays);
 
-      } catch (err) {
-        console.error("❌ Erreur Firestore :", err);
-        alert("❌ Une erreur est survenue.");
+          await addDoc(collection(db, "emails"), {
+            emailId: emailEntry.emailId,
+            userId,
+            workflowId: workflowRef.id,
+            associatedId: selectedLanding || selectedTunnel || null,
+            recipientEmail: leadData.email,
+            status: "scheduled",
+            scheduledAt: scheduledDate,
+            subject: "Email workflow",
+            url: "",
+            attachments: [],
+          });
+
+          console.log(`Email programmé pour ${leadData.email} à J+${emailEntry.delayDays}`);
+        }
       }
+
+      alert("✅ Workflow et mails créés !");
+      window.location.href = "emails.html";
     });
   });
 });
+
