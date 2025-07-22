@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (landingId || tunnelId) {
       const leadsRef = collection(db, "leads");
       const conditions = [];
-     if (landingId) conditions.push(where("source.refId", "==", landingId));
+      if (landingId) conditions.push(where("source.refId", "==", landingId));
       if (tunnelId) conditions.push(where("source.refId", "==", tunnelId));
 
       const q = query(leadsRef, ...conditions);
@@ -71,28 +71,41 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    console.log("✅ Leads récupérés :", leads);
+
     // 3. Dupliquer chaque mail pour chaque lead
     for (const { emailId, delay } of emails) {
       const originalRef = doc(db, "emails", emailId);
       const originalSnap = await getDoc(originalRef);
-      if (!originalSnap.exists()) continue;
+
+      if (!originalSnap.exists()) {
+        console.warn("❌ Email introuvable pour ID :", emailId);
+        continue;
+      }
+
       const original = originalSnap.data();
+      console.log("📧 Email à dupliquer :", original);
 
       for (const toEmail of leads) {
         const scheduledDate = Timestamp.fromDate(new Date(Date.now() + delay * 86400000));
+        console.log("→ Préparation envoi vers :", toEmail, "à la date", scheduledDate.toDate());
 
-        await addDoc(collection(db, "emails"), {
-          ...original,
-          userId: user.uid,
-          workflowId: workflowRef.id,
-          scheduledAt: scheduledDate,
-          recipients: [toEmail],
-          source: {
-            refId: workflowRef.id,
-            type: "workflow"
-          },
-          status: "ready"
-        });
+        try {
+          await addDoc(collection(db, "emails"), {
+            ...original,
+            userId: user.uid,
+            workflowId: workflowRef.id,
+            scheduledAt: scheduledDate,
+            recipients: [toEmail],
+            source: {
+              refId: workflowRef.id,
+              type: "workflow"
+            },
+            status: "ready"
+          });
+        } catch (err) {
+          console.error("❌ Erreur ajout email :", err);
+        }
       }
     }
 
