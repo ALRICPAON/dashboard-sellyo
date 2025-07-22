@@ -37,15 +37,19 @@
       position: relative;
     }
     .remove-mail-btn {
-  background: #900;
-  color: white;
+  background: transparent;
   border: none;
-  border-radius: 4px;
-  padding: 0.3rem 0.6rem;
-  cursor: pointer;
+  color: #ccc;
+  font-size: 1.2rem;
   float: right;
+  cursor: pointer;
   margin-top: -2.2rem;
-  z-index: 1;
+  margin-right: 0.5rem;
+  transition: color 0.2s;
+}
+
+.remove-mail-btn:hover {
+  color: red;
 }
     .submit-btn, .add-mail-btn, .back-btn {
       margin-top: 1.5rem;
