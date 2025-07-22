@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (video) formData.append("video", video);
 
     try {
-      await addDoc(collection(db, "tunnels"), firestoreData);
+      const docRef = await addDoc(collection(db, "tunnels"), firestoreData);
       await fetch(webhookURL, { method: "POST", body: formData });
 
       // ⏱ Attente avant redirection
