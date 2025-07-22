@@ -152,5 +152,10 @@
       mailCount++;
     }
   </script>
+  <script type="module">
+  import { deleteWorkflow, editWorkflow } from './js/workflow-actions.js';
+  window.deleteWorkflow = deleteWorkflow;
+  window.editWorkflow = editWorkflow;
+</script>
 </body>
 </html>
