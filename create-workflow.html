@@ -8,6 +8,14 @@
   <script type="module" src="js/submit-workflow.js"></script>
   <script type="module" src="js/load-workflow-data.js"></script>
   <style>
+    .email-block select {
+  position: relative;
+  z-index: 0; /* Ajouté pour que le select passe SOUS le bouton 🗑️ */
+}
+
+.email-block .remove-btn {
+  z-index: 10; /* Par-dessus seulement le bloc */
+}
     body {
       background: #111;
       color: #fff;
