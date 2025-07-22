@@ -42,18 +42,32 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        await addDoc(collection(db, "workflows"), {
+        // Enregistre le workflow
+        const workflowRef = await addDoc(collection(db, "workflows"), {
           userId: user.uid,
           name,
           landingId,
           tunnelId,
           emails,
           createdAt: serverTimestamp(),
-          ready: true // 🔁 déclenche l'envoi automatique via Firebase Function
+          ready: true
         });
 
+        // Crée les emails programmés
+        const now = new Date();
+        for (const { emailId, delayDays } of emails) {
+          const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
+          await addDoc(collection(db, "emails"), {
+            userId: user.uid,
+            emailId: emailId,
+            workflowId: workflowRef.id,
+            scheduledAt: scheduledAt,
+            status: "ready"
+          });
+        }
+
         alert("✅ Workflow créé !");
-        window.location.reload(); // ou redirection
+        window.location.reload();
       } catch (err) {
         console.error("Erreur Firestore :", err);
         alert("❌ Une erreur est survenue.");
