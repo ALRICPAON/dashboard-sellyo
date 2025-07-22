@@ -28,6 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const productLink = document.getElementById("productLink")?.value || "";
     const productPrice = document.getElementById("productPrice")?.value || "";
     const replyTo = document.getElementById("replyTo").value;
+    const landingId = document.getElementById("landingId")?.value || null;
+const tunnelId = document.getElementById("tunnelId")?.value || null;
+
 
     const createdAt = new Date().toISOString();
     const slugFinal = `${slug}-${Math.floor(10000 + Math.random() * 90000)}`;
