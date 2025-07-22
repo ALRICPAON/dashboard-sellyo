@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Pour chaque lead : créer un email programmé avec destinataire
             for (const leadDoc of leadsSnapshot.docs) {
               const leadData = leadDoc.data();
-              console.log("👤 Lead détecté :", leadData.email); // Debug
+             console.log("🔍 leadData complet :", leadData);
 
               await addDoc(collection(db, "emails"), {
                 userId: user.uid,
