@@ -111,22 +111,29 @@
   </div>
 
   <script>
-    function addEmailBlock() {
-      const emailsList = document.getElementById('emails-list');
-      const block = document.createElement('div');
-      block.className = 'email-block';
-      block.innerHTML = `
-        <span>Email :
-          <select name="emailId[]">
-            <option value="">-- Sélectionner un email --</option>
-            <!-- Options ajoutées dynamiquement -->
-          </select>
-        </span>
-        <span>Délai d'envoi : J+ <input type="number" name="delayDays[]" min="0" value="0" style="width: 60px; display: inline-block; margin-left: 5px;" /></span>
-        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">🗑️</button>
-      `;
-      emailsList.appendChild(block);
-    }
-  </script>
+  function addEmailBlock() {
+    const emailsList = document.getElementById('emails-list');
+    const block = document.createElement('div');
+    block.className = 'email-block';
+
+    const selectOptions = availableEmails.map(email =>
+      `<option value="${email.id}">${email.name}</option>`
+    ).join('');
+
+    block.innerHTML = `
+      <span>Email :
+        <select name="emailId[]" class="email-id">
+          <option value="">-- Sélectionner un email --</option>
+          ${selectOptions}
+        </select>
+      </span>
+      <span>Délai d'envoi : J+ 
+        <input type="number" name="delayDays[]" class="delay-days" min="0" value="0" style="width: 60px; display: inline-block; margin-left: 5px;" />
+      </span>
+      <button type="button" class="remove-btn" onclick="this.parentElement.remove()">🗑️</button>
+    `;
+    emailsList.appendChild(block);
+  }
+</script>
 </body>
 </html>
