@@ -54,9 +54,17 @@
         
         <input type="hidden" name="type" value="email">
 
+         <input type="hidden" id="landingId" name="landingId" value="">
+<input type="hidden" id="tunnelId" name="tunnelId" value=""
+
         <button type="submit">Générer l'email</button>
       </form>
     </div>
   </main>
+  <script>
+  const params = new URLSearchParams(window.location.search);
+  document.getElementById("landingId").value = params.get("landingId") || "";
+  document.getElementById("tunnelId").value = params.get("tunnelId") || "";
+</script>
 </body>
 </html>
