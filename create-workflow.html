@@ -110,30 +110,18 @@
     </div>
   </div>
 
-  <script>
-  function addEmailBlock() {
-    const emailsList = document.getElementById('emails-list');
-    const block = document.createElement('div');
-    block.className = 'email-block';
+ // Récupération des emails
+const emailSelect = document.getElementById("emailIds");
 
-    const selectOptions = availableEmails.map(email =>
-      `<option value="${email.id}">${email.name}</option>`
-    ).join('');
+const qEmails = query(collection(db, "emails"), where("userId", "==", user.uid));
+const emailsSnap = await getDocs(qEmails);
 
-    block.innerHTML = `
-      <span>Email :
-        <select name="emailId[]" class="email-id">
-          <option value="">-- Sélectionner un email --</option>
-          ${selectOptions}
-        </select>
-      </span>
-      <span>Délai d'envoi : J+ 
-        <input type="number" name="delayDays[]" class="delay-days" min="0" value="0" style="width: 60px; display: inline-block; margin-left: 5px;" />
-      </span>
-      <button type="button" class="remove-btn" onclick="this.parentElement.remove()">🗑️</button>
-    `;
-    emailsList.appendChild(block);
-  }
-</script>
+emailsSnap.forEach((doc) => {
+  const data = doc.data();
+  const option = document.createElement("option");
+  option.value = doc.id;
+  option.textContent = data.name || "(Sans nom)";
+  emailSelect.appendChild(option);
+});
 </body>
 </html>
