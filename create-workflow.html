@@ -5,22 +5,12 @@
   <title>Créer un Workflow – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css" />
   <script type="module" src="js/firebase-auth-check.js"></script>
-  <script type="module" src="js/submit-workflow.js"></script>
   <script type="module" src="js/load-workflow-data.js"></script>
   <style>
-    .email-block select {
-  position: relative;
-  z-index: 0; /* Ajouté pour que le select passe SOUS le bouton 🗑️ */
-}
-
-.email-block .remove-btn {
-  z-index: 10; /* Par-dessus seulement le bloc */
-}
     body {
       background: #111;
       color: #fff;
       font-family: sans-serif;
-      margin: 0;
       padding: 2rem;
     }
     h1 {
@@ -28,34 +18,25 @@
     }
     label {
       display: block;
-      margin: 1rem 0 0.5rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
     }
-    input, select {
+    select, input {
       width: 100%;
       padding: 0.5rem;
       border-radius: 5px;
       border: none;
-      margin-bottom: 1rem;
       background: #222;
-      color: #fff;
+      color: white;
     }
-    .email-block {
+    .mail-block {
       background: #1c1c1c;
       padding: 1rem;
+      margin-top: 1rem;
       border-radius: 8px;
-      margin-bottom: 1rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .email-block select {
-      z-index: 1;
       position: relative;
     }
-    .email-block span {
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    .remove-btn {
+    .remove-mail-btn {
       position: absolute;
       top: 10px;
       right: 10px;
@@ -63,23 +44,26 @@
       color: white;
       border: none;
       border-radius: 4px;
-      padding: 0.2rem 0.6rem;
+      padding: 0.3rem 0.6rem;
       cursor: pointer;
-      z-index: 2;
     }
-    .add-email-btn, .submit-btn, .back-btn {
+    .submit-btn, .add-mail-btn, .back-btn {
+      margin-top: 1.5rem;
       padding: 0.7rem 1.5rem;
-      background: #0a84ff;
       border: none;
       border-radius: 5px;
       color: white;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 1rem;
-      margin-right: 1rem;
     }
-    .workflow-section {
-      margin-top: 3rem;
+    .submit-btn { background: #0a84ff; }
+    .add-mail-btn { background: #444; }
+    .back-btn {
+      background: transparent;
+      color: #ccc;
+      text-decoration: underline;
+      display: inline-block;
+      margin-bottom: 1rem;
     }
     .workflow-item {
       background: #1c1c1c;
@@ -90,71 +74,83 @@
   </style>
 </head>
 <body>
+  <a class="back-btn" href="emails.html">← Retour à mes mails</a>
   <h1>Créer un Workflow Email</h1>
 
   <form id="workflow-form">
     <label for="workflowName">Nom du workflow</label>
-    <input type="text" id="workflowName" name="workflowName" required />
+    <input type="text" id="workflowName" required>
 
-    <label for="associatedId">Associer à une landing ou un tunnel (optionnel)</label>
-    <select id="associatedId" name="associatedId">
-      <option value="">Aucun</option>
-      <!-- Dynamique : options ajoutées via JS -->
-    </select>
+    <label for="landingSelect">Landing associée</label>
+    <select id="landingSelect"><option value="">Aucune</option></select>
 
-    <div id="emails-list">
-      <!-- Blocs d'emails ajoutés ici -->
-    </div>
+    <label for="tunnelSelect">Tunnel associé</label>
+    <select id="tunnelSelect"><option value="">Aucun</option></select>
 
-    <button type="button" class="add-email-btn" onclick="addEmailBlock()">+ Ajouter un Email</button>
-    <button type="submit" class="submit-btn">Créer le workflow</button>
-    <a href="emails.html" class="back-btn">← Retour à mes Emails</a>
+    <div id="mail-blocks-container"></div>
+    <button type="button" class="add-mail-btn" onclick="addMailBlock()">+ Ajouter un mail</button>
+    <br>
+    <button type="submit" class="submit-btn">✅ Enregistrer le workflow</button>
   </form>
 
-  <div class="workflow-section">
-    <h2>Mes Workflows</h2>
-    <div id="existing-workflows">
-      <!-- Liste dynamique des workflows -->
-    </div>
-  </div>
-<script>
-  // Variables globales accessibles partout
-  window.availableEmails = [];
-  window.emailsReady = false;
+  <hr style="margin: 3rem 0; border-color: #333;">
+  <h2>Mes Workflows</h2>
+  <div id="existing-workflows"></div>
 
-  function addEmailBlock() {
-    if (!window.emailsReady || availableEmails.length === 0) {
-      alert("⏳ Les emails ne sont pas encore chargés. Veuillez patienter.");
-      return;
-    }
-
-    const emailsList = document.getElementById('emails-list');
-    const block = document.createElement('div');
-    block.className = 'email-block';
-
-    const selectOptions = availableEmails.map(email =>
-      `<option value="${email.id}">${email.name}</option>`
-    ).join('');
-
-    block.innerHTML = `
-      <span>Email :
-        <select name="emailId[]" class="email-id">
-          <option value="">-- Sélectionner un email --</option>
-          ${selectOptions}
-        </select>
-      </span>
-      <span>Délai d'envoi : J+ 
-        <input type="number" name="delayDays[]" class="delay-days" min="0" value="0" style="width: 60px; display: inline-block; margin-left: 5px;" />
-      </span>
-      <button type="button" class="remove-btn" onclick="this.parentElement.remove()">🗑️</button>
-    `;
-    emailsList.appendChild(block);
-  }
-</script>
   <script type="module">
-  import { deleteWorkflow, editWorkflow } from './js/workflow-actions.js';
-  window.deleteWorkflow = deleteWorkflow;
-  window.editWorkflow = editWorkflow;
-</script>
+    import { deleteWorkflow, editWorkflow } from './js/workflow-actions.js';
+    window.deleteWorkflow = deleteWorkflow;
+    window.editWorkflow = editWorkflow;
+  </script>
+  <script>
+    window.availableEmails = [];
+    window.emailsReady = false;
+    window.mailCount = 0;
+
+    function addMailBlock() {
+      if (!emailsReady || availableEmails.length === 0) {
+        alert("Les emails ne sont pas encore chargés.");
+        return;
+      }
+      if (window.mailCount >= 10) {
+        alert("Limite de 10 mails atteinte.");
+        return;
+      }
+
+      const container = document.getElementById("mail-blocks-container");
+      const div = document.createElement("div");
+      div.className = "mail-block";
+
+      const select = document.createElement("select");
+      select.name = "emailId";
+      availableEmails.forEach(email => {
+        const opt = document.createElement("option");
+        opt.value = email.id;
+        opt.textContent = email.name;
+        select.appendChild(opt);
+      });
+
+      const delayInput = document.createElement("input");
+      delayInput.type = "number";
+      delayInput.name = "delayDays";
+      delayInput.min = "0";
+      delayInput.placeholder = "J+ (ex: 0, 2, 5...)";
+      delayInput.style.marginTop = "0.5rem";
+
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "🗑️";
+      removeBtn.className = "remove-mail-btn";
+      removeBtn.onclick = () => {
+        container.removeChild(div);
+        mailCount--;
+      };
+
+      div.appendChild(select);
+      div.appendChild(delayInput);
+      div.appendChild(removeBtn);
+      container.appendChild(div);
+      mailCount++;
+    }
+  </script>
 </body>
 </html>
