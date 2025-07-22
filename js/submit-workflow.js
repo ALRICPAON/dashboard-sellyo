@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
               refId: workflowRef.id,
               type: "workflow"
             },
-            status: "ready"
+            status: "scheduled"
           });
         } catch (err) {
           console.error("❌ Erreur ajout email :", err);
