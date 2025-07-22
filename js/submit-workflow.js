@@ -59,11 +59,19 @@ document.addEventListener("DOMContentLoaded", () => {
     let leads = [];
     if (landingId || tunnelId) {
       const leadsRef = collection(db, "leads");
-      const conditions = [];
-   if (landingId) conditions.push(where("refId", "==", landingId));
-if (tunnelId) conditions.push(where("refId", "==", tunnelId));
+let q = null;
 
-      const q = query(leadsRef, ...conditions);
+if (landingId) {
+  q = query(leadsRef,
+    where("userId", "==", user.uid),
+    where("slug", "==", landingId)
+  );
+} else if (tunnelId) {
+  q = query(leadsRef,
+    where("userId", "==", user.uid),
+    where("slug", "==", tunnelId)
+  );
+}
       const snap = await getDocs(q);
       snap.forEach(doc => {
         const data = doc.data();
