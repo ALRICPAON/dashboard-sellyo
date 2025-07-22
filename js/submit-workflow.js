@@ -3,7 +3,7 @@ import {
   getAuth, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, serverTimestamp
+  getFirestore, collection, addDoc, serverTimestamp, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -55,29 +55,25 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🔹 Étape 2 : création des mails liés
         const now = new Date();
 
-        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        for (const { emailId, delayDays } of emails) {
+          const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
 
-// ...
+          const originalDoc = await getDoc(doc(db, "emails", emailId));
+          if (!originalDoc.exists()) continue;
+          const originalData = originalDoc.data();
 
-for (const { emailId, delayDays } of emails) {
-  const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
-
-  const originalDoc = await getDoc(doc(db, "emails", emailId));
-  if (!originalDoc.exists()) continue;
-  const originalData = originalDoc.data();
-
-  await addDoc(collection(db, "emails"), {
-    userId: user.uid,
-    emailId,
-    workflowId: workflowRef.id,
-    scheduledAt: scheduledAt,
-    status: "scheduled",
-    subject: originalData.subject || "",
-    url: originalData.url || "",
-    attachments: originalData.attachments || [],
-    associatedId: landingId || tunnelId || null
-  });
-}
+          await addDoc(collection(db, "emails"), {
+            userId: user.uid,
+            emailId,
+            workflowId: workflowRef.id,
+            scheduledAt: scheduledAt,
+            status: "scheduled",
+            subject: originalData.subject || "",
+            url: originalData.url || "",
+            attachments: originalData.attachments || [],
+            associatedId: landingId || tunnelId || null
+          });
+        }
 
         alert("✅ Workflow créé avec succès !");
         window.location.reload();
