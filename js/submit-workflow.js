@@ -21,22 +21,23 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById("workflow-name").value;
-      const associatedId = document.getElementById("associated-id").value;
-      const emailItems = document.querySelectorAll(".email-item");
+      const name = document.getElementById("workflowName").value.trim();
+      const landingId = document.getElementById("landingSelect").value || null;
+      const tunnelId = document.getElementById("tunnelSelect").value || null;
 
+      const blocks = document.querySelectorAll("#mail-blocks-container .mail-block");
       const emails = [];
 
-      emailItems.forEach(item => {
-        const emailId = item.querySelector(".email-id").value;
-        const delay = parseInt(item.querySelector(".delay-days").value || "0");
+      blocks.forEach((block) => {
+        const emailId = block.querySelector("select").value;
+        const delayDays = parseInt(block.querySelector("input").value || "0");
         if (emailId) {
-          emails.push({ emailId, delayDays: delay });
+          emails.push({ emailId, delayDays });
         }
       });
 
       if (!name || emails.length === 0) {
-        alert("Nom et au moins un email requis.");
+        alert("Le nom du workflow et au moins un email sont obligatoires.");
         return;
       }
 
@@ -44,15 +45,18 @@ document.addEventListener("DOMContentLoaded", () => {
         await addDoc(collection(db, "workflows"), {
           userId: user.uid,
           name,
-          associatedId: associatedId || null,
+          landingId,
+          tunnelId,
           emails,
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
+          ready: true // 🔁 déclenche l'envoi automatique via Firebase Function
         });
+
         alert("✅ Workflow créé !");
-        window.location.href = "workflows.html"; // ou une autre page de redirection
+        window.location.reload(); // ou redirection
       } catch (err) {
-        console.error("❌ Erreur Firestore :", err);
-        alert("Erreur lors de l'enregistrement.");
+        console.error("Erreur Firestore :", err);
+        alert("❌ Une erreur est survenue.");
       }
     });
   });
