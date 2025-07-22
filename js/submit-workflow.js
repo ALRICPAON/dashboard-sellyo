@@ -60,8 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (landingId || tunnelId) {
       const leadsRef = collection(db, "leads");
       const conditions = [];
-      if (landingId) conditions.push(where("source.refId", "==", landingId));
-      if (tunnelId) conditions.push(where("source.refId", "==", tunnelId));
+   if (landingId) conditions.push(where("refId", "==", landingId));
+if (tunnelId) conditions.push(where("refId", "==", tunnelId));
 
       const q = query(leadsRef, ...conditions);
       const snap = await getDocs(q);
