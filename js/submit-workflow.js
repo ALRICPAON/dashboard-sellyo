@@ -25,9 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const name = document.getElementById("workflow-name").value;
-    const landingId = document.getElementById("landing-select").value || null;
-    const tunnelId = document.getElementById("tunnel-select").value || null;
+  const name = document.getElementById("workflowName").value;
+const landingId = document.getElementById("landingSelect").value || null;
+const tunnelId = document.getElementById("tunnelSelect").value || null;
 
     const emails = [];
 
