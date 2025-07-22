@@ -3,7 +3,7 @@ import {
   getAuth, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp
+  getFirestore, collection, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -41,43 +41,35 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        // Étape 1 : créer le workflow
+        // 🔹 Étape 1 : création du workflow
         const workflowRef = await addDoc(collection(db, "workflows"), {
           userId: user.uid,
           name,
           landingId,
           tunnelId,
           emails,
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
+          ready: true
         });
 
-        // Étape 2 : récupérer les leads associés
-        let refId = landingId || tunnelId;
-        let q = query(collection(db, "leads"), where("source.refId", "==", refId));
-        const leadsSnapshot = await getDocs(q);
+        // 🔹 Étape 2 : création des mails liés
         const now = new Date();
 
-        // Étape 3 : programmer un mail pour chaque lead × email du workflow
-        for (const lead of leadsSnapshot.docs) {
-          const leadData = lead.data();
-          const recipient = leadData.email;
+        for (const { emailId, delayDays } of emails) {
+          const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
 
-          for (const { emailId, delayDays } of emails) {
-            const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
-
-            await addDoc(collection(db, "emails"), {
-              userId: user.uid,
-              emailId,
-              workflowId: workflowRef.id,
-              recipients: [recipient],
-              scheduledAt,
-              status: "scheduled"
-            });
-          }
+          await addDoc(collection(db, "emails"), {
+            userId: user.uid,
+            emailId,
+            workflowId: workflowRef.id,
+            scheduledAt: scheduledAt,
+            status: "scheduled"
+          });
         }
 
         alert("✅ Workflow créé avec succès !");
         window.location.reload();
+
       } catch (err) {
         console.error("Erreur Firestore :", err);
         alert("❌ Une erreur est survenue.");
