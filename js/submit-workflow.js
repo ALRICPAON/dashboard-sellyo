@@ -96,7 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // Pour chaque lead : créer un email programmé avec destinataire
             for (const leadDoc of leadsSnapshot.docs) {
               const leadData = leadDoc.data();
-             console.log("🔍 leadData complet :", leadData);
+             console.log("lead complet =", leadData);
+console.log("email récupéré =", leadData.email);
 
               await addDoc(collection(db, "emails"), {
                 userId: user.uid,
@@ -108,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 url: originalData.url || "",
                 attachments: originalData.attachments || [],
                 associatedId: landingId || tunnelId || null,
-                recipientEmail: leadData.email || null
+                recipientEmail: leadData.email ? leadData.email : "undefined@bug.com"
               });
             }
           }
