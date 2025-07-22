@@ -204,14 +204,14 @@ removeBtn.className = "remove-mail-btn";
 removeBtn.title = "Supprimer ce mail";
 removeBtn.onclick = () => {
   container.removeChild(div);
-  mailCount--;
+  window.mailCount++;
 };
 
       div.appendChild(select);
       div.appendChild(delayInput);
       div.appendChild(removeBtn);
       container.appendChild(div);
-      mailCount++;
+      window.mailCount++;
     }
   </script>
   <script type="module">
