@@ -1,10 +1,18 @@
 import { app } from "./firebase-init.js";
 import {
-  getAuth, onAuthStateChanged
+  getAuth,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, serverTimestamp,
-  doc, getDoc, getDocs, query, where
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -42,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
+        // 🔹 Étape 1 : création du workflow
         const workflowRef = await addDoc(collection(db, "workflows"), {
           userId: user.uid,
           name,
@@ -52,14 +61,17 @@ document.addEventListener("DOMContentLoaded", () => {
           ready: true
         });
 
+        // 🔹 Étape 2 : pour chaque email programmé
         const now = new Date();
 
         for (const { emailId, delayDays } of emails) {
           const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
+
           const originalDoc = await getDoc(doc(db, "emails", emailId));
           if (!originalDoc.exists()) continue;
           const originalData = originalDoc.data();
 
+          // 🔍 Cherche les leads associés
           const leadsQuery = query(
             collection(db, "leads"),
             where(landingId ? "landingId" : "tunnelId", "==", landingId || tunnelId)
@@ -67,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const leadsSnapshot = await getDocs(leadsQuery);
 
           if (leadsSnapshot.empty) {
+            // Aucun lead : créer un email générique sans destinataire
             await addDoc(collection(db, "emails"), {
               userId: user.uid,
               emailId,
@@ -76,11 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
               subject: originalData.subject || "",
               url: originalData.url || "",
               attachments: originalData.attachments || [],
-              associatedId: landingId || tunnelId || null
+              associatedId: landingId || tunnelId || null,
+              recipientEmail: null
             });
           } else {
+            // Pour chaque lead : créer un email programmé avec destinataire
             for (const leadDoc of leadsSnapshot.docs) {
               const leadData = leadDoc.data();
+              console.log("👤 Lead détecté :", leadData.email); // Debug
+
               await addDoc(collection(db, "emails"), {
                 userId: user.uid,
                 emailId,
@@ -91,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 url: originalData.url || "",
                 attachments: originalData.attachments || [],
                 associatedId: landingId || tunnelId || null,
-                recipientEmail: leadData.email || ""
+                recipientEmail: leadData.email || null
               });
             }
           }
@@ -101,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.reload();
 
       } catch (err) {
-        console.error("Erreur Firestore :", err);
+        console.error("❌ Erreur Firestore :", err);
         alert("❌ Une erreur est survenue.");
       }
     });
