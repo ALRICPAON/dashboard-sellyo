@@ -143,7 +143,10 @@
     <input type="text" id="workflowName" required>
 
     <label for="landingSelect">Landing associée</label>
-    <select id="landingSelect"><option value="">Aucune</option></select>
+    <select id="landingSelect">
+  <option value="">Aucune</option>
+  <!-- Les options sont injectées dynamiquement dans load-workflow-data.js -->
+</select>
 
     <label for="tunnelSelect">Tunnel associé</label>
     <select id="tunnelSelect"><option value="">Aucun</option></select>
