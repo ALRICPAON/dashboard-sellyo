@@ -35,9 +35,10 @@ onAuthStateChanged(auth, async (user) => {
   const qLandings = query(collection(db, "tunnels"), where("userId", "==", user.uid), where("type", "==", "landing"));
   const landingsSnap = await getDocs(qLandings);
   landingsSnap.forEach((doc) => {
+    const data = doc.data();
     const opt = document.createElement("option");
-    opt.value = doc.id;
-    opt.textContent = doc.data().name || "(Landing sans nom)";
+    opt.value = data.slug || doc.id;  // ✅ Utilise le slug si dispo
+    opt.textContent = data.name || data.slug || "(Landing sans nom)";
     landingSelect.appendChild(opt);
   });
 
@@ -46,9 +47,10 @@ onAuthStateChanged(auth, async (user) => {
   const qTunnels = query(collection(db, "tunnels"), where("userId", "==", user.uid), where("type", "==", "tunnel"));
   const tunnelsSnap = await getDocs(qTunnels);
   tunnelsSnap.forEach((doc) => {
+    const data = doc.data();
     const opt = document.createElement("option");
-    opt.value = doc.id;
-    opt.textContent = doc.data().name || "(Tunnel sans nom)";
+    opt.value = data.slug || doc.id;  // ✅ Utilise le slug si dispo
+    opt.textContent = data.name || data.slug || "(Tunnel sans nom)";
     tunnelSelect.appendChild(opt);
   });
 
