@@ -1,7 +1,6 @@
 import { app } from "./firebase-init.js";
 import {
   getAuth,
-  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore,
@@ -19,6 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Utilisateur non connecté");
+      return;
+    }
 
     const name = document.getElementById("workflow-name").value;
     const landingId = document.getElementById("landing-select").value || null;
@@ -38,29 +43,27 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        alert("Utilisateur non connecté");
-        return;
-      }
+    if (emails.length === 0) {
+      alert("Ajoute au moins un mail avec un délai J+.");
+      return;
+    }
 
-      const workflowData = {
-        name,
-        landingId,
-        tunnelId,
-        emails,
-        userId: user.uid,
-        createdAt: serverTimestamp()
-      };
+    const workflowData = {
+      name,
+      landingId,
+      tunnelId,
+      emails,
+      userId: user.uid,
+      createdAt: serverTimestamp()
+    };
 
-      try {
-        await addDoc(collection(db, "workflows"), workflowData);
-        alert("✅ Workflow enregistré !");
-        window.location.href = "emails.html";
-      } catch (error) {
-        console.error("Erreur lors de l'enregistrement du workflow :", error);
-        alert("❌ Erreur lors de l'enregistrement");
-      }
-    });
+    try {
+      await addDoc(collection(db, "workflows"), workflowData);
+      alert("✅ Workflow enregistré !");
+      window.location.href = "emails.html";
+    } catch (error) {
+      console.error("❌ Erreur Firebase :", error);
+      alert("❌ Erreur lors de l'enregistrement");
+    }
   });
 });
