@@ -58,12 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
         for (const { emailId, delayDays } of emails) {
           const scheduledAt = new Date(now.getTime() + delayDays * 24 * 60 * 60 * 1000);
           await addDoc(collection(db, "emails"), {
-            userId: user.uid,
-            emailId: emailId,
-            workflowId: workflowRef.id,
-            scheduledAt: scheduledAt,
-           status: "draft"
-          });
+  userId: user.uid,
+  emailId: emailId,
+  workflowId: workflowRef.id,
+  scheduledAt: scheduledAt,
+  status: "scheduled", // ✅ Et non "draft"
+});
         }
 
         alert("✅ Workflow créé !");
