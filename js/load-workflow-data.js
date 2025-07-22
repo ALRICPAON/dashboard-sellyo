@@ -5,37 +5,37 @@ import { getFirestore, collection, query, where, getDocs } from "https://www.gst
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+let availableEmails = []; // Liste globale des emails pour injection dans les blocs
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
     return;
   }
 
-  // 🔁 Récupération des emails
-  const emailSelect = document.getElementById("emailSelect");
+  // Récupère les emails de l'utilisateur
   const qEmails = query(collection(db, "emails"), where("userId", "==", user.uid));
   const emailsSnap = await getDocs(qEmails);
 
+  availableEmails = [];
   emailsSnap.forEach((doc) => {
+    const data = doc.data();
+    availableEmails.push({
+      id: doc.id,
+      name: data.name || "(Sans nom)"
+    });
+  });
+
+  // Récupère les tunnels/landings
+  const assocSelect = document.getElementById("associatedId");
+  const qTunnels = query(collection(db, "tunnels"), where("userId", "==", user.uid));
+  const tunnelsSnap = await getDocs(qTunnels);
+
+  tunnelsSnap.forEach((doc) => {
     const data = doc.data();
     const option = document.createElement("option");
     option.value = doc.id;
     option.textContent = data.name || "(Sans nom)";
-    emailSelect.appendChild(option);
-  });
-
-  // 🔁 Récupération des landings et tunnels
-  const assocSelect = document.getElementById("associatedIdSelect");
-  const tunnelsRef = collection(db, "tunnels");
-  const tunnelsSnap = await getDocs(tunnelsRef);
-
-  tunnelsSnap.forEach((doc) => {
-    const data = doc.data();
-    if (data.userId === user.uid) {
-      const option = document.createElement("option");
-      option.value = doc.id;
-      option.textContent = data.name || "(Sans nom)";
-      assocSelect.appendChild(option);
-    }
+    assocSelect.appendChild(option);
   });
 });
