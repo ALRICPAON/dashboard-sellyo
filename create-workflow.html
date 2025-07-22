@@ -204,7 +204,7 @@ removeBtn.className = "remove-mail-btn";
 removeBtn.title = "Supprimer ce mail";
 removeBtn.onclick = () => {
   container.removeChild(div);
-  window.mailCount++;
+  window.mailCount--;
 };
 
       div.appendChild(select);
@@ -214,10 +214,5 @@ removeBtn.onclick = () => {
       window.mailCount++;
     }
   </script>
-  <script type="module">
-  import { deleteWorkflow, editWorkflow } from './js/workflow-actions.js';
-  window.deleteWorkflow = deleteWorkflow;
-  window.editWorkflow = editWorkflow;
-</script>
 </body>
 </html>
