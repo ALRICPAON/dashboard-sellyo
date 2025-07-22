@@ -7,77 +7,132 @@
   <script type="module" src="js/firebase-auth-check.js"></script>
   <script type="module" src="js/load-workflow-data.js"></script>
   <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: sans-serif;
-      padding: 2rem;
-    }
-    h1 {
-      margin-bottom: 1rem;
-    }
-    label {
-      display: block;
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-    }
-    select, input {
-      width: 100%;
-      padding: 0.5rem;
-      border-radius: 5px;
-      border: none;
-      background: #222;
-      color: white;
-    }
-    .mail-block {
-      background: #1c1c1c;
-      padding: 1rem;
-      margin-top: 1rem;
-      border-radius: 8px;
-      position: relative;
-    }
- .remove-mail-btn {
-  all: unset; /* 🔥 réinitialise tout (padding, background, etc.) */
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  font-size: 1.2rem;
-  color: #888;
-  cursor: pointer;
-  z-index: 10;
-  line-height: 1;
-  width: auto;
-  height: auto;
-}
+    <style>
+  body {
+    background: #111;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 2rem;
+  }
 
-.remove-mail-btn:hover {
-  color: red;
-}
-    .submit-btn, .add-mail-btn, .back-btn {
-      margin-top: 1.5rem;
-      padding: 0.7rem 1.5rem;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .submit-btn { background: #0a84ff; }
-    .add-mail-btn { background: #444; }
-    .back-btn {
-      background: transparent;
-      color: #ccc;
-      text-decoration: underline;
-      display: inline-block;
-      margin-bottom: 1rem;
-    }
-    .workflow-item {
-      background: #1c1c1c;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-  </style>
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  form {
+    max-width: 700px;
+    margin: auto;
+  }
+
+  label {
+    display: block;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #ddd;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    border: none;
+    background: #1e1e1e;
+    color: white;
+    font-size: 1rem;
+    transition: border 0.2s;
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border: 2px solid #0a84ff;
+  }
+
+  .mail-block {
+    background: #1c1c1c;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    position: relative;
+    border: 1px solid #333;
+  }
+
+  .remove-mail-btn {
+    all: unset;
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 1.2rem;
+    color: #888;
+    cursor: pointer;
+    z-index: 10;
+    line-height: 1;
+  }
+
+  .remove-mail-btn:hover {
+    color: red;
+  }
+
+  .submit-btn, .add-mail-btn, .back-btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+  }
+
+  .submit-btn {
+    background: #0a84ff;
+    color: white;
+  }
+
+  .add-mail-btn {
+    background: #333;
+    color: #fff;
+    margin-left: 0.5rem;
+  }
+
+  .back-btn {
+    background: transparent;
+    color: #bbb;
+    text-decoration: underline;
+    display: inline-block;
+    margin-bottom: 2rem;
+  }
+
+  .workflow-section {
+    max-width: 900px;
+    margin: 4rem auto;
+  }
+
+  .workflow-item {
+    background: #1c1c1c;
+    padding: 1.2rem;
+    border-radius: 10px;
+    border: 1px solid #333;
+    margin-bottom: 1.5rem;
+  }
+
+  .workflow-item button {
+    margin-right: 0.5rem;
+  }
+
+  .workflow-item strong {
+    font-size: 1.1rem;
+    color: #fff;
+  }
+
+  .workflow-item em {
+    color: #aaa;
+    font-style: italic;
+  }
+</style>
 </head>
 <body>
   <a class="back-btn" href="emails.html">← Retour à mes mails</a>
