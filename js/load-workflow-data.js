@@ -1,6 +1,10 @@
 import { app } from "./firebase-init.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getAuth, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, query, where, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -11,11 +15,10 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // 🔁 Récupération des emails
+  // 🔁 Emails
   const qEmails = query(collection(db, "emails"), where("userId", "==", user.uid));
   const emailsSnap = await getDocs(qEmails);
-
-  window.availableEmails = []; // bien dans `window.` pour que le script inline les voie
+  window.availableEmails = [];
 
   emailsSnap.forEach((doc) => {
     const data = doc.data();
@@ -25,49 +28,55 @@ onAuthStateChanged(auth, async (user) => {
     });
   });
 
-  window.emailsReady = true; // ✅ ça active le bouton et les blocs
+  window.emailsReady = true;
 
-  // 🔁 Récupération des tunnels/landings
-  const assocSelect = document.getElementById("associatedId");
-  const tunnelsSnap = await getDocs(query(collection(db, "tunnels"), where("userId", "==", user.uid)));
-
-  tunnelsSnap.forEach((doc) => {
-    const data = doc.data();
-    const option = document.createElement("option");
-    option.value = doc.id;
-    option.textContent = data.name || "(Sans nom)";
-    assocSelect.appendChild(option);
+  // 🔁 Landings
+  const landingSelect = document.getElementById("landingSelect");
+  const qLandings = query(collection(db, "tunnels"), where("userId", "==", user.uid), where("type", "==", "landing"));
+  const landingsSnap = await getDocs(qLandings);
+  landingsSnap.forEach((doc) => {
+    const opt = document.createElement("option");
+    opt.value = doc.id;
+    opt.textContent = doc.data().name || "(Landing sans nom)";
+    landingSelect.appendChild(opt);
   });
 
-  // Optionnel : ajouter automatiquement un premier bloc email
-  addEmailBlock();
+  // 🔁 Tunnels
+  const tunnelSelect = document.getElementById("tunnelSelect");
+  const qTunnels = query(collection(db, "tunnels"), where("userId", "==", user.uid), where("type", "==", "tunnel"));
+  const tunnelsSnap = await getDocs(qTunnels);
+  tunnelsSnap.forEach((doc) => {
+    const opt = document.createElement("option");
+    opt.value = doc.id;
+    opt.textContent = doc.data().name || "(Tunnel sans nom)";
+    tunnelSelect.appendChild(opt);
+  });
+
+  // 🔁 Workflows
+  const workflowsContainer = document.getElementById("existing-workflows");
+  const qWorkflows = query(collection(db, "workflows"), where("userId", "==", user.uid));
+  const workflowsSnap = await getDocs(qWorkflows);
+
+  workflowsSnap.forEach((doc) => {
+    const data = doc.data();
+    const div = document.createElement("div");
+    div.className = "workflow-item";
+
+    const assoc = (data.landingId ? `📍 Landing: ${data.landingId}<br>` : '') +
+                  (data.tunnelId ? `🔗 Tunnel: ${data.tunnelId}<br>` : '');
+
+    const emails = (data.emails || []).map(e => `📧 ${e.emailId} → J+${e.delayDays}`).join("<br>");
+
+    div.innerHTML = `
+      <strong>${data.name}</strong><br>
+      ${assoc}
+      <div style="margin-top: 0.5rem;">${emails}</div>
+      <div style="margin-top: 1rem;">
+        <button class="submit-btn" onclick="editWorkflow('${doc.id}')">✏️ Modifier</button>
+        <button class="remove-btn" onclick="deleteWorkflow('${doc.id}', this)">🗑️ Supprimer</button>
+      </div>
+    `;
+
+    workflowsContainer.appendChild(div);
+  });
 });
-import {
-  doc, getDoc, getDocs, collection, query, where, deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// Charger les workflows existants
-const workflowContainer = document.getElementById("existing-workflows");
-const qWorkflows = query(collection(db, "workflows"), where("userId", "==", user.uid));
-const workflowsSnap = await getDocs(qWorkflows);
-
-for (const workflowDoc of workflowsSnap.docs) {
-  const wf = workflowDoc.data();
-  const div = document.createElement("div");
-  div.className = "workflow-item";
-
-  const assocName = wf.associatedId ? `(lié à ${wf.associatedId})` : "(non lié)";
-  const emailList = (wf.emails || []).map(email => `📧 ${email.emailId} → J+${email.delayDays}`).join("<br>");
-
-  div.innerHTML = `
-    <strong>${wf.name}</strong> <br>
-    <em>${assocName}</em><br>
-    <div style="margin-top: 0.5rem;">${emailList}</div>
-    <div style="margin-top: 1rem;">
-      <button class="submit-btn" onclick="editWorkflow('${workflowDoc.id}')">✏️ Modifier</button>
-      <button class="remove-btn" onclick="deleteWorkflow('${workflowDoc.id}', this)">🗑️ Supprimer</button>
-    </div>
-  `;
-
-  workflowContainer.appendChild(div);
-}
