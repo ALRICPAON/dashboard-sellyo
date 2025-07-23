@@ -122,3 +122,5 @@ window.deleteWorkflow = async function(workflowId) {
     alert("❌ Erreur lors de la suppression.");
   }
 };
+  }); // ✅ FIN de onAuthStateChanged
+
