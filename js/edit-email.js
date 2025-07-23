@@ -111,7 +111,10 @@ onAuthStateChanged(auth, async (user) => {
     if (sendBtn) {
       sendBtn.addEventListener("click", async () => {
         try {
-          await updateDoc(doc(db, "emails", id), { status: "ready" });
+         await updateDoc(doc(db, "emails", id), {
+  status: "ready",
+  source: { type: "manuel" } // ✅ On réassigne proprement à chaque update manuel
+});
 
           alert("📨 Le mail est maintenant prêt à être envoyé.");
         } catch (err) {
