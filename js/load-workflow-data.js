@@ -28,7 +28,7 @@ emailsSnap.forEach((doc) => {
   window.availableEmails.push({
     id: doc.id,
     name: data.name || "(Sans nom)",
-    status: data?.source?.status ?? "draft"
+   status: data.status ?? "draft"
   });
 });
 
