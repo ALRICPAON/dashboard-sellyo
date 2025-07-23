@@ -25,7 +25,7 @@ emailsSnap.forEach((doc) => {
   window.availableEmails.push({
     id: doc.id,
     name: data.name || "(Sans nom)",
-    status: data.status || "draft" // ✅ Ajout du statut ici
+   status: data.source?.status || "draft" // ✅ Ajout du statut ici
   });
 });
 
