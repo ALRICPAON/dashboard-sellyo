@@ -71,23 +71,21 @@ for (const workflowDoc of workflowsSnap.docs) {
   const assoc = (workflowData.landingId ? `📍 Landing: ${workflowData.landingId}<br>` : '') +
                 (workflowData.tunnelId ? `🔗 Tunnel: ${workflowData.tunnelId}<br>` : '');
 
-  // 📨 Charger les vrais emails liés à ce workflow
-  const qEmails = query(
-    collection(db, "emails"),
-    where("workflowId", "==", workflowDoc.id)
-  );
-  const emailsSnap = await getDocs(qEmails);
+  // 🔍 Emails liés à ce workflow (par champ `workflowId`)
+  const emailQuery = query(collection(db, "emails"), where("workflowId", "==", workflowDoc.id));
+  const emailSnap = await getDocs(emailQuery);
 
   let emailListHTML = "";
-  emailsSnap.forEach((doc) => {
+  emailSnap.forEach((doc) => {
     const data = doc.data();
     const name = data.name || "(Sans nom)";
     const status = data.status || "inconnu";
     const to = data.recipients?.[0] || "non défini";
+    const delay = data.scheduledAt ? `🕒 ${new Date(data.scheduledAt.toDate()).toLocaleString()}` : "⏱️ -";
 
     emailListHTML += `
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span>📧 ${name} <em>[${status}]</em> → ${to}</span>
+        <span>📧 ${name} <em>[${status}]</em> → ${to} <small>${delay}</small></span>
         <button onclick="removeEmailFromWorkflow('${workflowDoc.id}', '${doc.id}')" style="background:none;border:none;color:#f55;cursor:pointer;font-size:1.2rem;">🗑️</button>
       </div>
     `;
@@ -97,7 +95,7 @@ for (const workflowDoc of workflowsSnap.docs) {
     <strong>${workflowData.name}</strong><br>
     ${assoc}
     <div style="margin-top: 0.5rem;">
-      ${emailListHTML}
+      ${emailListHTML || "<em>Aucun email trouvé pour ce workflow.</em>"}
     </div>
     <div style="margin-top: 1rem;">
       <button class="submit-btn" onclick="editWorkflow('${workflowDoc.id}')">✏️ Modifier</button>
