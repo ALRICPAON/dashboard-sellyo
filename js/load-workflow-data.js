@@ -23,7 +23,11 @@ window.availableEmails = [];
 emailsSnap.forEach((doc) => {
   const data = doc.data();
 
-  console.log("📬 EMAIL ID", doc.id, "FULL DATA:", data); // ✅ Affiche tout
+  // ✅ Ne garder que les mails créés manuellement ou liés à des leads
+  const typeSource = data.source?.type || null;
+  if (typeSource !== "manuel" && typeSource !== "leads") return;
+
+  console.log("📬 EMAIL ID", doc.id, "FULL DATA:", data);
 
   window.availableEmails.push({
     id: doc.id,
