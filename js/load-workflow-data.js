@@ -111,15 +111,29 @@ for (const workflowDoc of workflowsSnap.docs) {
 
 // ✅ Fonction placée au bon endroit, une seule fois
 window.deleteWorkflow = async function(workflowId) {
-  if (!confirm("❌ Supprimer ce workflow ? Les emails associés ne seront pas supprimés.")) return;
+  if (!confirm("❌ Supprimer ce workflow et tous les emails associés ?")) return;
 
   try {
+    // 🔁 Supprimer tous les emails liés à ce workflow
+    const emailQuery = query(collection(db, "emails"), where("workflowId", "==", workflowId));
+    const emailSnap = await getDocs(emailQuery);
+
+    const deletePromises = [];
+    emailSnap.forEach((docSnap) => {
+      deletePromises.push(deleteDoc(doc(db, "emails", docSnap.id)));
+    });
+
+    await Promise.all(deletePromises); // supprime tous les mails
+
+    // 🗑️ Supprimer le workflow
     await deleteDoc(doc(db, "workflows", workflowId));
-    alert("✅ Workflow supprimé !");
+
+    alert("✅ Workflow et emails associés supprimés !");
     location.reload();
+
   } catch (err) {
-    console.error("Erreur suppression workflow :", err);
-    alert("❌ Erreur lors de la suppression.");
+    console.error("❌ Erreur suppression workflow ou emails :", err);
+    alert("❌ Erreur lors de la suppression du workflow ou des emails.");
   }
 };
   }); // ✅ FIN de onAuthStateChanged
