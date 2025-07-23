@@ -72,7 +72,7 @@ window.emailsReady = true;
   const emailInfo = window.availableEmails.find(m => m.id === e.emailId);
   const name = emailInfo?.name || e.emailId;
   const status = emailInfo?.status || "inconnu";
-  return `📧 ${name} <em>[${status}]</em> → J+${e.delayDays ?? "?"}`;
+  return `📧 ${name} <em>[${status}]</em> → J+${e.delay ?? "?"}`;
 }).join("<br>");
 
     div.innerHTML = `
@@ -85,9 +85,9 @@ window.emailsReady = true;
     const status = emailInfo?.status || "inconnu";
     return `
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span>📧 ${name} <em>[${status}]</em> → J+${e.delayDays ?? "?"}</span>
-        <button onclick="removeEmailFromWorkflow('${doc.id}', '${e.emailId}')" style="background:none;border:none;color:#f55;cursor:pointer;font-size:1.2rem;">🗑️</button>
-      </div>
+  <span>📧 ${name} <em>[${status}]</em> → J+${e.delay ?? "?"}</span>
+  <button onclick="removeEmailFromWorkflow('${doc.id}', '${e.emailId}')" style="background:none;border:none;color:#f55;cursor:pointer;font-size:1.2rem;">🗑️</button>
+</div>
     `;
   }).join("")}
 </div>
