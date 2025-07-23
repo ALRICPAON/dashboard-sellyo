@@ -45,6 +45,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (emails.length === 0) return alert("Ajoute au moins un mail.");
 
     // 1. Créer le workflow
+    // 🔒 Vérifie si un workflow existe déjà avec le même landingId ou tunnelId
+const q1 = query(
+  collection(db, "workflows"),
+  where("userId", "==", user.uid),
+  where("landingId", "==", landingId || "")
+);
+const q2 = query(
+  collection(db, "workflows"),
+  where("userId", "==", user.uid),
+  where("tunnelId", "==", tunnelId || "")
+);
+
+const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+
+if (!snap1.empty || !snap2.empty) {
+  alert("⚠️ Un workflow est déjà associé à cette landing ou tunnel. Supprimez-le ou modifiez-le avant d’en créer un nouveau.");
+  return;
+}
     const workflowRef = await addDoc(collection(db, "workflows"), {
       userId: user.uid,
       name,
