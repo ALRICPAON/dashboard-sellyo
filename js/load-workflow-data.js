@@ -133,6 +133,7 @@ window.deleteWorkflow = async function(workflowId) {
 
   } catch (err) {
     console.error("❌ Erreur suppression workflow ou emails :", err);
+    console.log("💥 Détail de l'erreur Firebase :", JSON.stringify(err, null, 2));
     alert("❌ Erreur lors de la suppression du workflow ou des emails.");
   }
 };
