@@ -102,11 +102,23 @@ for (const workflowDoc of workflowsSnap.docs) {
       ${emailListHTML || "<em>Aucun email trouvé pour ce workflow.</em>"}
     </div>
     <div style="margin-top: 1rem;">
-      <button class="submit-btn" onclick="editWorkflow('${workflowDoc.id}')">✏️ Modifier</button>
+     <button class="submit-btn" onclick="deleteWorkflow('${workflowDoc.id}')">🗑️ Supprimer</button>
     </div>
   `;
 
   workflowsContainer.appendChild(div);
-  } // ← fin du for...of (tu l'as déjà)
-}); // ✅ FIN de onAuthStateChanged
+} // ← fin du for...of
 
+// ✅ Fonction placée au bon endroit, une seule fois
+window.deleteWorkflow = async function(workflowId) {
+  if (!confirm("❌ Supprimer ce workflow ? Les emails associés ne seront pas supprimés.")) return;
+
+  try {
+    await deleteDoc(doc(db, "workflows", workflowId));
+    alert("✅ Workflow supprimé !");
+    location.reload();
+  } catch (err) {
+    console.error("Erreur suppression workflow :", err);
+    alert("❌ Erreur lors de la suppression.");
+  }
+};
