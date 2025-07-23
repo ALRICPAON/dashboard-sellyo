@@ -78,7 +78,19 @@ window.emailsReady = true;
     div.innerHTML = `
       <strong>${data.name}</strong><br>
       ${assoc}
-      <div style="margin-top: 0.5rem;">${emails}</div>
+      <div style="margin-top: 0.5rem;">
+  ${(data.emails || []).map(e => {
+    const emailInfo = window.availableEmails.find(m => m.id === e.emailId);
+    const name = emailInfo?.name || e.emailId;
+    const status = emailInfo?.status || "inconnu";
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>📧 ${name} <em>[${status}]</em> → J+${e.delayDays ?? "?"}</span>
+        <button onclick="removeEmailFromWorkflow('${doc.id}', '${e.emailId}')" style="background:none;border:none;color:#f55;cursor:pointer;font-size:1.2rem;">🗑️</button>
+      </div>
+    `;
+  }).join("")}
+</div>
       <div style="margin-top: 1rem;">
        <button class="submit-btn" onclick="editWorkflow('${doc.id}')">✏️ Modifier</button>
       </div>
@@ -87,3 +99,17 @@ window.emailsReady = true;
     workflowsContainer.appendChild(div);
   });
 });
+window.removeEmailFromWorkflow = async (workflowId, emailId) => {
+  if (!confirm("Supprimer cet email du workflow ?")) return;
+
+  const workflowRef = doc(db, "workflows", workflowId);
+  const workflowSnap = await getDoc(workflowRef);
+
+  if (!workflowSnap.exists()) return alert("Workflow introuvable.");
+
+  const data = workflowSnap.data();
+  const updatedEmails = (data.emails || []).filter(e => e.emailId !== emailId);
+
+  await updateDoc(workflowRef, { emails: updatedEmails });
+  alert("Email supprimé. Rechargez la page pour voir les changements.");
+};
