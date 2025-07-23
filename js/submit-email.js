@@ -76,10 +76,20 @@ await addDoc(collection(db, "emails"), {
 
       // ✅ Redirection
       // Affiche un message de création en cours
+popup.innerHTML = ""; // évite la double popup
 popup.innerHTML = `
-  <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);color:white;display:flex;align-items:center;justify-content:center;z-index:9999;padding:2rem;text-align:center;font-size:1.2rem;">
-    ⏳ Création de votre email...<br><br>Merci de patienter jusqu’à <strong>1min30</strong>.<br>Ne fermez pas cette page.
-  </div>`;
+  <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:2rem;text-align:center;font-size:1.2rem;">
+    <div class="loader" style="border: 5px solid #444; border-top: 5px solid #0af; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 2rem;"></div>
+    <p>⏳ <strong>Création de votre email...</strong></p>
+    <p>Merci de patienter jusqu’à <strong>1min30</strong>.<br>Ne fermez pas cette page.</p>
+  </div>
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+`;
 // Redirection après 60 secondes
 setTimeout(() => {
   window.location.href = "emails.html";
