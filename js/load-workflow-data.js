@@ -58,61 +58,61 @@ window.emailsReady = true;
     tunnelSelect.appendChild(opt);
   });
 
-  // 🔁 Workflows
-  const workflowsContainer = document.getElementById("existing-workflows");
-  const qWorkflows = query(collection(db, "workflows"), where("userId", "==", user.uid));
-  const workflowsSnap = await getDocs(qWorkflows);
+// 🔁 Workflows
+const workflowsContainer = document.getElementById("existing-workflows");
+const qWorkflows = query(collection(db, "workflows"), where("userId", "==", user.uid));
+const workflowsSnap = await getDocs(qWorkflows);
 
-  workflowsSnap.forEach((doc) => {
+workflowsSnap.forEach(async (workflowDoc) => {
+  const workflowData = workflowDoc.data();
+  const div = document.createElement("div");
+  div.className = "workflow-item";
+
+  const assoc = (workflowData.landingId ? `📍 Landing: ${workflowData.landingId}<br>` : '') +
+                (workflowData.tunnelId ? `🔗 Tunnel: ${workflowData.tunnelId}<br>` : '');
+
+  // 📨 Charger les vrais emails liés à ce workflow
+  const qEmails = query(
+    collection(db, "emails"),
+    where("workflowId", "==", workflowDoc.id)
+  );
+  const emailsSnap = await getDocs(qEmails);
+
+  let emailListHTML = "";
+  emailsSnap.forEach((doc) => {
     const data = doc.data();
-    const div = document.createElement("div");
-    div.className = "workflow-item";
+    const name = data.name || "(Sans nom)";
+    const status = data.status || "inconnu";
+    const to = data.recipients?.[0] || "non défini";
 
-    const assoc = (data.landingId ? `📍 Landing: ${data.landingId}<br>` : '') +
-                  (data.tunnelId ? `🔗 Tunnel: ${data.tunnelId}<br>` : '');
-
-    const emails = (data.emails || []).map(e => {
-  const emailInfo = window.availableEmails.find(m => m.id === e.emailId);
-  const name = emailInfo?.name || e.emailId;
-  const status = emailInfo?.status || "inconnu";
-  return `📧 ${name} <em>[${status}]</em> → J+${e.delay ?? "?"}`;
-}).join("<br>");
-
-    div.innerHTML = `
-      <strong>${data.name}</strong><br>
-      ${assoc}
-      <div style="margin-top: 0.5rem;">
-  ${(data.emails || []).map(e => {
-    const emailInfo = window.availableEmails.find(m => m.id === e.emailId);
-    const name = emailInfo?.name || e.emailId;
-    const status = emailInfo?.status || "inconnu";
-    return `
+    emailListHTML += `
       <div style="display:flex;justify-content:space-between;align-items:center;">
-  <span>📧 ${name} <em>[${status}]</em> → J+${e.delay ?? "?"}</span>
-  <button onclick="removeEmailFromWorkflow('${doc.id}', '${e.emailId}')" style="background:none;border:none;color:#f55;cursor:pointer;font-size:1.2rem;">🗑️</button>
-</div>
-    `;
-  }).join("")}
-</div>
-      <div style="margin-top: 1rem;">
-       <button class="submit-btn" onclick="editWorkflow('${doc.id}')">✏️ Modifier</button>
+        <span>📧 ${name} <em>[${status}]</em> → ${to}</span>
+        <button onclick="removeEmailFromWorkflow('${workflowDoc.id}', '${doc.id}')" style="background:none;border:none;color:#f55;cursor:pointer;font-size:1.2rem;">🗑️</button>
       </div>
     `;
-
-    workflowsContainer.appendChild(div);
   });
+
+  div.innerHTML = `
+    <strong>${workflowData.name}</strong><br>
+    ${assoc}
+    <div style="margin-top: 0.5rem;">
+      ${emailListHTML}
+    </div>
+    <div style="margin-top: 1rem;">
+      <button class="submit-btn" onclick="editWorkflow('${workflowDoc.id}')">✏️ Modifier</button>
+    </div>
+  `;
+
+  workflowsContainer.appendChild(div);
 });
-window.removeEmailFromWorkflow = async (workflowId, emailId) => {
+
+// 🔥 Suppression réelle des emails liés à un workflow
+window.removeEmailFromWorkflow = async (workflowId, emailDocId) => {
   if (!confirm("Supprimer cet email du workflow ?")) return;
 
-  const workflowRef = doc(db, "workflows", workflowId);
-  const workflowSnap = await getDoc(workflowRef);
+  const emailRef = doc(db, "emails", emailDocId);
+  await deleteDoc(emailRef);
 
-  if (!workflowSnap.exists()) return alert("Workflow introuvable.");
-
-  const data = workflowSnap.data();
-  const updatedEmails = (data.emails || []).filter(e => e.emailId !== emailId);
-
-  await updateDoc(workflowRef, { emails: updatedEmails });
   alert("Email supprimé. Rechargez la page pour voir les changements.");
 };
