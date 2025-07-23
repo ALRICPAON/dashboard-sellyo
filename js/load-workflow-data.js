@@ -15,20 +15,21 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // 🔁 Emails
-  const qEmails = query(collection(db, "emails"), where("userId", "==", user.uid));
-  const emailsSnap = await getDocs(qEmails);
-  window.availableEmails = [];
+ // 🔁 Emails
+const qEmails = query(collection(db, "emails"), where("userId", "==", user.uid));
+const emailsSnap = await getDocs(qEmails);
+window.availableEmails = [];
 
-  emailsSnap.forEach((doc) => {
-    const data = doc.data();
-    window.availableEmails.push({
-      id: doc.id,
-      name: data.name || "(Sans nom)"
-    });
+emailsSnap.forEach((doc) => {
+  const data = doc.data();
+  window.availableEmails.push({
+    id: doc.id,
+    name: data.name || "(Sans nom)",
+    status: data.status || "draft" // ✅ Ajout du statut ici
   });
+});
 
-  window.emailsReady = true;
+window.emailsReady = true;
 
   // 🔁 Landings
   const landingSelect = document.getElementById("landingSelect");
@@ -67,7 +68,12 @@ onAuthStateChanged(auth, async (user) => {
     const assoc = (data.landingId ? `📍 Landing: ${data.landingId}<br>` : '') +
                   (data.tunnelId ? `🔗 Tunnel: ${data.tunnelId}<br>` : '');
 
-    const emails = (data.emails || []).map(e => `📧 ${e.emailId} → J+${e.delayDays}`).join("<br>");
+    const emails = (data.emails || []).map(e => {
+  const emailInfo = window.availableEmails.find(m => m.id === e.emailId);
+  const name = emailInfo?.name || e.emailId;
+  const status = emailInfo?.status || "inconnu";
+  return `📧 ${name} <em>[${status}]</em> → J+${e.delayDays ?? "?"}`;
+}).join("<br>");
 
     div.innerHTML = `
       <strong>${data.name}</strong><br>
