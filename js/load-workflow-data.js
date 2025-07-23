@@ -103,4 +103,6 @@ for (const workflowDoc of workflowsSnap.docs) {
   `;
 
   workflowsContainer.appendChild(div);
-}
+  } // ← fin du for...of (tu l'as déjà)
+}); // ✅ FIN de onAuthStateChanged
+
