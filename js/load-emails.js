@@ -54,16 +54,19 @@ onAuthStateChanged(auth, async (user) => {
     ready: "scheduled"
   };
 
-  const q = query(
+ const q = query(
   collection(db, "emails"),
-  where("userId", "==", user.uid),
-  where("source.type", "==", "manuel")
+  where("userId", "==", user.uid)
 );
-  const querySnapshot = await getDocs(q);
+const querySnapshot = await getDocs(q);
   emailsList.innerHTML = "";
 
   querySnapshot.forEach((docSnap) => {
     const data = docSnap.data();
+    const isWorkflow = data.isWorkflow === true;
+const isManuelOrLeads = data.source?.type === "manuel" || data.source?.type === "leads";
+
+if (isWorkflow || !isManuelOrLeads) return;
     const id = docSnap.id;
     const slug = extractSlugFromURL(data.url || "");
 
