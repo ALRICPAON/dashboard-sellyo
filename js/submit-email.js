@@ -67,11 +67,12 @@ await addDoc(collection(db, "emails"), {
   url: `https://alricpaon.github.io/sellyo-hosting/emails/${encodeURIComponent(slugFinal)}.html`,
   type: "email",
   status: "draft",
-  source: {
-    type: "manuel"
-  },
-  ...(landingId && { landingId }),
-  ...(tunnelId && { tunnelId })
+ source: {
+  type: "manuel",
+  refId: landingId || tunnelId || null
+},
+landingId: landingId || null,
+tunnelId: tunnelId || null
 });
 
       // ✅ Redirection
