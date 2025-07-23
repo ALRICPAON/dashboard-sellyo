@@ -63,7 +63,7 @@ const workflowsContainer = document.getElementById("existing-workflows");
 const qWorkflows = query(collection(db, "workflows"), where("userId", "==", user.uid));
 const workflowsSnap = await getDocs(qWorkflows);
 
-workflowsSnap.forEach(async (workflowDoc) => {
+for (const workflowDoc of workflowsSnap.docs) {
   const workflowData = workflowDoc.data();
   const div = document.createElement("div");
   div.className = "workflow-item";
@@ -105,14 +105,4 @@ workflowsSnap.forEach(async (workflowDoc) => {
   `;
 
   workflowsContainer.appendChild(div);
-});
-
-// 🔥 Suppression réelle des emails liés à un workflow
-window.removeEmailFromWorkflow = async (workflowId, emailDocId) => {
-  if (!confirm("Supprimer cet email du workflow ?")) return;
-
-  const emailRef = doc(db, "emails", emailDocId);
-  await deleteDoc(emailRef);
-
-  alert("Email supprimé. Rechargez la page pour voir les changements.");
-};
+}
