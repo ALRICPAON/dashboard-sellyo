@@ -54,7 +54,11 @@ onAuthStateChanged(auth, async (user) => {
     ready: "scheduled"
   };
 
-  const q = query(collection(db, "emails"), where("userId", "==", user.uid));
+  const q = query(
+  collection(db, "emails"),
+  where("userId", "==", user.uid),
+  where("source.type", "==", "manuel")
+);
   const querySnapshot = await getDocs(q);
   emailsList.innerHTML = "";
 
