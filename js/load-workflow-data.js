@@ -23,12 +23,12 @@ window.availableEmails = [];
 emailsSnap.forEach((doc) => {
   const data = doc.data();
 
-  console.log("EMAIL DATA 🔍", doc.id, data.source); // ✅ ICI
+  console.log("📬 EMAIL ID", doc.id, "FULL DATA:", data); // ✅ Affiche tout
 
   window.availableEmails.push({
     id: doc.id,
     name: data.name || "(Sans nom)",
-   status: data.status ?? "draft"
+    status: data.status || "⛔ (absent)"
   });
 });
 
