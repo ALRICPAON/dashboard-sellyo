@@ -3,7 +3,13 @@ import {
   getAuth, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, query, where, getDocs
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,        // ✅ pour cibler un document
+  deleteDoc   // ✅ pour le supprimer
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
