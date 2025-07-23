@@ -22,10 +22,13 @@ window.availableEmails = [];
 
 emailsSnap.forEach((doc) => {
   const data = doc.data();
+
+  console.log("EMAIL DATA 🔍", doc.id, data.source); // ✅ ICI
+
   window.availableEmails.push({
     id: doc.id,
     name: data.name || "(Sans nom)",
-   status: data.source?.status || "draft" // ✅ Ajout du statut ici
+    status: data?.source?.status ?? "draft"
   });
 });
 
