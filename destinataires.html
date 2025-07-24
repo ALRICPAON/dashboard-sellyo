@@ -70,6 +70,13 @@
   </div>
 
   <div class="section">
+  <label for="lead-dropdown">👤 Sélectionner un lead dans une liste</label>
+  <select id="lead-dropdown">
+    <option value="">-- Sélectionner un lead --</option>
+  </select>
+</div>
+  
+  <div class="section">
   <label>📋 Leads existants (coche ceux à qui envoyer)</label>
   <div id="leads-list" style="margin-top:1rem;"></div>
 </div>
@@ -106,6 +113,7 @@
   const feedback = document.getElementById("feedback");
   const leadsList = document.getElementById("leads-list");
   const dropdown = document.getElementById("link-content");
+   const leadDropdown = document.getElementById("lead-dropdown");
 
   let allLeads = [];
 
@@ -127,20 +135,29 @@
 
     // 🔄 Affichage des leads
     function renderLeads(leadsToRender) {
-      leadsList.innerHTML = "";
-      leadsToRender.forEach(lead => {
-        const label = `${lead.name || "-"} (${lead.email}) [${lead?.source?.name || "-"}]`;
-        const container = document.createElement("div");
-        container.style.marginBottom = "0.5rem";
-        container.innerHTML = `
-          <label>
-            <input type="checkbox" value="${lead.email}" />
-            ${label}
-          </label>
-        `;
-        leadsList.appendChild(container);
-      });
-    }
+  leadsList.innerHTML = "";
+  leadDropdown.innerHTML = `<option value="">-- Sélectionner un lead --</option>`;
+
+  leadsToRender.forEach(lead => {
+    const label = `${lead.name || "-"} (${lead.email}) [${lead?.source?.name || "-"}]`;
+
+    const container = document.createElement("div");
+    container.style.marginBottom = "0.5rem";
+    container.innerHTML = `
+      <label>
+        <input type="checkbox" value="${lead.email}" />
+        ${label}
+      </label>
+    `;
+    leadsList.appendChild(container);
+
+    // 🆕 Ajouter dans la dropdown
+    const opt = document.createElement("option");
+    opt.value = lead.email;
+    opt.innerText = label;
+    leadDropdown.appendChild(opt);
+  });
+}
 
     // 🔄 Charger les tunnels ou landings
     const tunnelsQuery = query(collection(db, "tunnels"), where("userId", "==", user.uid));
@@ -196,6 +213,19 @@
       }
     });
   });
+   // 🔁 Quand on sélectionne un lead dans la liste déroulante, cocher automatiquement
+leadDropdown.addEventListener("change", () => {
+  const selectedEmail = leadDropdown.value;
+  if (!selectedEmail) return;
+
+  const checkbox = [...leadsList.querySelectorAll("input[type='checkbox']")]
+    .find(cb => cb.value === selectedEmail);
+
+  if (checkbox) {
+    checkbox.checked = true;
+    checkbox.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+});
 </script>
 </body>
 </html>
