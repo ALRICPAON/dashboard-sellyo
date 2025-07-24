@@ -68,15 +68,15 @@ onAuthStateChanged(auth, async (user) => {
   const tunnelsQuery = query(collection(db, "tunnels"), where("userId", "==", user.uid));
   const tunnelsSnap = await getDocs(tunnelsQuery);
 
-  tunnelsSnap.forEach(doc => {
-    const data = doc.data();
-    const opt = document.createElement("option");
-    opt.value = data.name;
-    opt.innerText = `${data.name} (${data.type || "tunnel"})`;
-    opt.dataset.type = data.type;
-    opt.dataset.name = data.name;
-    dropdown.appendChild(opt);
-  });
+tunnelsSnap.forEach(doc => {
+  const data = doc.data();
+  const opt = document.createElement("option");
+  opt.value = doc.id; // ✅ ID utilisé pour retrouver les leads
+  opt.innerText = `${data.name} (${data.type || "tunnel"})`;
+  opt.dataset.type = data.type;
+  opt.dataset.name = data.name;
+  dropdown.appendChild(opt);
+});
 
   console.log("📂 Tunnels/landings chargés :", tunnelsSnap.docs.map(d => d.data()));
 
@@ -84,22 +84,21 @@ onAuthStateChanged(auth, async (user) => {
   renderLeads(allLeads);
 
   // 🔄 Filtrer les leads selon contenu sélectionné
-  dropdown.addEventListener("change", () => {
-    const selectedOption = dropdown.options[dropdown.selectedIndex];
-    const selectedType = selectedOption.dataset.type;
-    const selectedName = selectedOption.dataset.name;
+dropdown.addEventListener("change", () => {
+  const selectedRefId = dropdown.value;
 
-    if (!selectedType || !selectedName) {
-      renderLeads(allLeads);
-      return;
-    }
+  if (!selectedRefId) {
+    renderLeads(allLeads); // aucun choix → on affiche tous les leads
+    return;
+  }
 
-    const filtered = allLeads.filter(
-      l => l.source?.type === selectedType && l.source?.name === selectedName
-    );
+  const filtered = allLeads.filter(
+    l => l.source?.refId === selectedRefId
+  );
 
-    renderLeads(filtered);
-  });
+  console.log("🎯 Leads filtrés pour refId =", selectedRefId, ":", filtered.map(l => l.email));
+  renderLeads(filtered);
+});
 
   // 💾 Sauvegarde des destinataires
   saveBtn.addEventListener("click", async () => {
@@ -118,10 +117,11 @@ onAuthStateChanged(auth, async (user) => {
       await updateDoc(ref, {
         recipients: allRecipients,
         source: dropdown.selectedIndex > 0
-          ? {
-              type: dropdown.options[dropdown.selectedIndex].dataset.type,
-              name: dropdown.options[dropdown.selectedIndex].dataset.name
-            }
+  ? {
+      type: dropdown.options[dropdown.selectedIndex].dataset.type,
+      name: dropdown.options[dropdown.selectedIndex].dataset.name,
+      refId: dropdown.value // ✅ on enregistre bien l'ID (pour filtrage lead)
+    }
           : manualEmails.length > 0
             ? { type: "manual" }
             : { type: "leads" }
