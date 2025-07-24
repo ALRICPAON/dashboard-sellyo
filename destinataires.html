@@ -187,6 +187,7 @@
 
     // 🔘 Affichage initial = tous les leads
     renderLeads(allLeads);
+    document.querySelector(".section:nth-of-type(3)").style.display = "none";
 
     // ✅ Enregistrement quand clic bouton "Enregistrer"
     saveBtn.addEventListener("click", async () => {
