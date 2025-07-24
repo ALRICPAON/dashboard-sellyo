@@ -201,14 +201,6 @@
       delayInput.placeholder = "J+ (ex: 0, 2, 5...)";
       delayInput.style.marginTop = "0.5rem";
 
-      const removeBtn = document.createElement("button");
-removeBtn.innerHTML = "🗑️";
-removeBtn.className = "remove-mail-btn";
-removeBtn.title = "Supprimer ce mail";
-removeBtn.onclick = () => {
-  container.removeChild(div);
-  window.mailCount--;
-};
 
       div.appendChild(select);
       div.appendChild(delayInput);
