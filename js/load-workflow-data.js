@@ -9,7 +9,10 @@ import {
   where,
   getDocs,
   doc,        // ✅ pour cibler un document
-  deleteDoc   // ✅ pour le supprimer
+    deleteDoc,   // ✅ pour le supprimer
+  updateDoc,   // ✅ pour modifier un champ
+  deleteField  // ✅ pour effacer un champ (comme workflowId)
+
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -141,6 +144,22 @@ window.deleteWorkflow = async function(workflowId) {
     console.error("❌ Erreur suppression workflow ou emails :", err);
     console.log("💥 Détail de l'erreur Firebase :", JSON.stringify(err, null, 2));
     alert("❌ Erreur lors de la suppression du workflow ou des emails.");
+  }
+};
+  window.removeEmailFromWorkflow = async function(workflowId, emailId) {
+  if (!confirm("❌ Retirer cet email du workflow ?")) return;
+
+  try {
+    const emailRef = doc(db, "emails", emailId);
+    await updateDoc(emailRef, {
+      workflowId: deleteField()
+    });
+
+    alert("✅ Email retiré du workflow !");
+    location.reload();
+  } catch (err) {
+    console.error("❌ Erreur lors du retrait de l'email :", err);
+    alert("❌ Une erreur est survenue lors du retrait de l'email.");
   }
 };
   }); // ✅ FIN de onAuthStateChanged
