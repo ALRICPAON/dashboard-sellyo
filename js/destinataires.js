@@ -28,24 +28,43 @@ let allLeads = [];
 
 function renderLeads(leadsToRender) {
   leadsList.innerHTML = "";
+
+  const wrapper = document.createElement("div");
+  wrapper.style.border = "1px solid #333";
+  wrapper.style.background = "#1c1c1c";
+  wrapper.style.padding = "1rem";
+  wrapper.style.borderRadius = "10px";
+  wrapper.style.marginTop = "1rem";
+
+  const title = document.createElement("h3");
+  title.innerText = "📩 Leads disponibles";
+  title.style.marginBottom = "1rem";
+  title.style.color = "#00ccff";
+  wrapper.appendChild(title);
+
   if (leadsToRender.length === 0) {
-    leadsList.innerHTML = `<p style="color:gray;">Aucun lead trouvé.</p>`;
-    return;
+    const emptyMsg = document.createElement("p");
+    emptyMsg.style.color = "gray";
+    emptyMsg.innerText = "Aucun lead trouvé.";
+    wrapper.appendChild(emptyMsg);
+  } else {
+    leadsToRender.forEach(lead => {
+      const label = `${lead.name || "-"} (${lead.email}) [${lead?.source?.name || "-"})]`;
+      const container = document.createElement("div");
+      container.style.marginBottom = "0.5rem";
+      container.innerHTML = `
+        <label>
+          <input type="checkbox" value="${lead.email}" />
+          ${label}
+        </label>
+      `;
+      wrapper.appendChild(container);
+    });
   }
 
-  leadsToRender.forEach(lead => {
-    const label = `${lead.name || "-"} (${lead.email}) [${lead?.source?.name || "-"})]`;
-    const container = document.createElement("div");
-    container.style.marginBottom = "0.5rem";
-    container.innerHTML = `
-      <label>
-        <input type="checkbox" value="${lead.email}" />
-        ${label}
-      </label>
-    `;
-    leadsList.appendChild(container);
-  });
+  leadsList.appendChild(wrapper);
 }
+
 
 onAuthStateChanged(auth, async (user) => {
   if (!user || !emailId) {
