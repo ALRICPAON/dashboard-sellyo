@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ⏱ Attente avant redirection
       setTimeout(() => {
-  window.location.href = "dashboard.html?landing=1";
+ window.location.href = "https://sellyo.fr/landing";
 }, 90000);
     } catch (err) {
       alert("Erreur : " + err.message);
