@@ -1,42 +1,55 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Paramètres – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css" />
   <script type="module" src="js/firebase-auth-check.js"></script>
   <script type="module" src="js/submit-settings.js"></script>
 </head>
 
-<body style="background-color: #111; color: white; font-family: sans-serif;">
+<body style="background: #111; color: white; font-family: sans-serif;">
   <div id="navbar-container"></div>
   <script>
-    fetch('navbar.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('navbar-container').innerHTML = html;
+    fetch("navbar.html")
+      .then((res) => res.text())
+      .then((html) => {
+        document.getElementById("navbar-container").innerHTML = html;
       });
   </script>
 
-  <main>
-    <section style="max-width: 600px; margin: 2rem auto; padding: 2rem; background: #222; border-radius: 10px;">
-      <h2 style="margin-bottom: 1.5rem;">Paramètres Email & Domaine</h2>
+  <main style="padding: 2rem; max-width: 800px; margin: auto;">
+    <h1>⚙️ Paramètres</h1>
 
-      <form id="settings-form">
-        <label for="fromEmail">Adresse d'envoi (From)</label>
-        <input type="email" id="fromEmail" placeholder="ex. newsletter@mon-domaine.fr" required>
+    <!-- Bloc Email -->
+    <section style="margin-bottom: 3rem; background: #1c1c1c; padding: 2rem; border-radius: 10px;">
+      <h2>📧 Paramètres Email</h2>
+      <label>Email d'envoi :</label><br />
+      <input type="email" id="fromEmail" placeholder="ex: contact@votre-domaine.com" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;" /><br />
 
-        <label for="replyTo">Adresse de réponse (Reply-to)</label>
-        <input type="email" id="replyTo" placeholder="ex. contact@mon-domaine.fr" required>
+      <label>Nom affiché :</label><br />
+      <input type="text" id="fromName" placeholder="ex: Mon Entreprise" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;" /><br />
 
-        <label for="domaine">Domaine pour MailerSend</label>
-        <input type="text" id="domaine" placeholder="ex. mon-domaine.fr" required>
+      <label>Email de réponse (replyTo) :</label><br />
+      <input type="email" id="replyTo" placeholder="ex: contact@votre-domaine.com" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;" /><br />
 
-        <label for="customDomain">Domaine pour les pages (landing/tunnel)</label>
-        <input type="text" id="customDomain" placeholder="ex. pages.mon-domaine.fr" required>
+      <button id="saveEmailSettings" style="padding: 0.7rem 1.5rem; background: #00ccff; color: black; font-weight: bold; border: none; border-radius: 5px; margin-top: 1rem;">💾 Enregistrer</button>
+    </section>
 
-        <button type="submit" style="margin-top: 1.5rem;">💾 Enregistrer</button>
-      </form>
+    <!-- Bloc Domaine personnalisé -->
+    <section style="background: #1c1c1c; padding: 2rem; border-radius: 10px;">
+      <h2>🌐 Domaine personnalisé</h2>
+      <label>Votre domaine personnalisé :</label><br />
+      <input type="text" id="customDomain" placeholder="ex: monsite.com" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;" /><br />
+
+      <button id="generateDns" style="padding: 0.7rem 1.5rem; background: #00ccff; color: black; font-weight: bold; border: none; border-radius: 5px; margin-top: 1rem;">⚙️ Afficher les DNS à copier</button>
+
+      <div id="dnsInstructions" style="margin-top: 1.5rem; display: none;">
+        <h3>📋 Instructions DNS :</h3>
+        <ul id="dnsList" style="list-style-type: square; padding-left: 1.5rem;"></ul>
+      </div>
+
+      <div id="verificationStatus" style="margin-top: 1.5rem;"></div>
     </section>
   </main>
 </body>
