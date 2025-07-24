@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Paramètres – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/submit-settings.js"></script>
+</head>
+<body style="background:#111;color:white;font-family:sans-serif;">
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      });
+  </script>
+
+  <main style="max-width:800px;margin:2rem auto;padding:2rem;background:#1c1c1c;border-radius:10px">
+    <h2>Paramètres utilisateur</h2>
+
+    <!-- Section 1 : Email personnalisé -->
+    <section style="margin-bottom:2rem;">
+      <h3>📧 Domaine d'envoi des emails</h3>
+      <form id="mail-settings-form">
+        <label>Domaine (ex: mondomaine.com)</label>
+        <input type="text" name="mailDomain" placeholder="Ex: mondomaine.com" required><br><br>
+
+        <label>Email d'expéditeur (ex: contact@mondomaine.com)</label>
+        <input type="email" name="fromEmail" placeholder="Ex: contact@mondomaine.com" required><br><br>
+
+        <label>Email de réponse (reply-to)</label>
+        <input type="email" name="replyTo" placeholder="Ex: contact@mondomaine.com" required><br><br>
+
+        <button type="submit">💾 Enregistrer les paramètres d'envoi</button>
+      </form>
+    </section>
+
+    <!-- Section 2 : Domaine des tunnels / landings -->
+    <section>
+      <h3>🌐 Domaine personnalisé pour les pages</h3>
+      <form id="domain-settings-form">
+        <label>Domaine personnalisé (landing/tunnel)</label>
+        <input type="text" name="landingDomain" placeholder="Ex: offre.mondomaine.com" required><br><br>
+
+        <label>
+          <input type="checkbox" name="useCustomDomain">
+          Utiliser ce domaine pour afficher mes pages
+        </label><br><br>
+
+        <button type="submit">💾 Enregistrer le domaine personnalisé</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
