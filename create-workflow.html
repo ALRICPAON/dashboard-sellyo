@@ -166,57 +166,57 @@
     window.deleteWorkflow = deleteWorkflow;
     window.editWorkflow = editWorkflow;
   </script>
-  <script>
-    window.availableEmails = [];
-    window.emailsReady = false;
-    window.mailCount = 0;
+ <script>
+  window.availableEmails = [];
+  window.emailsReady = false;
+  window.mailCount = 0;
 
-    function addMailBlock() {
-      if (!emailsReady || availableEmails.length === 0) {
-        alert("Les emails ne sont pas encore chargés.");
-        return;
-      }
-      if (window.mailCount >= 10) {
-        alert("Limite de 10 mails atteinte.");
-        return;
-      }
-
-      const container = document.getElementById("mail-blocks-container");
-      const div = document.createElement("div");
-      div.className = "mail-block";
-
-      const deleteBtn = document.createElement("button");
-deleteBtn.type = "button";
-deleteBtn.className = "remove-mail-btn";
-deleteBtn.textContent = "🗑️";
-deleteBtn.addEventListener("click", () => {
-  div.remove();
-  window.mailCount--;
-});
-
-      const select = document.createElement("select");
-      select.name = "emailId";
-      availableEmails.forEach(email => {
-        const opt = document.createElement("option");
-        opt.value = email.id;
-        opt.textContent = email.name;
-        select.appendChild(opt);
-      });
-
-      const delayInput = document.createElement("input");
-      delayInput.type = "number";
-      delayInput.name = "delayDays";
-      delayInput.min = "0";
-      delayInput.placeholder = "J+ (ex: 0, 2, 5...)";
-      delayInput.style.marginTop = "0.5rem";
-
-    
-     div.appendChild(select);
-div.appendChild(delayInput);
-      div.appendChild(deleteBtn);
-container.appendChild(div);
-window.mailCount++;
+  function addMailBlock() {
+    if (!emailsReady || availableEmails.length === 0) {
+      alert("Les emails ne sont pas encore chargés.");
+      return;
     }
-  </script>
+    if (window.mailCount >= 10) {
+      alert("Limite de 10 mails atteinte.");
+      return;
+    }
+
+    const container = document.getElementById("mail-blocks-container");
+    const div = document.createElement("div");
+    div.className = "mail-block";
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "remove-mail-btn";
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.addEventListener("click", () => {
+      div.remove();
+      window.mailCount--;
+    });
+
+    const select = document.createElement("select");
+    select.name = "emailId";
+    availableEmails.forEach(email => {
+      const opt = document.createElement("option");
+      opt.value = email.id;
+      opt.textContent = email.name;
+      select.appendChild(opt);
+    });
+
+    const delayInput = document.createElement("input");
+    delayInput.type = "number";
+    delayInput.name = "delayDays";
+    delayInput.min = "0";
+    delayInput.placeholder = "J+ (ex: 0, 2, 5...)";
+    delayInput.style.marginTop = "0.5rem";
+
+    div.appendChild(deleteBtn); // 🧩 bouton en haut à droite
+    div.appendChild(select);
+    div.appendChild(delayInput);
+    container.appendChild(div);
+
+    window.mailCount++;
+  }
+</script>
 </body>
 </html>
