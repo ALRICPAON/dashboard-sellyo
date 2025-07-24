@@ -1,114 +1,71 @@
-import { app } from "./firebase-init.js";
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import fetch from "node-fetch";
+import admin from "firebase-admin";
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+if (!admin.apps.length) {
+  // Initialise Firebase Admin avec ta clé de service JSON stockée en variable d'environnement
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+  });
+}
 
-const form = document.getElementById("settings-form");
-const generateDnsBtn = document.getElementById("generateDns");
-const dnsInstructionsDiv = document.getElementById("dnsInstructions");
-const dnsList = document.getElementById("dnsList");
-const verificationStatus = document.getElementById("verificationStatus");
+const db = admin.firestore();
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    alert("Utilisateur non connecté.");
-    window.location.href = "index.html";
-    return;
-  }
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
 
-  const userId = user.uid;
-  const settingsRef = doc(db, "settings", userId);
+  const { domain, userId } = req.body;
+  if (!domain || !userId) return res.status(400).json({ error: "Missing domain or userId" });
 
-  // Charger les paramètres existants
-  const settingsSnap = await getDoc(settingsRef);
-  if (settingsSnap.exists()) {
-    const data = settingsSnap.data();
-    document.getElementById("fromEmail").value = data.fromEmail || "";
-    document.getElementById("fromName").value = data.fromName || "";
-    document.getElementById("replyTo").value = data.replyTo || "";
-    document.getElementById("customDomain").value = data.customDomain || "";
-  }
+  try {
+    // Appel à l'API MailerSend
+    const response = await fetch("https://api.mailersend.com/v1/domain-identities", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer "mlsn.5effbc1ef58f113b69226968756449401104197a50e144410640772130e0c143",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: domain,
+        domain_type: "custom",
+        dkim_selector: "mailersend",
+      }),
+    });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    if (!response.ok) {
+      const errData = await response.json();
+      return res.status(response.status).json(errData);
+    }
 
-    const fromEmail = document.getElementById("fromEmail").value.trim();
-    const fromName = document.getElementById("fromName").value.trim();
-    const replyTo = document.getElementById("replyTo").value.trim();
-    const customDomain = document.getElementById("customDomain").value.trim();
+    const data = await response.json();
 
-    try {
-      await setDoc(settingsRef, {
-        fromEmail,
-        fromName,
-        replyTo,
-        customDomain
+    // Sauvegarde des enregistrements DNS dans Firestore sous settings/{userId}/dnsRecords
+    if (data.dns && data.dns.length > 0) {
+      const batch = db.batch();
+
+      // On supprime les anciens enregistrements pour éviter doublons
+      const dnsRef = db.collection("settings").doc(userId).collection("dnsRecords");
+      const oldRecords = await dnsRef.get();
+      oldRecords.forEach(doc => batch.delete(doc.ref));
+
+      // On ajoute les nouveaux enregistrements
+      data.dns.forEach(record => {
+        const docRef = dnsRef.doc(); // doc auto-id
+        batch.set(docRef, record);
       });
 
-      alert("✅ Paramètres enregistrés !");
-    } catch (error) {
-      console.error("Erreur enregistrement paramètres :", error);
-      alert("❌ Erreur lors de l'enregistrement.");
-    }
-  });
-
-  generateDnsBtn.addEventListener("click", async () => {
-    const domain = document.getElementById("customDomain").value.trim();
-    if (!domain) {
-      alert("Merci de renseigner un domaine avant de générer les DNS.");
-      return;
+      await batch.commit();
     }
 
-    verificationStatus.textContent = "⏳ Vérification en cours...";
-    dnsInstructionsDiv.style.display = "none";
-    dnsList.innerHTML = "";
+    // On peut aussi sauvegarder le domaine custom dans settings/{userId}
+    await db.collection("settings").doc(userId).set({
+      customDomain: domain,
+      domainIdentityId: data.id || null,
+      dnsLastUpdated: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
 
-    try {
-      // IMPORTANT : Ne jamais exposer ta clé API dans le frontend en prod !
-      // Ici c'est un exemple uniquement pour test local/dev.
-      const response = await fetch("https://api.mailersend.com/v1/domain-identities", {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer TON_API_KEY_ICI",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name: domain,
-          domain_type: "custom",
-          dkim_selector: "mailersend"
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.dns && data.dns.length > 0) {
-        dnsInstructionsDiv.style.display = "block";
-        data.dns.forEach((record) => {
-          const li = document.createElement("li");
-          li.innerHTML = `<strong>${record.record_type}</strong> → ${record.name} : <code>${record.value}</code>`;
-          dnsList.appendChild(li);
-        });
-        verificationStatus.textContent = "✅ Enregistrements DNS récupérés.";
-      } else {
-        verificationStatus.textContent = "❌ Impossible de récupérer les enregistrements DNS.";
-      }
-    } catch (error) {
-      console.error("Erreur lors de la vérification du domaine :", error);
-      verificationStatus.textContent = "❌ Erreur lors de la vérification du domaine.";
-    }
-  });
-});
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Error in validate-domain handler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
