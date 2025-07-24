@@ -139,7 +139,9 @@
   leadDropdown.innerHTML = `<option value="">-- Sélectionner un lead --</option>`;
 
   leadsToRender.forEach(lead => {
-    const label = `${lead.name || "-"} (${lead.email}) [${lead?.source?.name || "-"}]`;
+    const label = lead.name
+  ? `${lead.name} (${lead.email})`
+  : lead.email;
 
     const container = document.createElement("div");
     container.style.marginBottom = "0.5rem";
