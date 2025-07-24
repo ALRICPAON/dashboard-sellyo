@@ -1,25 +1,35 @@
 import { app } from "./firebase-init.js";
 import {
-  getAuth, onAuthStateChanged
+  getAuth,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, doc, setDoc, getDoc
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
+
 const form = document.getElementById("settings-form");
+const generateDnsBtn = document.getElementById("generateDns");
+const dnsInstructionsDiv = document.getElementById("dnsInstructions");
+const dnsList = document.getElementById("dnsList");
+const verificationStatus = document.getElementById("verificationStatus");
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("Utilisateur non connecté.");
-    return (window.location.href = "index.html");
+    window.location.href = "index.html";
+    return;
   }
 
   const userId = user.uid;
+  const settingsRef = doc(db, "settings", userId);
 
   // Charger les paramètres existants
-  const settingsRef = doc(db, "settings", userId);
   const settingsSnap = await getDoc(settingsRef);
   if (settingsSnap.exists()) {
     const data = settingsSnap.data();
@@ -29,7 +39,6 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("customDomain").value = data.customDomain || "";
   }
 
-  // Soumission du formulaire
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -38,26 +47,39 @@ onAuthStateChanged(auth, async (user) => {
     const replyTo = document.getElementById("replyTo").value.trim();
     const customDomain = document.getElementById("customDomain").value.trim();
 
-    // Enregistrement Firestore
-    await setDoc(settingsRef, {
-      fromEmail,
-      fromName,
-      replyTo,
-      customDomain
-    });
+    try {
+      await setDoc(settingsRef, {
+        fromEmail,
+        fromName,
+        replyTo,
+        customDomain
+      });
 
-    alert("✅ Paramètres enregistrés !");
-    if (customDomain) {
-      await verifyDomainWithMailerSend(customDomain);
+      alert("✅ Paramètres enregistrés !");
+    } catch (error) {
+      console.error("Erreur enregistrement paramètres :", error);
+      alert("❌ Erreur lors de l'enregistrement.");
     }
   });
 
-  async function verifyDomainWithMailerSend(domain) {
+  generateDnsBtn.addEventListener("click", async () => {
+    const domain = document.getElementById("customDomain").value.trim();
+    if (!domain) {
+      alert("Merci de renseigner un domaine avant de générer les DNS.");
+      return;
+    }
+
+    verificationStatus.textContent = "⏳ Vérification en cours...";
+    dnsInstructionsDiv.style.display = "none";
+    dnsList.innerHTML = "";
+
     try {
-      const res = await fetch("https://api.mailersend.com/v1/domain-identities", {
+      // IMPORTANT : Ne jamais exposer ta clé API dans le frontend en prod !
+      // Ici c'est un exemple uniquement pour test local/dev.
+      const response = await fetch("https://api.mailersend.com/v1/domain-identities", {
         method: "POST",
         headers: {
-          "Authorization": "Bearer mlsn.5effbc1ef58f113b69226968756449401104197a50e144410640772130e0c143",
+          Authorization: "Bearer TON_API_KEY_ICI",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -67,28 +89,26 @@ onAuthStateChanged(auth, async (user) => {
         })
       });
 
-      const data = await res.json();
-
-      if (data.dns) {
-        // Afficher les entrées DNS dans une section dynamique
-        const dnsDiv = document.getElementById("dns-instructions");
-        dnsDiv.innerHTML = `<h3>📌 Enregistrements DNS à ajouter :</h3>`;
-        data.dns.forEach(record => {
-          dnsDiv.innerHTML += `
-            <div style="margin-bottom: 1rem;">
-              <strong>${record.record_type}</strong> → ${record.name}<br>
-              <code>${record.value}</code>
-            </div>
-          `;
-        });
-        dnsDiv.scrollIntoView({ behavior: "smooth" });
-      } else {
-        alert("❌ Impossible de récupérer les enregistrements DNS MailerSend.");
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
       }
 
-    } catch (err) {
-      console.error("Erreur MailerSend :", err);
-      alert("❌ Erreur lors de la tentative de vérification du domaine.");
+      const data = await response.json();
+
+      if (data.dns && data.dns.length > 0) {
+        dnsInstructionsDiv.style.display = "block";
+        data.dns.forEach((record) => {
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${record.record_type}</strong> → ${record.name} : <code>${record.value}</code>`;
+          dnsList.appendChild(li);
+        });
+        verificationStatus.textContent = "✅ Enregistrements DNS récupérés.";
+      } else {
+        verificationStatus.textContent = "❌ Impossible de récupérer les enregistrements DNS.";
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification du domaine :", error);
+      verificationStatus.textContent = "❌ Erreur lors de la vérification du domaine.";
     }
-  }
+  });
 });
