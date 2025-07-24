@@ -185,6 +185,15 @@
       const div = document.createElement("div");
       div.className = "mail-block";
 
+      const deleteBtn = document.createElement("button");
+deleteBtn.type = "button";
+deleteBtn.className = "remove-mail-btn";
+deleteBtn.textContent = "🗑️";
+deleteBtn.addEventListener("click", () => {
+  div.remove();
+  window.mailCount--;
+});
+
       const select = document.createElement("select");
       select.name = "emailId";
       availableEmails.forEach(email => {
@@ -202,9 +211,9 @@
       delayInput.style.marginTop = "0.5rem";
 
     
-
      div.appendChild(select);
 div.appendChild(delayInput);
+      div.appendChild(deleteBtn);
 container.appendChild(div);
 window.mailCount++;
     }
