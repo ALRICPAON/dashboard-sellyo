@@ -30,4 +30,4 @@ jobs:
           MAILERSEND_API_KEY: ${{ secrets.MAILERSEND_API_KEY }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
-        run: firebase deploy --only functions
+        run: firebase deploy --only functions --project sellyo-3bbdb
