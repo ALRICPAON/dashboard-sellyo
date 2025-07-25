@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-const fetch = require("node-fetch");
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 exports.saveEmailToMake = functions.https.onRequest(async (req, res) => {
   if (req.method !== "POST") {
