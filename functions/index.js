@@ -3,12 +3,11 @@ const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onDocumentUpdated, onDocumentCreated } = require("firebase-functions/firestore");
 const admin = require("firebase-admin");
 const axios = require("axios");
-const { MailerSend, EmailParams, Sender, Recipient, Attachment } = require("mailersend");
+const { MailerSend, EmailParams, Sender, Recipient } = require("mailersend");
 
 admin.initializeApp();
 const db = admin.firestore();
 
-// Utilisation sécurisée de la clé MailerSend via variable d'environnement
 const mailsend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_KEY || functions.config().mailersend.api_key,
 });
