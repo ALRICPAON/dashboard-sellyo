@@ -1,9 +1,9 @@
 const functions = require("firebase-functions/v2");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { onDocumentUpdated, onDocumentCreated } = require("firebase-functions/firestore");
+const { onDocumentUpdated, onDocumentCreated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const axios = require("axios");
-const { MailerSend, EmailParams, Sender, Recipient } = require("mailersend");
+const { MailerSend, EmailParams, Sender, Recipient, Attachment } = require("mailersend");
 
 admin.initializeApp();
 const db = admin.firestore();
