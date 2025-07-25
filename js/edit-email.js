@@ -34,11 +34,11 @@ onAuthStateChanged(auth, async (user) => {
     fileName = data.name || "email-sans-nom";
     const url = data.url;
 
-    // 🔄 Récupère le contenu HTML brut depuis GitHub
+    // Récupère le contenu HTML brut depuis GitHub
     const res = await fetch(url);
     const html = await res.text();
 
-    // ✅ Initialise GrapesJS
+    // Initialise GrapesJS
     const editor = grapesjs.init({
       container: "#editor",
       fromElement: false,
@@ -50,21 +50,27 @@ onAuthStateChanged(auth, async (user) => {
 
     editor.setComponents(html); // Injecte le contenu HTML dans GrapesJS
 
-    // ✅ Sauvegarde
+    // Sauvegarde
     const saveBtn = document.getElementById("save-email-btn");
     if (saveBtn) {
       saveBtn.addEventListener("click", async () => {
-        const updatedHTML = editor.getHtml();
-
         try {
-          const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
-          const formData = new FormData();
-          formData.append("id", id);
-          formData.append("html", updatedHTML);
-          formData.append("name", fileName);
-          formData.append("type", "email");
+          const updatedHTML = editor.getHtml();
 
-          // ✅ Popup visuelle
+          const firebaseFunctionURL = "https://us-central1-sellyo-3bbdb.cloudfunctions.net/modifyEmail";
+
+          const res = await fetch(firebaseFunctionURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: id,
+              html: updatedHTML,
+              name: fileName,
+              type: "email"
+            }),
+          });
+
+          // Popup visuelle
           const popup = document.createElement("div");
           popup.id = "popup-message";
           popup.innerHTML = `
@@ -86,11 +92,6 @@ onAuthStateChanged(auth, async (user) => {
           `;
           document.body.appendChild(popup);
 
-          const res = await fetch(webhookURL, {
-            method: "POST",
-            body: formData,
-          });
-
           if (res.ok) {
             popup.innerHTML = `
               ✅ Email modifié avec succès.<br><br>Redirection dans <strong>1min30</strong>...`;
@@ -98,7 +99,7 @@ onAuthStateChanged(auth, async (user) => {
               window.location.href = "emails.html";
             }, 90000); // 1min30
           } else {
-            throw new Error("Erreur Make : " + res.statusText);
+            throw new Error("Erreur serveur : " + res.statusText);
           }
         } catch (err) {
           alert("❌ Erreur de sauvegarde : " + err.message);
@@ -106,15 +107,15 @@ onAuthStateChanged(auth, async (user) => {
       });
     }
 
-    // ✅ ENVOI du mail (mise à jour statut Firestore)
+    // ENVOI du mail (mise à jour statut Firestore)
     const sendBtn = document.getElementById("send-email-btn");
     if (sendBtn) {
       sendBtn.addEventListener("click", async () => {
         try {
-         await updateDoc(doc(db, "emails", id), {
-  status: "ready",
-  source: { type: "manuel" } // ✅ On réassigne proprement à chaque update manuel
-});
+          await updateDoc(doc(db, "emails", id), {
+            status: "ready",
+            source: { type: "manuel" } // On réassigne proprement à chaque update manuel
+          });
 
           alert("📨 Le mail est maintenant prêt à être envoyé.");
         } catch (err) {
