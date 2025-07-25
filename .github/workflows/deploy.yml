@@ -3,7 +3,7 @@ name: Deploy Firebase Functions
 on:
   push:
     branches:
-      - main  # Déclenche le workflow sur les pushes vers main
+      - main
 
 jobs:
   deploy:
@@ -17,10 +17,12 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
+      - name: Install dependencies in functions folder
+        working-directory: ./functions
         run: npm install
 
       - name: Deploy Firebase Functions
+        working-directory: ./functions
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           MAILERSEND_API_KEY: ${{ secrets.MAILERSEND_API_KEY }}
