@@ -60,15 +60,17 @@ onAuthStateChanged(auth, async (user) => {
           const firebaseFunctionURL = "https://us-central1-sellyo-3bbdb.cloudfunctions.net/modifyEmail";
 
           const res = await fetch(firebaseFunctionURL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id: id,
-              html: updatedHTML,
-              name: fileName,
-              type: "email"
-            }),
-          });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    emailId: id,
+    updates: {
+      html: updatedHTML,
+      name: fileName,
+      type: "email"
+    }
+  }),
+});
           const resText = await res.text(); // 🔥 lis la réponse brute (même en cas d'erreur)
 console.log("🔍 Réponse de modifyEmail:", res.status, resText);
 
