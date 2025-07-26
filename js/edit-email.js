@@ -69,6 +69,9 @@ onAuthStateChanged(auth, async (user) => {
               type: "email"
             }),
           });
+          const resText = await res.text(); // 🔥 lis la réponse brute (même en cas d'erreur)
+console.log("🔍 Réponse de modifyEmail:", res.status, resText);
+
 
           // Popup visuelle
           const popup = document.createElement("div");
@@ -92,14 +95,16 @@ onAuthStateChanged(auth, async (user) => {
           `;
           document.body.appendChild(popup);
 
-          if (res.ok) {
+        if (res.ok) {
+  console.log("✅ Fonction exécutée avec succès !");
             popup.innerHTML = `
               ✅ Email modifié avec succès.<br><br>Redirection dans <strong>1min30</strong>...`;
             setTimeout(() => {
               window.location.href = "emails.html";
             }, 90000); // 1min30
-          } else {
-            throw new Error("Erreur serveur : " + res.statusText);
+         } else {
+  throw new Error("Erreur serveur : " + resText); // 🔁 utilise resText au lieu de res.statusText
+}
           }
         } catch (err) {
           alert("❌ Erreur de sauvegarde : " + err.message);
