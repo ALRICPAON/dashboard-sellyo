@@ -105,7 +105,7 @@ console.log("🔍 Réponse de modifyEmail:", res.status, resText);
          } else {
   throw new Error("Erreur serveur : " + resText); // 🔁 utilise resText au lieu de res.statusText
 }
-          }
+          
         } catch (err) {
           alert("❌ Erreur de sauvegarde : " + err.message);
         }
