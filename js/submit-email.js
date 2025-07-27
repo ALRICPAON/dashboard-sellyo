@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
           userId: user.uid,
           type: "email",
           name: slugFinal,
-          slug,
+          slug: slugFinal, // ✅ Utilise le slug unique avec chiffres
           subject,
           desc,
           tone,
