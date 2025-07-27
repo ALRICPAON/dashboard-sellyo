@@ -5,7 +5,7 @@ import { getFirestore, collection, addDoc } from "https://www.gstatic.com/fireba
 document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
   const db = getFirestore(app); // ✅ init Firestore
-  const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+  
 
   const form = document.getElementById("email-form");
   if (!form) return;
@@ -35,23 +35,33 @@ const tunnelId = document.getElementById("tunnelId")?.value || null;
     const createdAt = new Date().toISOString();
     const slugFinal = `${slug}-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    const formData = new FormData();
-    formData.append("userId", user.uid);
-    formData.append("type", "email");
-    formData.append("slug", slugFinal);
-    formData.append("subject", subject);
-    formData.append("desc", desc);
-    formData.append("tone", tone);
-    formData.append("productLink", productLink);
-    formData.append("productPrice", productPrice);
-    formData.append("createdAt", createdAt);
 
-    try {
-      // ✅ 1. Envoi à Make
-      await fetch(webhookURL, {
-        method: "POST",
-        body: formData
-      });
+  try {
+  await fetch("https://us-central1-sellyo-3bbdb.cloudfunctions.net/submitMainWebhook", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId: user.uid,
+      type: "email",
+      name: slugFinal,
+      subject,
+      desc,
+      tone,
+      productLink,
+      productPrice,
+      replyTo,
+      landingId,
+      tunnelId
+    })
+  });
+} catch (err) {
+  console.error("Erreur lors de l'appel à submitMainWebhook :", err);
+  alert("Erreur lors de l'envoi à Make. Veuillez réessayer.");
+  return;
+}
+
 
    // ✅ 2. Enregistrement dans Firestore
 await addDoc(collection(db, "emails"), {
