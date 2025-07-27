@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
           userId: user.uid,
           type: "email",
           name: slugFinal,
+          slug,
           subject,
           desc,
           tone,
