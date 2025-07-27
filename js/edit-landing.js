@@ -57,45 +57,52 @@ const url = `https://alricpaon.github.io/sellyo-hosting/landing/${folder}/${html
         const updatedHTML = editor.getHtml();
 
         try {
-          const webhookURL = "https://hook.eu2.make.com/57o9q241bdmobplyxrxn4o7iwopdmc59";
-          const formData = new FormData();
-          formData.append("id", id);
-          formData.append("html", updatedHTML);
-          formData.append("name", fileName);
-          formData.append("type", "landing");
-          formData.append("folder", folder);
-formData.append("htmlFileName", htmlFileName);
+  const popup = document.createElement("div");
+  popup.id = "popup-message";
+  popup.innerHTML = `<div style="text-align:center;">⏳ Sauvegarde en cours...<br><br>Merci de patienter <strong>1min30</strong>.</div>`;
+  popup.style.cssText = `
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #222;
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    z-index: 9999;
+    text-align: center;`;
+  document.body.appendChild(popup);
 
-          const popup = document.createElement("div");
-          popup.id = "popup-message";
-          popup.innerHTML = `<div style="text-align:center;">⏳ Sauvegarde en cours...<br><br>Merci de patienter <strong>1min30</strong>.</div>`;
-          popup.style.cssText = `
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #222;
-            color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            z-index: 9999;
-            text-align: center;`;
-          document.body.appendChild(popup);
+  const firebaseFunctionURL = "https://us-central1-sellyo-3bbdb.cloudfunctions.net/modifyEmail";
 
-          const res = await fetch(webhookURL, {
-            method: "POST",
-            body: formData,
-          });
+  const res = await fetch(firebaseFunctionURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      emailId: id,
+      updates: {
+        html: updatedHTML,
+        name: fileName,
+        type: "landing",
+        folder,
+        htmlFileName
+      }
+    }),
+  });
 
-          if (res.ok) {
-            popup.innerHTML = `✅ Landing modifiée.<br><br>Redirection dans <strong>1min30</strong>...`;
-            setTimeout(() => {
-              window.location.href = "landing.html";
-            }, 90000);
-          } else {
-            throw new Error("Erreur Make : " + res.statusText);
-          }
+  const resText = await res.text();
+  console.log("🔍 Réponse de modifyEmail:", res.status, resText);
+
+  if (res.ok) {
+    popup.innerHTML = `✅ Landing modifiée.<br><br>Redirection dans <strong>1min30</strong>...`;
+    setTimeout(() => {
+      window.location.href = "landing.html";
+    }, 90000);
+  } else {
+    throw new Error("Erreur serveur : " + resText);
+  }
+}
         } catch (err) {
           alert("❌ Erreur de sauvegarde : " + err.message);
         }
