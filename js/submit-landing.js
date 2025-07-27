@@ -1,4 +1,4 @@
-// ✅ submit-landing.js – Pour landing pages avec Firestore + Make
+// ✅ submit-landing.js – Version sécurisée via Cloud Functions (submitMainWebhook)
 
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -7,7 +7,7 @@ import { getFirestore, collection, addDoc } from "https://www.gstatic.com/fireba
 document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const webhookURL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+  const submitURL = "https://sellyo-3bbdb.web.app/__/functions/submitMainWebhook"; // 🔐 Appelle Firebase Function
   const slugCounter = Math.floor(10000 + Math.random() * 90000);
 
   const form = document.getElementById("tunnel-form");
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = auth.currentUser;
     if (!user) return alert("Vous devez être connecté.");
 
-    // ⏳ Popup de génération
+    // ⏳ Popup
     const popup = document.createElement("div");
     popup.id = "tunnel-loading-overlay";
     popup.innerHTML = `
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const firestoreData = {
       userId: user.uid,
-      type: "landing", // 👈 CHANGÉ ici
+      type: "landing",
       name,
       goal,
       sector,
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
       slug: slugFinal,
       htmlFileName: `${slugFinal}.html`,
       createdAt,
-      pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`, // 👈 CHANGÉ ici
+      pageUrl: `https://cdn.sellyo.fr/landing/${folder}/${slugFinal}.html`,
       fields,
       customField,
       extraText
@@ -102,13 +102,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (video) formData.append("video", video);
 
     try {
-      const docRef = await addDoc(collection(db, "tunnels"), firestoreData);
-      await fetch(webhookURL, { method: "POST", body: formData });
+      await addDoc(collection(db, "tunnels"), firestoreData);
 
-      // ⏱ Attente avant redirection
+      // 🔁 Envoi à la fonction Firebase qui redirige vers Make
+      await fetch(submitURL, {
+        method: "POST",
+        body: formData
+      });
+
       setTimeout(() => {
- window.location.href = "https://sellyo.fr/landing";
-}, 90000);
+        window.location.href = "https://sellyo.fr/landing";
+      }, 90000);
     } catch (err) {
       alert("Erreur : " + err.message);
     }
