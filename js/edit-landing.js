@@ -107,3 +107,4 @@ if (saveBtn) {
     }
   });
 }
+}); // fin de onAuthStateChanged
