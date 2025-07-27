@@ -1,20 +1,18 @@
-// ✅ submit-landing.js – Version sécurisée via Cloud Functions (submitMainWebhook)
-
 import { app } from "./firebase-init.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const submitURL = "https://sellyo-3bbdb.web.app/__/functions/submitMainWebhook"; // 🔐 Appelle Firebase Function
-  const slugCounter = Math.floor(10000 + Math.random() * 90000);
 
   const form = document.getElementById("tunnel-form");
   const folderInput = document.getElementById("folderName");
   const slugInput = document.getElementById("slug");
 
   if (!form) return;
+
+  const slugCounter = Math.floor(10000 + Math.random() * 90000);
 
   folderInput.addEventListener("input", () => {
     folderInput.value = folderInput.value.replace(/[^a-zA-Z0-9\-]/g, "");
@@ -30,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = auth.currentUser;
     if (!user) return alert("Vous devez être connecté.");
 
-    // ⏳ Popup
     const popup = document.createElement("div");
     popup.id = "tunnel-loading-overlay";
     popup.innerHTML = `
@@ -58,9 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const slug = slugInput?.value || "";
     const slugFinal = `${slug}-${slugCounter}`;
     const createdAt = new Date().toISOString();
-
     const customField = document.getElementById("customField")?.value || "";
     const extraText = document.getElementById("extraText")?.value || "";
+
+    const logo = document.getElementById("logo")?.files[0];
+    const cover = document.getElementById("cover-image")?.files[0];
+    const video = document.getElementById("custom-video")?.files[0];
 
     const fields = Array.from(document.querySelectorAll("input[name='fields']:checked")).map((el) => ({
       label: el.value.charAt(0).toUpperCase() + el.value.slice(1),
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       placeholder: `Votre ${el.value}`
     }));
 
-    const firestoreData = {
+    const docData = {
       userId: user.uid,
       type: "landing",
       name,
@@ -89,31 +89,29 @@ document.addEventListener("DOMContentLoaded", () => {
       extraText
     };
 
-    const formData = new FormData();
-    Object.entries(firestoreData).forEach(([key, val]) =>
-      formData.append(key, typeof val === "object" ? JSON.stringify(val) : val)
-    );
-
-    const logo = document.getElementById("logo")?.files[0];
-    const cover = document.getElementById("cover-image")?.files[0];
-    const video = document.getElementById("custom-video")?.files[0];
-    if (logo) formData.append("logo", logo);
-    if (cover) formData.append("cover", cover);
-    if (video) formData.append("video", video);
-
     try {
-      await addDoc(collection(db, "tunnels"), firestoreData);
+      await addDoc(collection(db, "tunnels"), docData);
 
-      // 🔁 Envoi à la fonction Firebase qui redirige vers Make
-      await fetch(submitURL, {
+      // 🔁 Appel Firebase Function (Make)
+      const res = await fetch("https://submitmainwebhook-mplcxq32ca-uc.a.run.app", {
         method: "POST",
-        body: formData
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...docData,
+          logo: logo?.name || null,
+          cover: cover?.name || null,
+          video: video?.name || null
+        })
       });
+
+      if (!res.ok) throw new Error("Échec de la fonction Cloud");
 
       setTimeout(() => {
         window.location.href = "https://sellyo.fr/landing";
       }, 90000);
+
     } catch (err) {
+      console.error("❌ Erreur soumission :", err);
       alert("Erreur : " + err.message);
     }
   });
