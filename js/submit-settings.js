@@ -1,69 +1,56 @@
 import { app } from "./firebase-init.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const MAILERSEND_API_KEY = "mlsn.5effbc1ef58f113b69226968756449401104197a50e144410640772130e0c143";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
-  const db = getFirestore(app);
 
-  const form = document.getElementById("tunnel-form");
-  if (!form) return;
+  const form = document.getElementById("settings-form");
+  const dnsBlock = document.getElementById("dns-instructions");
+  const dnsOutput = document.getElementById("dns-values");
+  const statusMsg = document.getElementById("dns-status");
 
-  form.addEventListener("submit", async (e) => {
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const user = auth.currentUser;
-    if (!user) return alert("Vous devez être connecté.");
+    if (!user) return alert("Veuillez vous connecter.");
 
-    const name = document.getElementById("tunnel-name")?.value || "";
-    const goal = document.getElementById("tunnel-goal")?.value || "";
-    // ... récupère tous les autres champs ...
+    const fromName = document.getElementById("fromName")?.value || "";
+    const fromEmail = document.getElementById("fromEmail")?.value || "";
+    const replyTo = document.getElementById("replyTo")?.value || "";
+    const customDomain = document.getElementById("customDomain")?.value || "";
 
-    const firestoreData = {
-      userId: user.uid,
-      type: "landing",
-      name,
-      goal,
-      // ajoute ici les autres champs nécessaires
-      createdAt: new Date().toISOString()
-    };
+    if (!customDomain) {
+      return alert("Veuillez entrer un domaine personnalisé.");
+    }
 
     try {
-      // Envoie à Firestore
-      await addDoc(collection(db, "tunnels"), firestoreData);
+      const res = await fetch("https://create-mailersend-domain-<ID>.a.run.app", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.uid,
+          fromName,
+          fromEmail,
+          replyTo,
+          customDomain,
+        }),
+      });
 
-      // Optionnel : appel direct à MailerSend API (exemple POST simplifié)
-      const domainToValidate = document.getElementById("customDomain")?.value || "";
-      if (domainToValidate) {
-        const response = await fetch("https://api.mailersend.com/v1/domain-identities", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${MAILERSEND_API_KEY}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            name: domainToValidate,
-            domain_type: "custom",
-            dkim_selector: "mailersend"
-          })
-        });
+      if (!res.ok) throw new Error("Erreur lors de l’appel à la fonction");
 
-        if (!response.ok) {
-          const err = await response.json();
-          console.error("Erreur MailerSend:", err);
-          alert("Erreur validation domaine : " + (err.error || "Inconnue"));
-          return;
-        }
-        const data = await response.json();
-        console.log("Validation domaine réussie:", data);
-      }
+      const data = await res.json();
 
-      alert("✅ Tunnel créé et domaine validé (test).");
+      dnsBlock.style.display = "block";
+      dnsOutput.textContent = data.dns || "✅ Domaine soumis avec succès.";
+      statusMsg.textContent = "📡 Domaine en attente de validation DNS.";
 
     } catch (err) {
-      alert("Erreur : " + err.message);
+      console.error("Erreur submit-settings:", err);
+      alert("Erreur lors de l'enregistrement des paramètres.");
     }
   });
 });
