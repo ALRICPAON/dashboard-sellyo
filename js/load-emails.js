@@ -110,7 +110,7 @@ recipientCount = recipientsSnap.size;
   🎯 ${recipientCount} destinataire${recipientCount > 1 ? "s" : ""}
 </span>
       </div>
-    `;
+
     emailsList.appendChild(container);
   }
 
