@@ -68,13 +68,9 @@ onAuthStateChanged(auth, async (user) => {
     const slug = extractSlugFromURL(data.url || "");
 
     // 🔍 Récupération du nombre de leads associés via le refId dans source
-    let leadsCount = 0;
-    const refId = data.source?.refId;
-    if (refId) {
-      const leadsQuery = query(collection(db, "leads"), where("refId", "==", refId));
-      const leadsSnap = await getDocs(leadsQuery);
-      leadsCount = leadsSnap.size;
-    }
+   let recipientCount = 0;
+const recipientsSnap = await getDocs(collection(db, `emails/${id}/recipients`));
+recipientCount = recipientsSnap.size;
 
     const container = document.createElement("div");
     container.className = "email-card";
@@ -111,8 +107,8 @@ onAuthStateChanged(auth, async (user) => {
         <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
         <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
         <span style="margin-left: 6px; font-size: 0.85em; color: #888;">
-          👥 ${leadsCount} lead${leadsCount > 1 ? "s" : ""}
-        </span>
+  🎯 ${recipientCount} destinataire${recipientCount > 1 ? "s" : ""}
+</span>
       </div>
     `;
     emailsList.appendChild(container);
