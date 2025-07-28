@@ -61,7 +61,7 @@ onAuthStateChanged(auth, async (user) => {
 const querySnapshot = await getDocs(q);
   emailsList.innerHTML = "";
 
-  querySnapshot.forEach((docSnap) => {
+  for (const docSnap of querySnapshot.docs) {
     const data = docSnap.data();
     const isWorkflow = data.isWorkflow === true;
 const isManuelOrLeads = data.source?.type === "manuel" || data.source?.type === "leads";
