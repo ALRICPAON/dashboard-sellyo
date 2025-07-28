@@ -69,6 +69,18 @@ const isManuelOrLeads = data.source?.type === "manuel" || data.source?.type === 
 if (isWorkflow || !isManuelOrLeads) return;
     const id = docSnap.id;
     const slug = extractSlugFromURL(data.url || "");
+    
+    // 🔍 Récupération du nombre de leads associés via le refId dans source
+let leadsCount = 0;
+const refId = data.source?.refId;
+if (refId) {
+  const leadsQuery = query(
+    collection(db, "leads"),
+    where("refId", "==", refId)
+  );
+  const leadsSnap = await getDocs(leadsQuery);
+  leadsCount = leadsSnap.size;
+}
 
     const container = document.createElement("div");
     container.className = "email-card";
