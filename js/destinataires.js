@@ -90,10 +90,10 @@ onAuthStateChanged(auth, async (user) => {
   tunnelsSnap.forEach(doc => {
     const data = doc.data();
     const opt = document.createElement("option");
-    opt.value = data.name;
-    opt.innerText = `${data.name} (${data.type || "tunnel"})`;
-    opt.dataset.type = data.type;
-    opt.dataset.name = data.name;
+   opt.value = data.slug; // ← c’est ce qu’on utilise comme refId dans les leads
+opt.innerText = `${data.name || data.slug} (${data.type || "tunnel"})`;
+opt.dataset.type = data.type;
+opt.dataset.slug = data.slug; // ← pour filtrage précis
     dropdown.appendChild(opt);
   });
 
@@ -106,16 +106,16 @@ onAuthStateChanged(auth, async (user) => {
   dropdown.addEventListener("change", () => {
     const selectedOption = dropdown.options[dropdown.selectedIndex];
     const selectedType = selectedOption.dataset.type;
-    const selectedName = selectedOption.dataset.name;
+    const selectedSlug = selectedOption.dataset.slug;
 
     if (!selectedType || !selectedName) {
       renderLeads(allLeads);
       return;
     }
 
-    const filtered = allLeads.filter(
+  const filtered = allLeads.filter(
   l =>
-    l.refId === selectedName &&
+    l.refId === selectedSlug &&
     (!selectedType || l.source?.type === selectedType)
 );
 
