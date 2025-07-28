@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!selectedSlug) return;
     console.log("🔗 Landing sélectionné :", selectedSlug);
 
-    const q = query(collection(db, "leads"), where("refId", "==", selectedSlug));
+    const q = query(collection(db, "leads"), where("source", "==", selectedSlug));
     const snapshot = await getDocs(q);
     console.log("🔍 Leads associés :", snapshot.size);
 
