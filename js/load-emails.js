@@ -61,66 +61,55 @@ onAuthStateChanged(auth, async (user) => {
 const querySnapshot = await getDocs(q);
   emailsList.innerHTML = "";
 
-  for (const docSnap of querySnapshot.docs) {
-  const data = docSnap.data();
-  const isWorkflow = data.isWorkflow === true;
-  const isManuelOrLeads = data.source?.type === "manuel" || data.source?.type === "leads";
-  if (isWorkflow || !isManuelOrLeads) continue;
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    const isWorkflow = data.isWorkflow === true;
+const isManuelOrLeads = data.source?.type === "manuel" || data.source?.type === "leads";
 
-  const id = docSnap.id;
-  const slug = extractSlugFromURL(data.url || "");
+if (isWorkflow || !isManuelOrLeads) return;
+    const id = docSnap.id;
+    const slug = extractSlugFromURL(data.url || "");
 
-  // 🔢 Récupération du nombre de destinataires associés
-  const destinatairesSnap = await getDocs(collection(db, `emails/${id}/destinataires`));
-  const destinatairesCount = destinatairesSnap.size;
+    const container = document.createElement("div");
+    container.className = "email-card";
+    container.innerHTML = `
+      <div class="email-header">
+        <span class="email-status ${statusClass[data.status] || "draft"}">
+          ${statusText[data.status] || "📝 Brouillon"}
+        </span>
+        <h3>${data.name || slug || "(sans nom)"}</h3>
+        <p><strong>Objet :</strong> ${data.subject || "-"}</p>
+        <p><strong>Description :</strong> ${data.desc || "-"}</p>
+      </div>
 
-  const destinatairesLabel = destinatairesCount > 0
-    ? `📨 ${destinatairesCount} destinataire${destinatairesCount > 1 ? "s" : ""}`
-    : `📨 Aucun`;
+      ${Array.isArray(data.attachments) && data.attachments.length > 0 ? `
+        <div class="attachments">
+          <strong>📎 Fichiers joints :</strong>
+          <ul>
+            ${data.attachments.map(f => `
+              <li>
+                <a href="${f.url}" target="_blank">${f.name}</a>
+                <button class="delete-attachment-btn" data-email-id="${id}" data-file-name="${f.name}">🗑️</button>
+              </li>`).join("")}
+          </ul>
+        </div>` : ""
+      }
 
-  const container = document.createElement("div");
-  container.className = "email-card";
-  container.innerHTML = `
-    <div class="email-header">
-      <span class="email-status ${statusClass[data.status] || "draft"}">
-        ${statusText[data.status] || "📝 Brouillon"}
-      </span>
-      <h3>${data.name || slug || "(sans nom)"}</h3>
-      <p><strong>Objet :</strong> ${data.subject || "-"}</p>
-      <p><strong>Description :</strong> ${data.desc || "-"}</p>
-    </div>
+      <div class="email-actions">
+        <button class="view-btn" data-id="${id}" onclick="window.open('${data.url}', '_blank')">📩 Voir</button>
+        <button class="edit-btn" data-id="${id}">✏️ Modifier</button>
+        <button class="upload-btn" data-id="${id}">📤 Uploader</button>
+        <button class="delete-btn" data-id="${id}">🧨 Supprimer</button>
+        <button class="send-btn" data-id="${id}">📨 Envoyer</button>
+        <button class="schedule-btn" data-id="${id}">🕓 Programmer</button>
+        <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
+        <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
+      </div>
+    `;
+    emailsList.appendChild(container);
+  });
 
-    ${Array.isArray(data.attachments) && data.attachments.length > 0 ? `
-      <div class="attachments">
-        <strong>📎 Fichiers joints :</strong>
-        <ul>
-          ${data.attachments.map(f => `
-            <li>
-              <a href="${f.url}" target="_blank">${f.name}</a>
-              <button class="delete-attachment-btn" data-email-id="${id}" data-file-name="${f.name}">🗑️</button>
-            </li>`).join("")}
-        </ul>
-      </div>` : ""
-    }
-
-    <div class="email-actions">
-      <button class="view-btn" data-id="${id}" onclick="window.open('${data.url}', '_blank')">📩 Voir</button>
-      <button class="edit-btn" data-id="${id}">✏️ Modifier</button>
-      <button class="upload-btn" data-id="${id}">📤 Uploader</button>
-      <button class="delete-btn" data-id="${id}">🧨 Supprimer</button>
-      <button class="send-btn" data-id="${id}">📨 Envoyer</button>
-      <button class="schedule-btn" data-id="${id}">🕓 Programmer</button>
-            <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
-      <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
-      <span style="margin-left: 6px; font-size: 0.85em; color: #aaa;">
-        ${destinatairesLabel}
-      </span>
-    </div>
-  `;
-  emailsList.appendChild(container);
-} // ✅ FIN du `for (const docSnap of ...)`
-
-  // ✅ DÉBUT de la gestion des clics
+  // Gestion des clics
   emailsList.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!id) return;
