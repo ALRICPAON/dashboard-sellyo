@@ -1,4 +1,4 @@
-// ✅ Nouveau load-emails.js avec design modernisé et nouveaux boutons + compteur de leads
+// ✅ Nouveau load-emails.js avec compteur de destinataires corrigé
 
 import { app } from "./firebase-init.js";
 import {
@@ -67,10 +67,10 @@ onAuthStateChanged(auth, async (user) => {
     const id = docSnap.id;
     const slug = extractSlugFromURL(data.url || "");
 
-    // 🔍 Récupération du nombre de leads associés via le refId dans source
-   let recipientCount = 0;
-const recipientsSnap = await getDocs(collection(db, `emails/${id}/recipients`));
-recipientCount = recipientsSnap.size;
+    // 🔢 Récupération du nombre de destinataires (sous-collection)
+    let recipientCount = 0;
+    const recipientsSnap = await getDocs(collection(db, `emails/${id}/recipients`));
+    recipientCount = recipientsSnap.size;
 
     const container = document.createElement("div");
     container.className = "email-card";
@@ -107,10 +107,10 @@ recipientCount = recipientsSnap.size;
         <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
         <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
         <span style="margin-left: 6px; font-size: 0.85em; color: #888;">
-  🎯 ${recipientCount} destinataire${recipientCount > 1 ? "s" : ""}
-</span>
+          🎯 ${recipientCount} destinataire${recipientCount > 1 ? "s" : ""}
+        </span>
       </div>
-
+    `;
     emailsList.appendChild(container);
   }
 
@@ -121,18 +121,22 @@ recipientCount = recipientsSnap.size;
     if (e.target.classList.contains("edit-btn")) {
       window.location.href = `edit-email.html?id=${id}`;
     }
+
     if (e.target.classList.contains("upload-btn")) {
       window.location.href = `upload-email.html?id=${id}`;
     }
+
     if (e.target.classList.contains("target-btn")) {
       window.location.href = `destinataires.html?id=${id}`;
     }
+
     if (e.target.classList.contains("delete-btn")) {
       const confirmed = confirm("Confirmer la suppression de cet email ?");
       if (!confirmed) return;
       await deleteDoc(doc(db, "emails", id));
       e.target.closest(".email-card").remove();
     }
+
     if (e.target.classList.contains("delete-attachment-btn")) {
       const emailId = e.target.dataset.emailId;
       const fileName = e.target.dataset.fileName;
@@ -149,6 +153,7 @@ recipientCount = recipientsSnap.size;
       await updateDoc(emailRef, { attachments: updated });
       window.location.reload();
     }
+
     if (e.target.classList.contains("send-btn")) {
       const confirmed = confirm("Envoyer cet email maintenant ?");
       if (!confirmed) return;
@@ -161,6 +166,7 @@ recipientCount = recipientsSnap.size;
       statusElem.innerHTML = "⏳ Envoi en cours";
       statusElem.className = "email-status scheduled";
     }
+
     if (e.target.classList.contains("schedule-btn")) {
       openSchedulePopup(id);
     }
