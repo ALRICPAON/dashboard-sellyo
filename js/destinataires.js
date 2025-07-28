@@ -114,8 +114,10 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const filtered = allLeads.filter(
-      l => l.source?.type === selectedType && l.source?.name === selectedName
-    );
+  l =>
+    l.refId === selectedName &&
+    (!selectedType || l.source?.type === selectedType)
+);
 
     renderLeads(filtered);
   });
