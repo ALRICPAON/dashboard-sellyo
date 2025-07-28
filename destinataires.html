@@ -1,94 +1,38 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Destinataires Email – Sellyo</title>
-  <link rel="stylesheet" href="dashboard.css" />
-  <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: sans-serif;
-      padding: 2rem;
-    }
-    .section {
-      background: #222;
-      padding: 1.5rem;
-      border-radius: 10px;
-      margin-bottom: 2rem;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    textarea {
-      width: 100%;
-      height: 120px;
-      padding: 1rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: none;
-      background: #333;
-      color: white;
-    }
-    button {
-      margin-top: 1rem;
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 6px;
-      background: #00bcd4;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .message {
-      margin-top: 1rem;
-      font-size: 1rem;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Associer les destinataires – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="/js/firebase-auth-check.js"></script>
+  <script type="module" src="/js/destinataire.js"></script>
 </head>
-<body>
-  <h1>📨 Ajouter des destinataires</h1>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <div id="navbar-container"></div>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("navbar-container").innerHTML = html;
+      });
+  </script>
 
-  <a href="emails.html" style="
-    display: inline-block;
-    margin-bottom: 2rem;
-    padding: 0.5rem 1rem;
-    background-color: #00bcd4;
-    color: black;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 6px;
-  ">⬅️ Retour à mes emails</a>
+  <main style="max-width: 700px; margin: 2rem auto; background: #1e1e1e; padding: 2rem; border-radius: 10px;">
+    <h2>📨 Associer les destinataires à un contenu</h2>
 
-  <div class="section">
-    <label for="manual-emails">✏️ Emails manuels (séparés par des virgules)</label>
-    <textarea id="manual-emails" placeholder="ex : client1@mail.com, client2@site.fr"></textarea>
-    <button id="save-manual">💾 Enregistrer les destinataires</button>
-    <div class="message" id="feedback"></div>
-  </div>
+    <div style="margin-top: 2rem;">
+      <label for="link-content" style="display: block; margin-bottom: 0.5rem;">🔗 Sélectionner un contenu (landing ou tunnel)</label>
+      <select id="link-content" style="width: 100%; padding: 0.5rem; border-radius: 5px; border: none; background: #2e2e2e; color: white;">
+        <option value="">-- Choisir un contenu --</option>
+      </select>
+    </div>
 
-  <div class="section">
-    <label for="lead-dropdown">👤 Sélectionner un lead dans une liste</label>
-    <select id="lead-dropdown">
-      <option value="">-- Sélectionner un lead --</option>
-    </select>
-  </div>
-
-  <div class="section">
-    <label>📋 Leads existants (coche ceux à qui envoyer)</label>
-    <div id="leads-list" style="margin-top:1rem;"></div>
-  </div>
-
-  <div class="section">
-    <label for="link-content">🔗 Associer à une landing ou tunnel</label>
-    <select id="link-content">
-      <option value="">-- Sélectionner --</option>
-    </select>
-  </div>
-
-  <!-- 🔁 Script séparé -->
-  <script type="module" src="js/destinataires.js"></script>
+    <div style="margin-top: 2rem;">
+      <button id="save-manual" style="padding: 0.7rem 1.5rem; background: #00ccff; color: #000; border: none; border-radius: 5px; font-weight: bold;">
+        💾 Enregistrer les destinataires
+      </button>
+      <p id="feedback" style="margin-top: 1rem; color: #ff6666;"></p>
+    </div>
+  </main>
 </body>
 </html>
