@@ -1,6 +1,8 @@
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
@@ -27,6 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const slugFinal = `${slug}-${Math.floor(10000 + Math.random() * 90000)}`;
     const createdAt = new Date().toISOString();
+    const scheduledAtInput = document.getElementById("scheduledAt")?.value || null;
+const scheduledAt = scheduledAtInput ? Timestamp.fromDate(new Date(scheduledAtInput)) : null;
+
 
     // ✅ Affiche l’attente immédiatement
     const popup = document.createElement("div");
@@ -84,6 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
         createdAt,
         url: `https://alricpaon.github.io/sellyo-hosting/emails/${encodeURIComponent(slugFinal)}.html`,
         type: "email",
+        status: scheduledAt ? "scheduled" : "draft",
+scheduledAt: scheduledAt,
         status: "draft",
         source: { type: "manuel", refId: landingId || tunnelId || null },
         landingId: landingId || null,
