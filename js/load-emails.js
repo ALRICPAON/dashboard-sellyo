@@ -119,6 +119,7 @@ const querySnapshot = await getDocs(q);
   `;
   emailsList.appendChild(container);
 }
+  } // ← 👈 fermeture de la boucle for
 
   // Gestion des clics
   emailsList.addEventListener("click", async (e) => {
