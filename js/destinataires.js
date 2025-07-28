@@ -65,7 +65,6 @@ function renderLeads(leadsToRender) {
   leadsList.appendChild(wrapper);
 }
 
-
 onAuthStateChanged(auth, async (user) => {
   if (!user || !emailId) {
     window.location.href = "index.html";
@@ -90,10 +89,10 @@ onAuthStateChanged(auth, async (user) => {
   tunnelsSnap.forEach(doc => {
     const data = doc.data();
     const opt = document.createElement("option");
-   opt.value = data.slug; // ← c’est ce qu’on utilise comme refId dans les leads
-opt.innerText = `${data.name || data.slug} (${data.type || "tunnel"})`;
-opt.dataset.type = data.type;
-opt.dataset.slug = data.slug; // ← pour filtrage précis
+    opt.value = data.slug; // ← utilisé comme refId dans les leads
+    opt.innerText = `${data.name || data.slug} (${data.type || "tunnel"})`;
+    opt.dataset.type = data.type;
+    opt.dataset.slug = data.slug;
     dropdown.appendChild(opt);
   });
 
@@ -108,16 +107,14 @@ opt.dataset.slug = data.slug; // ← pour filtrage précis
     const selectedType = selectedOption.dataset.type;
     const selectedSlug = selectedOption.dataset.slug;
 
-    if (!selectedType || !selectedName) {
+    if (!selectedType || !selectedSlug) {
       renderLeads(allLeads);
       return;
     }
 
-  const filtered = allLeads.filter(
-  l =>
-    l.refId === selectedSlug &&
-    (!selectedType || l.source?.type === selectedType)
-);
+    const filtered = allLeads.filter(
+      l => l.refId === selectedSlug && l.type === selectedType
+    );
 
     renderLeads(filtered);
   });
@@ -135,13 +132,15 @@ opt.dataset.slug = data.slug; // ← pour filtrage précis
     }
 
     try {
+      const selectedOption = dropdown.options[dropdown.selectedIndex];
+
       const ref = doc(db, "emails", emailId);
       await updateDoc(ref, {
         recipients: allRecipients,
         source: dropdown.selectedIndex > 0
           ? {
-              type: dropdown.options[dropdown.selectedIndex].dataset.type,
-              name: dropdown.options[dropdown.selectedIndex].dataset.name
+              type: selectedOption.dataset.type,
+              name: selectedOption.textContent.trim()
             }
           : manualEmails.length > 0
             ? { type: "manual" }
@@ -153,4 +152,3 @@ opt.dataset.slug = data.slug; // ← pour filtrage précis
     }
   });
 });
-avant verifie stp
