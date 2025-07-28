@@ -69,8 +69,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // 🔢 Récupération du nombre de destinataires (sous-collection)
     let recipientCount = 0;
-    const recipientsSnap = await getDocs(collection(db, `emails/${id}/recipients`));
-    recipientCount = recipientsSnap.size;
+   const recipientsCount = Array.isArray(data.recipients) ? data.recipients.length : 0;
 
     const container = document.createElement("div");
     container.className = "email-card";
@@ -106,9 +105,9 @@ onAuthStateChanged(auth, async (user) => {
         <button class="schedule-btn" data-id="${id}">🕓 Programmer</button>
         <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
         <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
-        <span style="margin-left: 6px; font-size: 0.85em; color: #888;">
-          🎯 ${recipientCount} destinataire${recipientCount > 1 ? "s" : ""}
-        </span>
+       <span style="margin-left: 6px; font-size: 0.85em; color: #888;">
+  👥 ${recipientsCount} destinataire${recipientsCount > 1 ? "s" : ""}
+</span>
       </div>
     `;
     emailsList.appendChild(container);
