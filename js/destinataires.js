@@ -23,7 +23,7 @@ const addManualBtn = document.getElementById("add-manual-btn");
 const addLeadBtn = document.getElementById("add-lead-btn");
 const addLandingBtn = document.getElementById("add-landing-btn");
 const saveBtn = document.getElementById("save-manual");
-const table = document.getElementById("recipients-table");
+const table = document.querySelector("#recipients-table tbody");
 const feedback = document.getElementById("feedback");
 
 const selectedRecipients = new Set(); // Pour éviter les doublons
