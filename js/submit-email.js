@@ -1,6 +1,5 @@
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getFirestore, collection, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 
@@ -91,7 +90,6 @@ const scheduledAt = scheduledAtInput ? Timestamp.fromDate(new Date(scheduledAtIn
         type: "email",
         status: scheduledAt ? "scheduled" : "draft",
 scheduledAt: scheduledAt,
-        status: "draft",
         source: { type: "manuel", refId: landingId || tunnelId || null },
         landingId: landingId || null,
         tunnelId: tunnelId || null
