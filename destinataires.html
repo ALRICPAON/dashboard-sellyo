@@ -5,13 +5,29 @@
   <title>Destinataires Email – Sellyo</title>
   <link rel="stylesheet" href="dashboard.css" />
   <script type="module" src="/js/firebase-auth-check.js"></script>
-  <script type="module" src="js/destinataires.js"></script>
+  <script type="module" src="/js/destinataires.js"></script>
   <style>
     body {
       background: #111;
       color: white;
       font-family: sans-serif;
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+    .main {
+      flex: 1;
       padding: 2rem;
+    }
+    .sidebar {
+      width: 350px;
+      background: #1a1a1a;
+      border-left: 2px solid #333;
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
     }
     .section {
       background: #222;
@@ -24,17 +40,7 @@
       display: block;
       margin-bottom: 0.5rem;
     }
-    textarea {
-      width: 100%;
-      height: 120px;
-      padding: 1rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: none;
-      background: #333;
-      color: white;
-    }
-    select {
+    textarea, select {
       width: 100%;
       padding: 0.5rem;
       font-size: 1rem;
@@ -57,50 +63,76 @@
       margin-top: 1rem;
       font-size: 1rem;
     }
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      background-color: #00bcd4;
+      color: black;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 6px;
+    }
+    .recipient-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .recipient-table th, .recipient-table td {
+      padding: 0.5rem;
+      border-bottom: 1px solid #444;
+      text-align: left;
+    }
+    .recipient-table td button {
+      background: red;
+      color: white;
+      border: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+  <div class="main">
+    <h1>📨 Ajouter des destinataires</h1>
+    <a href="emails.html" class="back-btn">⬅️ Retour à mes emails</a>
 
-  <h1>📨 Ajouter des destinataires</h1>
+    <div class="section">
+      <label for="manual-emails">✏️ Emails manuels</label>
+      <textarea id="manual-emails" placeholder="ex: client1@mail.com, client2@site.fr"></textarea>
+      <button id="add-manual">➕ Ajouter</button>
+    </div>
 
-  <a href="emails.html" style="
-    display: inline-block;
-    margin-bottom: 2rem;
-    padding: 0.5rem 1rem;
-    background-color: #00bcd4;
-    color: black;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 6px;">⬅️ Retour à mes emails</a>
+    <div class="section">
+      <label for="lead-dropdown">👤 Ajouter un lead existant</label>
+      <select id="lead-dropdown">
+        <option value="">-- Sélectionner un lead --</option>
+      </select>
+      <button id="add-lead">➕ Ajouter</button>
+    </div>
 
-  <div class="section">
-    <label for="manual-emails">✏️ Emails manuels (séparés par des virgules)</label>
-    <textarea id="manual-emails" placeholder="ex : client1@mail.com, client2@site.fr"></textarea>
+    <div class="section">
+      <label for="link-content">🔗 Associer tous les leads d'une landing/tunnel</label>
+      <select id="link-content">
+        <option value="">-- Sélectionner --</option>
+      </select>
+      <button id="add-from-content">➕ Ajouter tous les leads</button>
+    </div>
+
+    <div class="section">
+      <button id="save-manual">💾 Enregistrer les destinataires</button>
+      <div class="message" id="feedback"></div>
+    </div>
   </div>
 
-  <div class="section">
-    <label for="lead-dropdown">👤 Sélectionner un lead dans une liste</label>
-    <select id="lead-dropdown">
-      <option value="">-- Sélectionner un lead --</option>
-    </select>
+  <div class="sidebar">
+    <h2>📬 Destinataires sélectionnés</h2>
+    <table class="recipient-table" id="recipients-table">
+      <thead>
+        <tr><th>Email</th><th>Action</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-
-  <div class="section">
-    <label>📋 Leads existants (coche ceux à qui envoyer)</label>
-    <div id="leads-list" style="margin-top:1rem;"></div>
-  </div>
-
-  <div class="section">
-    <label for="link-content">🔗 Associer à une landing ou tunnel</label>
-    <select id="link-content">
-      <option value="">-- Sélectionner --</option>
-    </select>
-  </div>
-
-  <div class="section">
-    <button id="save-manual">💾 Enregistrer les destinataires</button>
-    <div class="message" id="feedback"></div>
-  </div>
-
 </body>
 </html>
