@@ -1,4 +1,4 @@
-// ✅ Nouveau load-emails.js avec design modernisé et nouveaux boutons
+// ✅ Nouveau load-emails.js avec design modernisé et nouveaux boutons + compteur de leads
 
 import { app } from "./firebase-init.js";
 import {
@@ -54,33 +54,27 @@ onAuthStateChanged(auth, async (user) => {
     ready: "scheduled"
   };
 
- const q = query(
-  collection(db, "emails"),
-  where("userId", "==", user.uid)
-);
-const querySnapshot = await getDocs(q);
+  const q = query(collection(db, "emails"), where("userId", "==", user.uid));
+  const querySnapshot = await getDocs(q);
   emailsList.innerHTML = "";
 
   for (const docSnap of querySnapshot.docs) {
     const data = docSnap.data();
     const isWorkflow = data.isWorkflow === true;
-const isManuelOrLeads = data.source?.type === "manuel" || data.source?.type === "leads";
+    const isManuelOrLeads = data.source?.type === "manuel" || data.source?.type === "leads";
+    if (isWorkflow || !isManuelOrLeads) continue;
 
-if (isWorkflow || !isManuelOrLeads) return;
     const id = docSnap.id;
     const slug = extractSlugFromURL(data.url || "");
-    
+
     // 🔍 Récupération du nombre de leads associés via le refId dans source
-let leadsCount = 0;
-const refId = data.source?.refId;
-if (refId) {
-  const leadsQuery = query(
-    collection(db, "leads"),
-    where("refId", "==", refId)
-  );
-  const leadsSnap = await getDocs(leadsQuery);
-  leadsCount = leadsSnap.size;
-}
+    let leadsCount = 0;
+    const refId = data.source?.refId;
+    if (refId) {
+      const leadsQuery = query(collection(db, "leads"), where("refId", "==", refId));
+      const leadsSnap = await getDocs(leadsQuery);
+      leadsCount = leadsSnap.size;
+    }
 
     const container = document.createElement("div");
     container.className = "email-card";
@@ -117,14 +111,13 @@ if (refId) {
         <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
         <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
         <span style="margin-left: 6px; font-size: 0.85em; color: #888;">
-  👥 ${leadsCount} lead${leadsCount > 1 ? "s" : ""}
-</span>
+          👥 ${leadsCount} lead${leadsCount > 1 ? "s" : ""}
+        </span>
       </div>
     `;
     emailsList.appendChild(container);
-  });
+  }
 
-  // Gestion des clics
   emailsList.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!id) return;
@@ -132,24 +125,18 @@ if (refId) {
     if (e.target.classList.contains("edit-btn")) {
       window.location.href = `edit-email.html?id=${id}`;
     }
-
     if (e.target.classList.contains("upload-btn")) {
       window.location.href = `upload-email.html?id=${id}`;
     }
-    
     if (e.target.classList.contains("target-btn")) {
-  window.location.href = `destinataires.html?id=${id}`;
-}
-    
-
-
+      window.location.href = `destinataires.html?id=${id}`;
+    }
     if (e.target.classList.contains("delete-btn")) {
       const confirmed = confirm("Confirmer la suppression de cet email ?");
       if (!confirmed) return;
       await deleteDoc(doc(db, "emails", id));
       e.target.closest(".email-card").remove();
     }
-
     if (e.target.classList.contains("delete-attachment-btn")) {
       const emailId = e.target.dataset.emailId;
       const fileName = e.target.dataset.fileName;
@@ -166,7 +153,6 @@ if (refId) {
       await updateDoc(emailRef, { attachments: updated });
       window.location.reload();
     }
-
     if (e.target.classList.contains("send-btn")) {
       const confirmed = confirm("Envoyer cet email maintenant ?");
       if (!confirmed) return;
@@ -180,7 +166,7 @@ if (refId) {
       statusElem.className = "email-status scheduled";
     }
     if (e.target.classList.contains("schedule-btn")) {
-  openSchedulePopup(id);
-}
+      openSchedulePopup(id);
+    }
   });
-}); // 🔴 fermeture de onAuthStateChanged — essentielle !
+});
