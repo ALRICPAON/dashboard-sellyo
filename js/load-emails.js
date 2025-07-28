@@ -116,6 +116,9 @@ if (refId) {
         <button class="schedule-btn" data-id="${id}">🕓 Programmer</button>
         <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
         <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
+        <span style="margin-left: 6px; font-size: 0.85em; color: #888;">
+  👥 ${leadsCount} lead${leadsCount > 1 ? "s" : ""}
+</span>
       </div>
     `;
     emailsList.appendChild(container);
@@ -137,9 +140,7 @@ if (refId) {
     if (e.target.classList.contains("target-btn")) {
   window.location.href = `destinataires.html?id=${id}`;
 }
-    <span style="margin-left: 6px; font-size: 0.85em; color: #888;">
-  👥 ${leadsCount} lead${leadsCount > 1 ? "s" : ""}
-</span>
+    
 
 
     if (e.target.classList.contains("delete-btn")) {
