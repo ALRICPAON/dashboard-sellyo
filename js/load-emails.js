@@ -137,6 +137,10 @@ if (refId) {
     if (e.target.classList.contains("target-btn")) {
   window.location.href = `destinataires.html?id=${id}`;
 }
+    <span style="margin-left: 6px; font-size: 0.85em; color: #888;">
+  👥 ${leadsCount} lead${leadsCount > 1 ? "s" : ""}
+</span>
+
 
     if (e.target.classList.contains("delete-btn")) {
       const confirmed = confirm("Confirmer la suppression de cet email ?");
