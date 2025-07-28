@@ -110,7 +110,7 @@ const querySnapshot = await getDocs(q);
       <button class="delete-btn" data-id="${id}">🧨 Supprimer</button>
       <button class="send-btn" data-id="${id}">📨 Envoyer</button>
       <button class="schedule-btn" data-id="${id}">🕓 Programmer</button>
-      <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
+            <button class="relance-btn" data-id="${id}">⏱️ Créer relance</button>
       <button class="target-btn" data-id="${id}">🎯 Destinataires</button>
       <span style="margin-left: 6px; font-size: 0.85em; color: #aaa;">
         ${destinatairesLabel}
@@ -118,10 +118,9 @@ const querySnapshot = await getDocs(q);
     </div>
   `;
   emailsList.appendChild(container);
-}
-  } // ← 👈 fermeture de la boucle for
+} // ✅ FIN du `for (const docSnap of ...)`
 
-  // Gestion des clics
+  // ✅ DÉBUT de la gestion des clics
   emailsList.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!id) return;
