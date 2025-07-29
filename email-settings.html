@@ -1,40 +1,27 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Domaine email – Sellyo</title>
-  <link rel="stylesheet" href="dashboard.css" />
-  <script type="module" src="js/firebase-auth-check.js"></script>
-  <script type="module" src="js/submit-mail-settings.js"></script>
+  <meta charset="UTF-8">
+  <title>Paramètres Email – Sellyo</title>
 </head>
+<body style="background:#111; color:white; font-family:sans-serif; padding:2rem;">
 
-<body style="background:#111; color:white; font-family:sans-serif;">
-  <div id="navbar-container"></div>
-  <script>
-    fetch("navbar.html")
-      .then(res => res.text())
-      .then(html => document.getElementById("navbar-container").innerHTML = html);
-  </script>
+  <h2>📧 Configuration de l’adresse email d’envoi</h2>
 
-  <main style="padding: 2rem; max-width: 800px; margin: auto;">
-    <h1>✉️ Domaine pour l'envoi des emails</h1>
+  <label for="fromEmail">Adresse email d’envoi :</label><br />
+  <input type="email" id="fromEmail" placeholder="ex: contact@monsite.com" style="width: 100%; padding: 0.5rem; margin: 1rem 0;" required />
 
-    <section style="background: #1c1c1c; padding: 2rem; border-radius: 10px;">
-      <label for="emailDomain">Nom de domaine à utiliser pour l'envoi :</label><br />
-      <input type="text" id="emailDomain" placeholder="ex: monsite.com" style="width: 100%; padding: 0.5rem; margin: 1rem 0;" />
+  <button id="setup-domain" style="padding: 0.7rem 1.5rem; background: #00ccff; color: black; font-weight: bold; border: none; border-radius: 5px;">
+    ⚙️ Afficher les DNS à configurer
+  </button>
 
-      <button type="button" id="generateDnsBtn" style="padding: 0.7rem 1.5rem; background: #00ccff; color: black; font-weight: bold; border: none; border-radius: 5px;">
-        ⚙️ Générer les instructions DNS
-      </button>
+  <div id="dns-popup" style="display:none; background:#222; color:white; padding:1rem; border-radius:8px; margin-top: 2rem;">
+    <h3>🛠️ Instructions DNS</h3>
+    <pre id="dns-records">...</pre>
+    <p id="domain-status" style="font-weight:bold; color:orange;">🟡 En attente de validation</p>
+    <button id="check-domain-status">🔁 Vérifier à nouveau</button>
+  </div>
 
-      <div id="dnsInstructions" style="display: none; margin-top: 2rem;">
-        <h3>📋 Instructions DNS à copier dans ton registrar :</h3>
-        <ul id="dnsList" style="list-style-type: square; padding-left: 1.5rem;"></ul>
-
-        <button type="button" id="verifyDnsBtn" style="margin-top: 1.5rem;">🔍 Vérifier la configuration DNS</button>
-        <p id="dnsStatus" style="margin-top: 1rem; font-weight: bold;"></p>
-      </div>
-    </section>
-  </main>
+  <script type="module" src="js/submit-mail-settings.js"></script>
 </body>
 </html>
