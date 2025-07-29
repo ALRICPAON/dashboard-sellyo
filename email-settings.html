@@ -3,27 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <title>Paramètres Email – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script type="module" src="js/firebase-auth-check.js"></script>
 </head>
-<body <body style="background:#111; color:white; font-family:sans-serif; padding:2rem; border: 8px solid red;">
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <header>
+    <a href="dashboard.html">
+      <img src="assets/logo.png" alt="Logo Sellyo" class="logo" style="cursor: pointer;">
+    </a>
+    <nav>
+      <ul>
+        <li><a href="dashboard.html">Accueil</a></li>
+        <li><a href="tunnels.html">Mes tunnels</a></li>
+        <li><a href="clients.html">Mes clients</a></li>
+        <li><a href="emails.html">Mes emails</a></li>
+        <li><a href="stats.html">Statistiques</a></li>
+        <li><a href="email-settings.html">Paramètres Email</a></li>
+        <li><a href="index.html">Déconnexion</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<div style="background:red; color:white; padding:10px; font-weight:bold;">
-  🧪 TEST VISUEL : VOUS ÊTES SUR LA BONNE PAGE ?
-</div>
+  <main>
+    <div style="background:#2e2e2e; padding:2rem; border-radius:10px; max-width:800px; margin:2rem auto;">
+      <h2>Configurer votre adresse email professionnelle</h2>
+      <p>Pour envoyer des emails professionnels avec votre propre domaine (ex. contact@monagence.com), vous devez ajouter ces deux entrées DNS dans votre hébergeur (ex : OVH, IONOS, etc.) :</p>
 
-  <h2>Configuration email d'envoi</h2>
+      <h3>📄 Entrée SPF</h3>
+      <pre style="background:#1e1e1e; padding:10px; border-radius:5px;">Type : TXT
+Nom : @
+Valeur : v=spf1 include:_spf.mailersend.net ~all</pre>
 
-  <label for="custom-domain">Nom de domaine :</label><br>
-  <input type="text" id="custom-domain" placeholder="ex: monsite.com">
-  <button id="setup-domain">Configurer</button>
+      <h3>📄 Entrée DKIM</h3>
+      <pre style="background:#1e1e1e; padding:10px; border-radius:5px;">Type : TXT
+Nom : mailersend._domainkey
+Valeur : v=DKIM1; k=rsa; p=MIIBIjANBgkq... (clé à générer)</pre>
 
-  <div id="dns-popup" style="display:none; background:#222; color:white; padding:1rem; border-radius:8px; margin-top: 2rem;">
-    <h3>Instructions DNS</h3>
-    <pre id="dns-records">...</pre>
-    <p id="domain-status" style="font-weight:bold; color:orange;">🟡 En attente de validation</p>
-    <button id="check-domain-status">Vérifier à nouveau</button>
-  </div>
+      <p>Après avoir ajouté ces enregistrements, cliquez sur le bouton ci-dessous pour vérifier votre configuration.</p>
 
-  <!-- ✅ Ton script chargé en module -->
-  <script type="module" src="js/submit-mail-settings.js"></script>
+      <button id="verify-domain" style="margin-top:1rem; padding:10px 20px; font-size:1rem; background:#00ccff; color:white; border:none; border-radius:6px;">🔍 Vérifier mon domaine</button>
+
+      <p id="verification-result" style="margin-top:1rem;"></p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { app } from "./js/firebase-init.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById("verify-domain").addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return alert("Vous devez être connecté.");
+
+      // Appel fictif (à adapter avec Make ou un endpoint MailerSend)
+      const result = await fetch("https://hook.eu2.make.com/ton-endpoint-verification", {
+        method: "POST",
+        body: JSON.stringify({ userId: user.uid }),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const data = await result.json();
+      const output = document.getElementById("verification-result");
+
+      if (data.status === "verified") {
+        output.textContent = "✅ Votre domaine est correctement configuré.";
+        output.style.color = "lightgreen";
+      } else {
+        output.textContent = "❌ Votre domaine n'est pas encore configuré ou la propagation DNS est incomplète.";
+        output.style.color = "orange";
+      }
+    });
+  </script>
 </body>
 </html>
+<h2>Paramètres d'envoi des emails</h2>
+<label>Adresse email d'envoi :</label><br>
+<input type="email" id="sender-email" placeholder="ex: contact@monsite.com"><br><br>
+
+<button id="generate-dns">Afficher les instructions DNS</button><br><br>
+
+<div id="dns-instructions" style="display:none;">
+  <h3>Enregistrements DNS à ajouter :</h3>
+  <pre id="dns-values">...</pre>
+  <button id="check-dns">Valider la configuration</button>
+  <p id="dns-status" style="color: limegreen; font-weight: bold;"></p>
+</div>
