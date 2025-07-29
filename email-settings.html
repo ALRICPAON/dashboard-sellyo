@@ -3,23 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <title>Paramètres Email – Sellyo</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .settings-container {
+      background: #1c1c1c;
+      padding: 3rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 204, 255, 0.3);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.7rem;
+      margin-top: 0.3rem;
+      border: none;
+      border-radius: 6px;
+      background: #2c2c2c;
+      color: white;
+    }
+
+    button {
+      margin-top: 2rem;
+      width: 100%;
+      padding: 0.9rem;
+      background: #00ccff;
+      border: none;
+      border-radius: 6px;
+      color: #111;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00b3e6;
+    }
+  </style>
 </head>
-<body style="background:#111; color:white; font-family:sans-serif; padding:2rem;">
+<body>
 
-  <h2>📧 Configuration de l’adresse email d’envoi</h2>
+  <div class="settings-container">
+    <h2>Configuration email</h2>
 
-  <label for="fromEmail">Adresse email d’envoi :</label><br />
-  <input type="email" id="fromEmail" placeholder="ex: contact@monsite.com" style="width: 100%; padding: 0.5rem; margin: 1rem 0;" required />
+    <label for="custom-domain">Nom de domaine :</label>
+    <input type="text" id="custom-domain" placeholder="ex : monsite.com">
 
-  <button id="setup-domain" style="padding: 0.7rem 1.5rem; background: #00ccff; color: black; font-weight: bold; border: none; border-radius: 5px;">
-    ⚙️ Afficher les DNS à configurer
-  </button>
+    <label for="sender-email">Adresse email d'envoi :</label>
+    <input type="email" id="sender-email" placeholder="ex : contact@monsite.com">
 
-  <div id="dns-popup" style="display:none; background:#222; color:white; padding:1rem; border-radius:8px; margin-top: 2rem;">
-    <h3>🛠️ Instructions DNS</h3>
-    <pre id="dns-records">...</pre>
-    <p id="domain-status" style="font-weight:bold; color:orange;">🟡 En attente de validation</p>
-    <button id="check-domain-status">🔁 Vérifier à nouveau</button>
+    <label for="company-name">Nom de l’entreprise :</label>
+    <input type="text" id="company-name" placeholder="ex : Sellyo">
+
+    <button id="save-settings">Enregistrer</button>
   </div>
 
   <script type="module" src="js/submit-mail-settings.js"></script>
