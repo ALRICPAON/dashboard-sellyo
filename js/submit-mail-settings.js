@@ -1,47 +1,99 @@
 import { app } from "./firebase-init.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const auth = getAuth(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  const emailInput = document.getElementById("sender-email");
-  const dnsBlock = document.getElementById("dns-instructions");
-  const dnsOutput = document.getElementById("dns-values");
-  const generateBtn = document.getElementById("generate-dns");
-  const checkBtn = document.getElementById("check-dns");
-  const statusMsg = document.getElementById("dns-status");
+const domainInput = document.getElementById("emailDomain");
+const generateBtn = document.getElementById("generateDnsBtn");
+const dnsBlock = document.getElementById("dnsInstructions");
+const dnsList = document.getElementById("dnsList");
+const verifyBtn = document.getElementById("verifyDnsBtn");
+const dnsStatus = document.getElementById("dnsStatus");
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) return;
 
   generateBtn.addEventListener("click", async () => {
-    const email = emailInput.value.trim();
-    const domain = email.split("@")[1];
-    if (!domain) return alert("Email invalide");
+    const domain = domainInput.value.trim().toLowerCase();
+    if (!domain) return alert("Merci d’entrer un domaine valide.");
 
-    // Tu fais ici l’appel POST vers MailerSend pour créer le domaine
-    // Pour cette démo, on affiche des valeurs simulées
-    dnsOutput.innerText = `
-Nom : @ | Type : TXT | Valeur : v=spf1 include:_spf.mailersend.net ~all
-Nom : sellyo._domainkey.${domain} | Type : CNAME | Valeur : sellyo._domainkey.mailersend.net
-Nom : rp._domainkey.${domain} | Type : CNAME | Valeur : rp.mailersend.net
-    `.trim();
+    try {
+      const res = await fetch("https://us-central1-sellyo-3bbdb.cloudfunctions.net/createMailerSendDomain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domain })
+      });
 
-    dnsBlock.style.display = "block";
-    statusMsg.textContent = "";
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      await setDoc(doc(db, "users", user.uid), {
+        emailDomain: {
+          name: domain,
+          domainId: data.id,
+          status: "pending"
+        }
+      }, { merge: true });
+
+      dnsList.innerHTML = "";
+      for (const record of data.dns || []) {
+        const li = document.createElement("li");
+        li.textContent = `Nom : ${record.name} | Type : ${record.record_type} | Valeur : ${record.value}`;
+        dnsList.appendChild(li);
+      }
+
+      dnsStatus.textContent = "🟡 En attente de validation";
+      dnsStatus.style.color = "orange";
+      dnsBlock.style.display = "block";
+    } catch (err) {
+      console.error("❌ Erreur création domaine :", err);
+      alert("Erreur lors de l’enregistrement du domaine.");
+    }
   });
 
-  checkBtn.addEventListener("click", async () => {
-    const email = emailInput.value.trim();
-    const domain = email.split("@")[1];
+  verifyBtn.addEventListener("click", async () => {
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const domainInfo = userDoc.data()?.emailDomain;
 
-    // Ici tu appelles MailerSend GET /domains/domain_id pour vérifier (ou un endpoint Make si besoin)
-    // Simulation pour test :
-    const isValid = true; // à remplacer par la vraie vérification via API
+    if (!domainInfo?.domainId) return alert("Aucun domaine trouvé pour cet utilisateur.");
 
-    if (isValid) {
-      statusMsg.textContent = "✅ Configuration validée avec succès !";
-      statusMsg.style.color = "limegreen";
-    } else {
-      statusMsg.textContent = "❌ La configuration DNS n’est pas encore correcte.";
-      statusMsg.style.color = "red";
+    try {
+      const res = await fetch("https://us-central1-sellyo-3bbdb.cloudfunctions.net/checkMailerSendDomainStatus", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domainId: domainInfo.domainId,
+          userId: user.uid
+        })
+      });
+
+      const data = await res.json();
+      const isValid = data.validated;
+
+      await setDoc(doc(db, "users", user.uid), {
+        emailDomain: {
+          ...domainInfo,
+          status: isValid ? "validated" : "pending"
+        }
+      }, { merge: true });
+
+      dnsStatus.textContent = isValid
+        ? "✅ Domaine vérifié et prêt à l'envoi"
+        : "🟡 Toujours en attente de validation";
+      dnsStatus.style.color = isValid ? "limegreen" : "orange";
+    } catch (err) {
+      console.error("❌ Erreur de vérification DNS :", err);
+      alert("Erreur lors de la vérification DNS.");
     }
   });
 });
