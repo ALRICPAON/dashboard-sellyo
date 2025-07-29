@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const res = await fetch("https://us-central1-sellyo-3bbdb.cloudfunctions.net/createMailerSendDomain", {
+        const res = await fetch("https://europe-west1-sellyo-functions.cloudfunctions.net/createMailerSendDomain", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ domain })
