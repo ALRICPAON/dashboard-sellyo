@@ -21,22 +21,21 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     }
 
     try {
-     const response = await fetch("https://createcustomdomainnetlify-mplcxq32ca-ew.a.run.app/", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    userId: user.uid,
-    customDomain: customDomain
-  })
-});
+      const response = await fetch("https://europe-west1-sellyo-3bbdb.cloudfunctions.net/createCustomDomainNetlify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.uid,
+          domain: customDomain
+        }),
+      });
 
       const data = await response.json();
 
       if (response.ok) {
         messageDiv.textContent = "✅ Domaine enregistré avec succès !";
         messageDiv.style.color = "lightgreen";
+        console.log("📬 Réponse API Netlify :", data);
       } else {
         console.error("Erreur:", data);
         messageDiv.textContent = "❌ Erreur : " + (data.error || "Domaine invalide.");
