@@ -1,48 +1,46 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Domaine du site – Sellyo</title>
-  <link rel="stylesheet" href="dashboard.css">
+  <meta charset="UTF-8" />
+  <title>Paramètres Domaine – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css" />
   <script type="module" src="js/firebase-auth-check.js"></script>
   <script type="module" src="js/submit-settings.js"></script>
 </head>
-<body style="background:#111; color:white; font-family:sans-serif; padding:2rem;">
 
-  <!-- 🔙 Bouton retour -->
-  <div style="margin-bottom: 2rem;">
-    <a href="dashboard.html" style="color:#00ccff; text-decoration:none; font-weight:bold;">← Retour à l’accueil</a>
-  </div>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      });
+  </script>
 
-  <main style="max-width: 500px; margin: auto; background:#222; padding:2rem; border-radius:12px;">
-    <h2 style="text-align:center; margin-bottom:1.5rem;">Configurer un domaine pour vos pages Sellyo</h2>
-
+  <main style="padding: 2rem; max-width: 600px; margin: auto;">
+    <h2>Configurer le domaine principal</h2>
     <form id="settings-form">
-      <label for="customDomain">Nom de domaine personnalisé :</label><br>
-      <input id="customDomain" type="text" placeholder="ex: tunnel.monsite.com" style="width:100%; padding:0.5rem; margin-bottom:1rem;"><br>
+      <label for="custom-domain">Domaine personnalisé :</label><br />
+      <input
+        type="text"
+        id="custom-domain"
+        name="customDomain"
+        placeholder="ex: monsiteperso.fr"
+        style="width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 16px;"
+        required
+      />
 
-      <label for="fromName">Nom de l’expéditeur (facultatif) :</label><br>
-      <input id="fromName" type="text" placeholder="ex: Jean Dupont" style="width:100%; padding:0.5rem; margin-bottom:1rem;"><br>
-
-      <label for="fromEmail">Email expéditeur (facultatif) :</label><br>
-      <input id="fromEmail" type="email" placeholder="ex: contact@monsite.com" style="width:100%; padding:0.5rem; margin-bottom:1rem;"><br>
-
-      <label for="replyTo">Adresse de réponse (facultatif) :</label><br>
-      <input id="replyTo" type="email" placeholder="ex: support@monsite.com" style="width:100%; padding:0.5rem; margin-bottom:1.5rem;"><br>
-
-      <button type="submit" style="width:100%; padding:0.75rem; background:#00ccff; color:#111; border:none; font-weight:bold; border-radius:6px;">
-        🌐 Enregistrer le domaine
+      <button type="submit" style="padding: 10px 20px; background-color: #00ccff; border: none; color: black; cursor: pointer;">
+        Enregistrer le domaine
       </button>
     </form>
 
-    <!-- Bloc instructions DNS -->
-    <div id="dns-instructions" style="display:none; margin-top:2rem;">
-      <h3>🔐 Instructions DNS</h3>
-      <pre id="dns-values" style="background:#333; padding:1rem; border-radius:8px;"></pre>
-      <p id="dns-status" style="font-weight:bold; color:orange;">⏳ En attente de validation</p>
-      <button id="check-domain-status" style="margin-top:1rem; background:#00ccff; color:#111; border:none; padding:0.5rem 1rem; border-radius:6px;">🔄 Vérifier</button>
+    <div id="message" style="margin-top: 1rem;"></div>
+
+    <div style="margin-top: 3rem;">
+      <a href="dashboard.html" style="color: #00ccff;">← Retour au tableau de bord</a>
     </div>
   </main>
-
 </body>
 </html>
