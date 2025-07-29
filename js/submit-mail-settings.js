@@ -4,89 +4,116 @@ import {
   getFirestore, doc, setDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+console.log("📦 JS chargé !");
 
-const setupBtn = document.getElementById("setup-domain");
-const domainInput = document.getElementById("custom-domain");
-const popup = document.getElementById("dns-popup");
-const dnsOutput = document.getElementById("dns-records");
-const statusText = document.getElementById("domain-status");
-const checkBtn = document.getElementById("check-domain-status");
+document.addEventListener("DOMContentLoaded", () => {
+  const setupBtn = document.getElementById("setup-domain");
+  const domainInput = document.getElementById("custom-domain");
+  const popup = document.getElementById("dns-popup");
+  const dnsOutput = document.getElementById("dns-records");
+  const statusText = document.getElementById("domain-status");
+  const checkBtn = document.getElementById("check-domain-status");
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) return;
+  if (!setupBtn) {
+    console.error("❌ Bouton 'Configurer' non trouvé dans le DOM");
+    return;
+  }
 
-  setupBtn.addEventListener("click", async () => {
-    const domain = domainInput.value.trim().toLowerCase();
-    if (!domain) return alert("Merci de renseigner un domaine valide.");
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    // 📤 Appel fonction cloud pour créer le domaine
-    const res = await fetch("https://us-central1-sellyo-3bbdb.cloudfunctions.net/createMailerSendDomain", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ domain })
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      alert("❌ Erreur création domaine : " + data.error);
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      console.warn("🟡 Utilisateur non connecté");
       return;
     }
 
-    // 🔐 Stocke dans Firestore
-    await setDoc(doc(db, "users", user.uid), {
-      emailDomain: {
-        name: domain,
-        domainId: data.id,
-        status: "pending"
-      }
-    }, { merge: true });
+    console.log("✅ Utilisateur connecté :", user.email);
 
-    // 🧾 Affiche les DNS
-    const dns = data.dns?.records || [];
-    dnsOutput.innerText = dns.map(r =>
-      `Nom : ${r.name} | Type : ${r.record_type} | Valeur : ${r.value}`
-    ).join("\n");
+    setupBtn.addEventListener("click", async () => {
+      const domain = domainInput.value.trim().toLowerCase();
+      if (!domain) return alert("Merci de renseigner un domaine valide.");
 
-    statusText.textContent = "🟡 En attente de validation";
-    statusText.style.color = "orange";
-    popup.style.display = "block";
-  });
+      console.log("📤 Envoi à createMailerSendDomain pour :", domain);
 
-  checkBtn.addEventListener("click", async () => {
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    const domainInfo = userDoc.data()?.emailDomain;
+      try {
+        const res = await fetch("https://us-central1-sellyo-3bbdb.cloudfunctions.net/createMailerSendDomain", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ domain })
+        });
 
-    if (!domainInfo || !domainInfo.domainId) return alert("Aucun domaine à vérifier");
+        const data = await res.json();
+        if (!res.ok) {
+          console.error("❌ Erreur API MailerSend :", data.error);
+          return alert("Erreur : " + data.error);
+        }
 
-    const res = await fetch(`https://api.mailersend.com/v1/domain-identities/${domainInfo.domainId}`, {
-      headers: {
-        Authorization: `Bearer VOTRE_SECRET_MAILERSEND`,
-        "Content-Type": "application/json"
+        // 🔐 Stocke dans Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          emailDomain: {
+            name: domain,
+            domainId: data.id,
+            status: "pending"
+          }
+        }, { merge: true });
+
+        // 🧾 Affiche les DNS
+        const dns = data.dns || [];
+        dnsOutput.innerText = dns.map(r =>
+          `Nom : ${r.name} | Type : ${r.record_type} | Valeur : ${r.value}`
+        ).join("\n");
+
+        statusText.textContent = "🟡 En attente de validation";
+        statusText.style.color = "orange";
+        popup.style.display = "block";
+        console.log("✅ Domaine enregistré, instructions DNS affichées");
+
+      } catch (err) {
+        console.error("❌ Erreur fetch domaine :", err);
+        alert("Erreur serveur : " + err.message);
       }
     });
 
-    const data = await res.json();
+    checkBtn.addEventListener("click", async () => {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const domainInfo = userDoc.data()?.emailDomain;
 
-    const isVerified = data.dkim?.status === "verified" && data.spf?.status === "verified";
+      if (!domainInfo || !domainInfo.domainId) return alert("Aucun domaine à vérifier");
 
-    const newStatus = isVerified ? "validated" : "pending";
+      try {
+        const res = await fetch(`https://api.mailersend.com/v1/domain-identities/${domainInfo.domainId}`, {
+          headers: {
+            Authorization: `Bearer VOTRE_SECRET_MAILERSEND`,
+            "Content-Type": "application/json"
+          }
+        });
 
-    // 💾 Met à jour le statut Firestore
-    await setDoc(doc(db, "users", user.uid), {
-      emailDomain: {
-        ...domainInfo,
-        status: newStatus
+        const data = await res.json();
+
+        const isVerified = data.dkim?.status === "verified" && data.spf?.status === "verified";
+        const newStatus = isVerified ? "validated" : "pending";
+
+        await setDoc(doc(db, "users", user.uid), {
+          emailDomain: {
+            ...domainInfo,
+            status: newStatus
+          }
+        }, { merge: true });
+
+        if (isVerified) {
+          statusText.textContent = "✅ Domaine vérifié et prêt à l'envoi";
+          statusText.style.color = "limegreen";
+        } else {
+          statusText.textContent = "🟡 Toujours en attente de validation";
+          statusText.style.color = "orange";
+        }
+
+        console.log("🔁 Statut de validation mis à jour :", newStatus);
+      } catch (err) {
+        console.error("❌ Erreur vérification domaine :", err);
+        alert("Erreur lors de la vérification DNS.");
       }
-    }, { merge: true });
-
-    if (isVerified) {
-      statusText.textContent = "✅ Domaine vérifié et prêt à l'envoi";
-      statusText.style.color = "limegreen";
-    } else {
-      statusText.textContent = "🟡 Toujours en attente de validation";
-      statusText.style.color = "orange";
-    }
+    });
   });
 });
