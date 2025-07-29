@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return alert("Erreur : " + data.error);
         }
 
-        // 🔐 Stocke dans Firestore
         await setDoc(doc(db, "users", user.uid), {
           emailDomain: {
             name: domain,
@@ -58,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }, { merge: true });
 
-        // 🧾 Affiche les DNS
         const dns = data.dns || [];
         dnsOutput.innerText = dns.map(r =>
           `Nom : ${r.name} | Type : ${r.record_type} | Valeur : ${r.value}`
@@ -82,26 +80,24 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!domainInfo || !domainInfo.domainId) return alert("Aucun domaine à vérifier");
 
       try {
-        const res = await fetch(`https://api.mailersend.com/v1/domain-identities/${domainInfo.domainId}`, {
-          headers: {
-            Authorization: `Bearer VOTRE_SECRET_MAILERSEND`,
-            "Content-Type": "application/json"
-          }
+        const res = await fetch("https://us-central1-sellyo-3bbdb.cloudfunctions.net/checkMailerSendDomainStatus", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            domainId: domainInfo.domainId,
+            userId: user.uid
+          })
         });
 
         const data = await res.json();
+        if (!res.ok) {
+          console.error("❌ Erreur check DNS :", data.error);
+          return alert("Erreur lors de la vérification DNS");
+        }
 
-        const isVerified = data.dkim?.status === "verified" && data.spf?.status === "verified";
-        const newStatus = isVerified ? "validated" : "pending";
+        const newStatus = data.validated ? "validated" : "pending";
 
-        await setDoc(doc(db, "users", user.uid), {
-          emailDomain: {
-            ...domainInfo,
-            status: newStatus
-          }
-        }, { merge: true });
-
-        if (isVerified) {
+        if (data.validated) {
           statusText.textContent = "✅ Domaine vérifié et prêt à l'envoi";
           statusText.style.color = "limegreen";
         } else {
@@ -109,10 +105,10 @@ document.addEventListener("DOMContentLoaded", () => {
           statusText.style.color = "orange";
         }
 
-        console.log("🔁 Statut de validation mis à jour :", newStatus);
+        console.log("🔁 Statut mis à jour via fonction backend :", newStatus);
       } catch (err) {
-        console.error("❌ Erreur vérification domaine :", err);
-        alert("Erreur lors de la vérification DNS.");
+        console.error("❌ Erreur réseau/verif DNS :", err);
+        alert("Erreur serveur lors de la vérification.");
       }
     });
   });
