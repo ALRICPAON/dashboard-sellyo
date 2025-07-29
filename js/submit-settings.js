@@ -21,7 +21,7 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     }
 
     try {
-      https://europe-west1-sellyo-functions.cloudfunctions.net/createCustomDomainNetlify
+      const response = await fetch("https://europe-west1-sellyo-functions.cloudfunctions.net/createCustomDomainNetlify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
