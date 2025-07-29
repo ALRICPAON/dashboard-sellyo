@@ -21,14 +21,16 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     }
 
     try {
-      const response = await fetch("https://europe-west1-sellyo-functions.cloudfunctions.net/createCustomDomainNetlify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.uid,
-          customDomain: customDomain
-        }),
-      });
+     const response = await fetch("https://createcustomdomainnetlify-mplcxq32ca-ew.a.run.app/", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    userId: user.uid,
+    customDomain: customDomain
+  })
+});
 
       const data = await response.json();
 
