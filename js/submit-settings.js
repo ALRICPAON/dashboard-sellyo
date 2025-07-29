@@ -1,56 +1,49 @@
 import { app } from "./firebase-init.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const auth = getAuth(app);
+const auth = getAuth(app);
 
-  const form = document.getElementById("settings-form");
-  const dnsBlock = document.getElementById("dns-instructions");
-  const dnsOutput = document.getElementById("dns-values");
-  const statusMsg = document.getElementById("dns-status");
+document.getElementById("settings-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  const domainInput = document.getElementById("custom-domain");
+  const messageDiv = document.getElementById("message");
+  const customDomain = domainInput.value.trim();
 
-    const user = auth.currentUser;
-    if (!user) return alert("Veuillez vous connecter.");
+  messageDiv.textContent = "⏳ Enregistrement en cours...";
+  messageDiv.style.color = "#ccc";
 
-    const fromName = document.getElementById("fromName")?.value || "";
-    const fromEmail = document.getElementById("fromEmail")?.value || "";
-    const replyTo = document.getElementById("replyTo")?.value || "";
-    const customDomain = document.getElementById("customDomain")?.value || "";
-
-    if (!customDomain) {
-      return alert("Veuillez entrer un domaine personnalisé.");
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      messageDiv.textContent = "❌ Vous devez être connecté.";
+      messageDiv.style.color = "red";
+      return;
     }
 
     try {
-      const res = await fetch("https://create-mailersend-domain-<ID>.a.run.app", {
+      const response = await fetch("https://europe-west1-sellyo-3bbdb.cloudfunctions.net/createCustomDomainNetlify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user.uid,
-          fromName,
-          fromEmail,
-          replyTo,
-          customDomain,
+          customDomain: customDomain
         }),
       });
 
-      if (!res.ok) throw new Error("Erreur lors de l’appel à la fonction");
+      const data = await response.json();
 
-      const data = await res.json();
-
-      dnsBlock.style.display = "block";
-      dnsOutput.textContent = data.dns || "✅ Domaine soumis avec succès.";
-      statusMsg.textContent = "📡 Domaine en attente de validation DNS.";
-
+      if (response.ok) {
+        messageDiv.textContent = "✅ Domaine enregistré avec succès !";
+        messageDiv.style.color = "lightgreen";
+      } else {
+        console.error("Erreur:", data);
+        messageDiv.textContent = "❌ Erreur : " + (data.error || "Domaine invalide.");
+        messageDiv.style.color = "red";
+      }
     } catch (err) {
       console.error("Erreur submit-settings:", err);
-      alert("Erreur lors de l'enregistrement des paramètres.");
+      messageDiv.textContent = "❌ Erreur lors de l'enregistrement du domaine.";
+      messageDiv.style.color = "red";
     }
   });
 });
