@@ -1,12 +1,12 @@
-<h2>Paramètres d'envoi des emails</h2>
-<label>Adresse email d'envoi :</label><br>
-<input type="email" id="sender-email" placeholder="ex: contact@monsite.com"><br><br>
+<h2>Configuration email d'envoi</h2>
 
-<button id="generate-dns">Afficher les instructions DNS</button><br><br>
+<label for="custom-domain">Nom de domaine :</label><br>
+<input type="text" id="custom-domain" placeholder="ex: monsite.com">
+<button id="setup-domain">Configurer</button>
 
-<div id="dns-instructions" style="display:none;">
-  <h3>Enregistrements DNS à ajouter :</h3>
-  <pre id="dns-values">...</pre>
-  <button id="check-dns">Valider la configuration</button>
-  <p id="dns-status" style="color: limegreen; font-weight: bold;"></p>
+<div id="dns-popup" style="display:none; background:#222; color:white; padding:1rem; border-radius:8px;">
+  <h3>Instructions DNS</h3>
+  <pre id="dns-records">...</pre>
+  <p id="domain-status" style="font-weight:bold; color:orange;">🟡 En attente de validation</p>
+  <button id="check-domain-status">Vérifier à nouveau</button>
 </div>
