@@ -1,12 +1,25 @@
-<h2>Configuration email d'envoi</h2>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Paramètres Email – Sellyo</title>
+</head>
+<body style="background:#111; color:white; font-family:sans-serif; padding:2rem;">
 
-<label for="custom-domain">Nom de domaine :</label><br>
-<input type="text" id="custom-domain" placeholder="ex: monsite.com">
-<button id="setup-domain">Configurer</button>
+  <h2>Configuration email d'envoi</h2>
 
-<div id="dns-popup" style="display:none; background:#222; color:white; padding:1rem; border-radius:8px;">
-  <h3>Instructions DNS</h3>
-  <pre id="dns-records">...</pre>
-  <p id="domain-status" style="font-weight:bold; color:orange;">🟡 En attente de validation</p>
-  <button id="check-domain-status">Vérifier à nouveau</button>
-</div>
+  <label for="custom-domain">Nom de domaine :</label><br>
+  <input type="text" id="custom-domain" placeholder="ex: monsite.com">
+  <button id="setup-domain">Configurer</button>
+
+  <div id="dns-popup" style="display:none; background:#222; color:white; padding:1rem; border-radius:8px; margin-top: 2rem;">
+    <h3>Instructions DNS</h3>
+    <pre id="dns-records">...</pre>
+    <p id="domain-status" style="font-weight:bold; color:orange;">🟡 En attente de validation</p>
+    <button id="check-domain-status">Vérifier à nouveau</button>
+  </div>
+
+  <!-- ✅ Ton script chargé en module -->
+  <script type="module" src="js/submit-mail-settings.js"></script>
+</body>
+</html>
