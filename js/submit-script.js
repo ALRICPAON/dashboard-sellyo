@@ -96,7 +96,10 @@ await addDoc(collection(userRef, "items"), {
         status: "pending",
         source: "manuel",
         captionUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-caption.txt`,
-        youtubeTitleUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-title.txt`
+        youtubeTitleUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-title.txt`,
+        promptVideoUrl: videoType === "videoia"
+  ? `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-prompt.txt`
+  : null
 
       });
 
