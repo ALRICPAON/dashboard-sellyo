@@ -1,3 +1,11 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+// Initialisation Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("script-form");
 
@@ -25,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const user = await firebase.auth().currentUser;
+      const user = auth.currentUser;
       if (!user) throw new Error("Utilisateur non authentifié");
       data.userId = user.uid;
     } catch (err) {
