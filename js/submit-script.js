@@ -1,75 +1,113 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { firebaseConfig } from "./firebase-config.js";
-
-// 🔧 Initialisation Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  const auth = getAuth(app);
+  const db = getFirestore(app);
   const form = document.getElementById("script-form");
+  if (!form) return;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log("📩 Formulaire soumis");
 
-    const formData = new FormData(form);
-    const title = formData.get("title");
-    const slugInput = formData.get("slug");
-    const slug = slugInput || generateSlug(title);
+    const user = auth.currentUser;
+    if (!user) return alert("Vous devez être connecté pour créer un script.");
 
-    const data = {
-      slug,
-      title,
-      description: formData.get("description"),
-      goal: formData.get("goal"),
-      audience: formData.get("audience"),
-      tone: formData.get("tone"),
-      language: formData.get("language"),
-      keywords: formData.get("keywords"),
-      videoType: formData.get("videoType"),
-      includeCaption: formData.get("includeCaption") === "on",
-      safeContent: formData.get("safeContent") === "on",
-      type: "script"
-    };
+    // 🔁 Récupération des données formulaire
+    const slugInput = document.querySelector('[name="slug"]')?.value || "";
+    const title = document.querySelector('[name="title"]')?.value || "";
+    const description = document.querySelector('[name="description"]')?.value || "";
+    const goal = document.querySelector('[name="goal"]')?.value || "";
+    const audience = document.querySelector('[name="audience"]')?.value || "";
+    const tone = document.querySelector('[name="tone"]')?.value || "";
+    const language = document.querySelector('[name="language"]')?.value || "";
+    const keywords = document.querySelector('[name="keywords"]')?.value || "";
+    const videoType = document.querySelector('[name="videoType"]')?.value || "";
+    const includeCaption = document.querySelector('[name="includeCaption"]')?.checked;
+    const safeContent = document.querySelector('[name="safeContent"]')?.checked;
+
+    // 🧠 Slug propre + unique
+    const slugClean = generateSlug(slugInput || title);
+    const slugFinal = `${slugClean}-${Math.floor(10000 + Math.random() * 90000)}`;
+    const createdAt = new Date().toISOString();
+
+    // ⏳ Loader pendant la génération
+    const popup = document.createElement("div");
+    popup.id = "script-loading-overlay";
+    popup.innerHTML = `
+      <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:2rem;text-align:center;font-size:1.2rem;">
+        <div class="loader" style="border: 5px solid #444; border-top: 5px solid #0af; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 2rem;"></div>
+        <p>🎬 <strong>Création de votre script...</strong></p>
+        <p>Merci de patienter jusqu’à <strong>1min30</strong>.<br>Ne fermez pas cette page.</p>
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `;
+    document.body.appendChild(popup);
 
     try {
-      const user = auth.currentUser;
-      if (!user) throw new Error("Utilisateur non authentifié");
-      data.userId = user.uid;
-      console.log("✅ Utilisateur connecté :", data.userId);
-    } catch (err) {
-      console.error("❌ Erreur d'authentification :", err);
-      alert("Vous devez être connecté pour créer un script.");
-      return;
-    }
-
-    console.log("📤 Données à envoyer à Make :", data);
-
-    try {
-      const response = await fetch("https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp", {
+      // 📤 Appel Webhook Make
+      const res = await fetch("https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.uid,
+          type: "script",
+          slug: slugFinal,
+          title,
+          description,
+          goal,
+          audience,
+          tone,
+          language,
+          keywords,
+          videoType,
+          includeCaption,
+          safeContent
+        })
       });
 
-      console.log("📬 Réponse Make reçue :", response.status, response.statusText);
+      if (!res.ok) throw new Error("Erreur webhook Make");
 
-      if (!response.ok) {
-        throw new Error("Erreur HTTP " + response.status);
-      }
+      console.log("📡 Script envoyé à Make avec succès");
 
-      alert("✅ Script en cours de génération. Il apparaîtra bientôt dans votre interface.");
-      form.reset();
-    } catch (error) {
-      console.error("❌ Erreur lors de l'envoi à Make :", error);
-      alert("Erreur lors de la soumission du formulaire. Veuillez réessayer.");
+      // 📝 Ajout Firestore dans scripts/{uid}/items
+      await addDoc(collection(db, "scripts", user.uid, "items"), {
+        userId: user.uid,
+        title,
+        slug: slugFinal,
+        description,
+        tone,
+        language,
+        goal,
+        audience,
+        keywords,
+        videoType,
+        includeCaption,
+        safeContent,
+        createdAt,
+        url: `https://alricpaon.github.io/sellyo-hosting/scripts/${slugFinal}.html`,
+        status: "pending",
+        source: "manuel"
+      });
+
+      // ✅ Redirection après délai
+      setTimeout(() => {
+        window.location.href = "scripts.html";
+      }, 90000); // 1min30
+
+    } catch (err) {
+      console.error("❌ Erreur de soumission :", err);
+      alert("Erreur : " + err.message);
     }
   });
 
-  // 🔤 Générateur de slug propre
+  // 🔤 Nettoyage du slug
   function generateSlug(text) {
     return text
       .toLowerCase()
