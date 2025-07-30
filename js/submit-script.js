@@ -1,6 +1,6 @@
 import { app } from "./firebase-init.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
@@ -77,7 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("📡 Script envoyé à Make avec succès");
 
       // 📝 Ajout Firestore dans scripts/{uid}/items
-      await addDoc(collection(db, "scripts", user.uid, "items"), {
+      const userRef = doc(db, "scripts", user.uid);
+await addDoc(collection(userRef, "items"), {
         userId: user.uid,
         title,
         slug: slugFinal,
