@@ -50,7 +50,7 @@ document.getElementById("generateVideoBtn").addEventListener("click", async () =
     else if (type === "aigen") {
       try {
         const { getFunctions, httpsCallable } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js");
-        const functions = getFunctions();
+        const functions = getFunctions(app);
         const generateImageFromPrompt = httpsCallable(functions, "generateImageFromPrompt");
 
         const result = await generateImageFromPrompt({
