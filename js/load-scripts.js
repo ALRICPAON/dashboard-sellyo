@@ -6,6 +6,8 @@ import {
 import {
   getFirestore,
   collection,
+  query,
+  where,
   getDocs,
   deleteDoc,
   doc
@@ -13,7 +15,7 @@ import {
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-const list = document.getElementById("scripts-list");
+const scriptsList = document.getElementById("scripts-list");
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -21,70 +23,41 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const scriptsRef = collection(doc(db, "scripts", user.uid), "items");
-  const snapshot = await getDocs(scriptsRef);
-  list.innerHTML = "";
+  const q = query(collection(db, "scripts", user.uid, "items"));
+  const querySnapshot = await getDocs(q);
+  scriptsList.innerHTML = "";
 
-  if (snapshot.empty) {
-    list.innerHTML = "<p>Aucun script généré pour le moment.</p>";
-    return;
-  }
-
-  snapshot.forEach((docSnap) => {
+  for (const docSnap of querySnapshot.docs) {
     const data = docSnap.data();
     const id = docSnap.id;
-    const url = data.url || "#";
 
     const container = document.createElement("div");
     container.className = "script-card";
-    container.style = "border: 1px solid #444; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; background-color: #1c1c1c;";
-
     container.innerHTML = `
-      <h3 style="margin: 0 0 1rem 0;">🎬 ${data.title || "(sans titre)"}</h3>
-
-      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-        <button class="view-btn" data-url="${url}">📽️ Voir</button>
-        <button class="copy-btn" data-url="${url}">🔗 Copier le lien</button>
-        <button class="export-btn" data-url="${url}">📤 Exporter</button>
-        <button class="edit-btn" data-id="${id}">✏️ Modifier</button>
-        <button class="generate-btn" data-id="${id}">🧠 Générer la vidéo</button>
-        <button class="delete-btn" data-id="${id}">🗑️ Supprimer</button>
+      <h3>${data.title || data.slug || "(sans titre)"}</h3>
+      <div class="script-actions">
+        ${data.url ? `<button onclick="window.open('${data.url}', '_blank')">🎬 Voir script</button>` : ""}
+        ${data.captionUrl ? `<button onclick="window.open('${data.captionUrl}', '_blank')">💬 Voir légende</button>` : ""}
+        ${data.youtubeTitleUrl ? `<button onclick="window.open('${data.youtubeTitleUrl}', '_blank')">📺 Voir titre YouTube</button>` : ""}
+        
+        <button onclick="alert('Exporter à implémenter')">📤 Exporter</button>
+        <button onclick="window.location.href='edit-script.html?id=${id}'">✏️ Modifier</button>
+        <button onclick="alert('À connecter à Runway ou Sora')">🤖 Générer vidéo</button>
+        <button class="delete-btn" data-id="${id}">🧨 Supprimer</button>
       </div>
     `;
+    scriptsList.appendChild(container);
+  }
 
-    list.appendChild(container);
-  });
-
-  list.addEventListener("click", async (e) => {
+  scriptsList.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
-    const url = e.target.dataset.url;
-
-    if (e.target.classList.contains("view-btn")) {
-      if (!url || url === "#") return alert("Aucun lien disponible.");
-      window.open(url, "_blank");
-    }
-
-    if (e.target.classList.contains("copy-btn")) {
-      await navigator.clipboard.writeText(url);
-      alert("🔗 Lien copié dans le presse-papiers !");
-    }
-
-    if (e.target.classList.contains("export-btn")) {
-      alert("📤 Fonction Exporter à venir !");
-    }
-
-    if (e.target.classList.contains("edit-btn")) {
-      window.location.href = `edit-script.html?id=${id}`;
-    }
-
-    if (e.target.classList.contains("generate-btn")) {
-      alert("🧠 Génération vidéo à venir !");
-    }
+    if (!id) return;
 
     if (e.target.classList.contains("delete-btn")) {
-      const confirmDelete = confirm("Supprimer ce script ?");
-      if (!confirmDelete) return;
-      await deleteDoc(doc(db, "scripts", auth.currentUser.uid, "items", id));
+      const confirmed = confirm("Supprimer ce script ?");
+      if (!confirmed) return;
+
+      await deleteDoc(doc(db, "scripts", user.uid, "items", id));
       e.target.closest(".script-card").remove();
     }
   });
