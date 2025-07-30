@@ -33,7 +33,6 @@ onAuthStateChanged(auth, async (user) => {
   snapshot.forEach((docSnap) => {
     const data = docSnap.data();
     const id = docSnap.id;
-    const hashtags = Array.isArray(data.hashtags) ? data.hashtags.join(" ") : "";
     const url = data.url || "#";
 
     const container = document.createElement("div");
@@ -41,20 +40,15 @@ onAuthStateChanged(auth, async (user) => {
     container.style = "border: 1px solid #444; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; background-color: #1c1c1c;";
 
     container.innerHTML = `
-      <h3 style="margin: 0 0 0.5rem 0;">🎬 ${data.title || "Script sans titre"}</h3>
-      <p><strong>🎯 Objectif :</strong> ${data.goal || "-"}</p>
-      <p><strong>👥 Audience :</strong> ${data.audience || "-"}</p>
-      <p><strong>🎞️ Type de vidéo :</strong> ${data.videoType || "-"}</p>
-      <p><strong>📝 Description :</strong> ${data.description || "-"}</p>
-      <p><strong>🧠 Légende :</strong> ${data.caption || "Aucune"}</p>
-      <p><strong>🧷 Hashtags :</strong> ${hashtags || "Aucun"}</p>
-      <p><strong>📎 Lien GitHub :</strong> <a href="${url}" target="_blank" style="color:#00c278;">Voir le fichier</a></p>
+      <h3 style="margin: 0 0 1rem 0;">🎬 ${data.title || "(sans titre)"}</h3>
 
-      <div class="script-actions" style="margin-top: 1rem;">
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
         <button class="view-btn" data-url="${url}">📽️ Voir</button>
+        <button class="copy-btn" data-url="${url}">🔗 Copier le lien</button>
+        <button class="export-btn" data-url="${url}">📤 Exporter</button>
         <button class="edit-btn" data-id="${id}">✏️ Modifier</button>
-        <button class="delete-btn" data-id="${id}">🗑️ Supprimer</button>
         <button class="generate-btn" data-id="${id}">🧠 Générer la vidéo</button>
+        <button class="delete-btn" data-id="${id}">🗑️ Supprimer</button>
       </div>
     `;
 
@@ -70,12 +64,21 @@ onAuthStateChanged(auth, async (user) => {
       window.open(url, "_blank");
     }
 
+    if (e.target.classList.contains("copy-btn")) {
+      await navigator.clipboard.writeText(url);
+      alert("🔗 Lien copié dans le presse-papiers !");
+    }
+
+    if (e.target.classList.contains("export-btn")) {
+      alert("📤 Fonction Exporter à venir !");
+    }
+
     if (e.target.classList.contains("edit-btn")) {
       window.location.href = `edit-script.html?id=${id}`;
     }
 
     if (e.target.classList.contains("generate-btn")) {
-      alert("🧠 Cette fonctionnalité sera bientôt disponible !");
+      alert("🧠 Génération vidéo à venir !");
     }
 
     if (e.target.classList.contains("delete-btn")) {
