@@ -92,7 +92,7 @@ await addDoc(collection(userRef, "items"), {
         includeCaption,
         safeContent,
         createdAt,
-        url: `https://alricpaon.github.io/sellyo-hosting/scripts/${slugFinal}.html`,
+        url: `https://alricpaon.github.io/sellyo-hosting/script/${slugFinal}.html`,
         status: "pending",
         source: "manuel"
       });
