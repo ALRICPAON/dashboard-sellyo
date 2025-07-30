@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { firebaseConfig } from "./firebase-config.js";
 
-// Initialisation Firebase
+// 🔧 Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -11,11 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    console.log("📩 Formulaire soumis");
 
     const formData = new FormData(form);
     const title = formData.get("title");
     const slugInput = formData.get("slug");
-    const slug = slugInput || generateSlug(title); // ✅ Génère slug si vide
+    const slug = slugInput || generateSlug(title);
 
     const data = {
       slug,
@@ -29,18 +30,21 @@ document.addEventListener("DOMContentLoaded", () => {
       videoType: formData.get("videoType"),
       includeCaption: formData.get("includeCaption") === "on",
       safeContent: formData.get("safeContent") === "on",
-      type: "script" // ✅ important pour Make
+      type: "script"
     };
 
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Utilisateur non authentifié");
       data.userId = user.uid;
+      console.log("✅ Utilisateur connecté :", data.userId);
     } catch (err) {
-      console.error("Erreur d'authentification :", err);
+      console.error("❌ Erreur d'authentification :", err);
       alert("Vous devez être connecté pour créer un script.");
       return;
     }
+
+    console.log("📤 Données à envoyer à Make :", data);
 
     try {
       const response = await fetch("https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp", {
@@ -51,14 +55,16 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(data)
       });
 
+      console.log("📬 Réponse Make reçue :", response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error("Erreur lors de l'envoi au webhook Make");
+        throw new Error("Erreur HTTP " + response.status);
       }
 
       alert("✅ Script en cours de génération. Il apparaîtra bientôt dans votre interface.");
       form.reset();
     } catch (error) {
-      console.error("Erreur submit-script:", error);
+      console.error("❌ Erreur lors de l'envoi à Make :", error);
       alert("Erreur lors de la soumission du formulaire. Veuillez réessayer.");
     }
   });
