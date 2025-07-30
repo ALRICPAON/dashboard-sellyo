@@ -1,0 +1,46 @@
+<!-- 🎬 Générateur Vidéo – Sellyo -->
+<section id="video-generator" style="padding:2rem; max-width:800px; margin:auto; color:white; background:#111; border-radius:12px;">
+  <h2>🎬 Générer ma vidéo à partir du script</h2>
+
+  <label style="margin-top:1rem;">🧠 Choisir le type de vidéo :</label>
+  <select id="videoType" style="width:100%; padding:8px; margin-top:5px;">
+    <option value="">-- Sélectionnez une option --</option>
+    <option value="facecam">📹 Face Cam (nettoyage)</option>
+    <option value="avatar">🤖 Avatar IA (présentateur virtuel)</option>
+    <option value="aigen">🌍 Vidéo IA complète</option>
+  </select>
+
+  <!-- 📹 Option 1: Face Cam -->
+  <div id="facecam-options" style="display:none; margin-top:1rem;">
+    <label for="facecamFile">Uploader votre vidéo face cam :</label>
+    <input type="file" id="facecamFile" accept="video/mp4" style="margin-top:5px;" />
+  </div>
+
+  <!-- 🤖 Option 2: Avatar IA -->
+  <div id="avatar-options" style="display:none; margin-top:1rem;">
+    <label>Choisir la voix :</label>
+    <select id="avatarVoice">
+      <option value="fr_male_01">Homme - FR</option>
+      <option value="fr_female_01">Femme - FR</option>
+      <option value="en_male_01">Homme - EN</option>
+      <option value="en_female_01">Femme - EN</option>
+    </select>
+
+    <label style="margin-top:1rem;">Choisir l’avatar :</label>
+    <select id="avatarId">
+      <option value="john_001">John</option>
+      <option value="sophie_002">Sophie</option>
+    </select>
+  </div>
+
+  <!-- 🌍 Option 3: Vidéo IA Générée -->
+  <div id="aigen-options" style="display:none; margin-top:1rem;">
+    <p>La vidéo sera générée automatiquement avec des images IA, voix off et texte intégré.</p>
+  </div>
+
+  <button id="generateVideoBtn" style="margin-top:2rem; padding:10px 20px; background:#00ccff; color:#000; font-weight:bold; border:none; border-radius:8px;">
+    🚀 Lancer la génération
+  </button>
+
+  <p id="generationStatus" style="margin-top:1rem;"></p>
+</section>
