@@ -1,50 +1,88 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { app } from "./firebase-init.js";
 import {
-  getFirestore, collection, getDocs, doc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import {
-  getAuth, onAuthStateChanged
+  getAuth,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { firebaseConfig } from "./firebase-config.js"; // ou "./firebase-init.js" si tu centralises
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
-
-const listContainer = document.getElementById("scripts-list");
+const db = getFirestore(app);
+const list = document.getElementById("scripts-list");
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    listContainer.innerHTML = "<p>Veuillez vous connecter pour voir vos scripts.</p>";
+    window.location.href = "index.html";
     return;
   }
 
-  try {
-    // ✅ Chemin correct : scripts/{uid}/items
-    const parentRef = doc(db, "scripts", user.uid);
-    const itemsRef = collection(parentRef, "items");
-    const snapshot = await getDocs(itemsRef);
+  const scriptsRef = collection(doc(db, "scripts", user.uid), "items");
+  const snapshot = await getDocs(scriptsRef);
+  list.innerHTML = "";
 
-    if (snapshot.empty) {
-      listContainer.innerHTML = "<p>Aucun script pour l’instant. Créez-en un pour commencer.</p>";
-      return;
+  if (snapshot.empty) {
+    list.innerHTML = "<p>Aucun script généré pour le moment.</p>";
+    return;
+  }
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    const id = docSnap.id;
+    const hashtags = Array.isArray(data.hashtags) ? data.hashtags.join(" ") : "";
+    const url = data.url || "#";
+
+    const container = document.createElement("div");
+    container.className = "script-card";
+    container.style = "border: 1px solid #444; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; background-color: #1c1c1c;";
+
+    container.innerHTML = `
+      <h3 style="margin: 0 0 0.5rem 0;">🎬 ${data.title || "Script sans titre"}</h3>
+      <p><strong>🎯 Objectif :</strong> ${data.goal || "-"}</p>
+      <p><strong>👥 Audience :</strong> ${data.audience || "-"}</p>
+      <p><strong>🎞️ Type de vidéo :</strong> ${data.videoType || "-"}</p>
+      <p><strong>📝 Description :</strong> ${data.description || "-"}</p>
+      <p><strong>🧠 Légende :</strong> ${data.caption || "Aucune"}</p>
+      <p><strong>🧷 Hashtags :</strong> ${hashtags || "Aucun"}</p>
+      <p><strong>📎 Lien GitHub :</strong> <a href="${url}" target="_blank" style="color:#00c278;">Voir le fichier</a></p>
+
+      <div class="script-actions" style="margin-top: 1rem;">
+        <button class="view-btn" data-url="${url}">📽️ Voir</button>
+        <button class="edit-btn" data-id="${id}">✏️ Modifier</button>
+        <button class="delete-btn" data-id="${id}">🗑️ Supprimer</button>
+        <button class="generate-btn" data-id="${id}">🧠 Générer la vidéo</button>
+      </div>
+    `;
+
+    list.appendChild(container);
+  });
+
+  list.addEventListener("click", async (e) => {
+    const id = e.target.dataset.id;
+    const url = e.target.dataset.url;
+
+    if (e.target.classList.contains("view-btn")) {
+      if (!url || url === "#") return alert("Aucun lien disponible.");
+      window.open(url, "_blank");
     }
 
-    const html = [];
-    snapshot.forEach((doc) => {
-      const s = doc.data();
-      html.push(`
-        <div style="border: 1px solid #444; padding: 1rem; margin-bottom: 1rem; border-radius: 8px;">
-          <h3 style="margin: 0 0 0.5rem 0;">${s.title || "Script sans titre"}</h3>
-          <p style="color: #ccc;">${s.description?.substring(0, 200) || "Aucune description disponible"}...</p>
-          <a href="${s.url}" target="_blank" style="color: #00c278;">▶️ Voir le script</a>
-        </div>
-      `);
-    });
+    if (e.target.classList.contains("edit-btn")) {
+      window.location.href = `edit-script.html?id=${id}`;
+    }
 
-    listContainer.innerHTML = html.join("");
-  } catch (error) {
-    console.error("Erreur chargement scripts:", error);
-    listContainer.innerHTML = "<p>Erreur lors du chargement des scripts.</p>";
-  }
+    if (e.target.classList.contains("generate-btn")) {
+      alert("🧠 Cette fonctionnalité sera bientôt disponible !");
+    }
+
+    if (e.target.classList.contains("delete-btn")) {
+      const confirmDelete = confirm("Supprimer ce script ?");
+      if (!confirmDelete) return;
+      await deleteDoc(doc(db, "scripts", auth.currentUser.uid, "items", id));
+      e.target.closest(".script-card").remove();
+    }
+  });
 });
