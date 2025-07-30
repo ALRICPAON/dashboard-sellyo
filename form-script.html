@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Créer un script vidéo – Sellyo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/submit-script.js"></script>
+</head>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      });
+  </script>
+
+  <main style="max-width: 800px; margin: auto; padding: 2rem;">
+    <h2 style="margin-bottom: 1rem;">🎬 Créer un script vidéo</h2>
+
+    <form id="script-form">
+
+      <!-- PARTIE 1 : CONTENU -->
+      <fieldset style="border: 1px solid #444; padding: 1rem; margin-bottom: 2rem;">
+        <legend>📝 Informations pour générer le script</legend>
+
+        <label>Titre de la vidéo :
+          <input type="text" name="title" required style="width: 100%; padding: 0.5rem;" />
+        </label><br><br>
+
+        <label>Description du produit ou service :
+          <textarea name="description" required rows="4" style="width: 100%; padding: 0.5rem;"></textarea>
+        </label><br><br>
+
+        <label>Objectif marketing :
+          <select name="goal" required style="width: 100%; padding: 0.5rem;">
+            <option value="vente">Vente</option>
+            <option value="lead">Collecte de leads</option>
+            <option value="notoriete">Notoriété</option>
+            <option value="engagement">Engagement</option>
+          </select>
+        </label><br><br>
+
+        <label>Public cible :
+          <input type="text" name="audience" required style="width: 100%; padding: 0.5rem;" />
+        </label><br><br>
+
+        <label>Ton souhaité :
+          <select name="tone" required style="width: 100%; padding: 0.5rem;">
+            <option value="serieux">Sérieux</option>
+            <option value="inspirant">Inspirant</option>
+            <option value="fun">Fun</option>
+            <option value="provocateur">Provocateur</option>
+          </select>
+        </label><br><br>
+
+        <label>Langue :
+          <select name="language" required style="width: 100%; padding: 0.5rem;">
+            <option value="fr">🇫🇷 Français</option>
+            <option value="en">🇺🇸 Anglais</option>
+          </select>
+        </label><br><br>
+
+        <label>Mots-clés à inclure (optionnel) :
+          <input type="text" name="keywords" placeholder="ex: IA, productivité, tunnel" style="width: 100%; padding: 0.5rem;" />
+        </label>
+      </fieldset>
+
+      <!-- PARTIE 2 : FORMAT VIDÉO -->
+      <fieldset style="border: 1px solid #444; padding: 1rem; margin-bottom: 2rem;">
+        <legend>🎥 Format de la vidéo souhaitée</legend>
+
+        <label>Type de rendu final :
+          <select name="videoType" required style="width: 100%; padding: 0.5rem;">
+            <option value="facecam">🎥 Face Cam (l'utilisateur filme)</option>
+            <option value="avatar">🧑‍💻 Avatar IA réaliste</option>
+            <option value="videoia">🤖 Vidéo 100% IA visuelle</option>
+          </select>
+        </label><br><br>
+
+        <label>
+          <input type="checkbox" name="includeCaption" checked />
+          Générer une légende et des hashtags
+        </label><br><br>
+
+        <label>
+          <input type="checkbox" name="safeContent" checked />
+          Filtrer les mots sensibles (éviter bannissements réseaux)
+        </label>
+      </fieldset>
+
+      <button type="submit" style="padding: 1rem 2rem; background-color: #00c278; color: white; border: none; font-size: 1rem; border-radius: 6px;">
+        ✨ Générer mon script
+      </button>
+    </form>
+  </main>
+</body>
+</html>
