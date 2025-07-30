@@ -18,16 +18,19 @@ document.addEventListener("DOMContentLoaded", () => {
       safeContent: formData.get("safeContent") === "on",
     };
 
-    // Ajout ID utilisateur via Firebase Auth (si connecté)
-    try {
-      const user = await firebase.auth().currentUser;
-      if (!user) throw new Error("Utilisateur non authentifié");
-      data.userId = user.uid;
-    } catch (err) {
-      console.error("Erreur d'authentification :", err);
-      alert("Vous devez être connecté pour créer un script.");
-      return;
-    }
+   // Ajout ID utilisateur via Firebase Auth
+try {
+  const user = await firebase.auth().currentUser;
+  if (!user) throw new Error("Utilisateur non authentifié");
+  data.userId = user.uid;
+
+  // ✅ Type de contenu (utile pour Make + GitHub)
+  data.type = "script";
+} catch (err) {
+  console.error("Erreur d'authentification :", err);
+  alert("Vous devez être connecté pour créer un script.");
+  return;
+}
 
     try {
       const response = await fetch("https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp", {
