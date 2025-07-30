@@ -94,7 +94,10 @@ await addDoc(collection(userRef, "items"), {
         createdAt,
         url: `https://alricpaon.github.io/sellyo-hosting/script/${slugFinal}.html`,
         status: "pending",
-        source: "manuel"
+        source: "manuel",
+        captionUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-caption.txt`,
+        youtubeTitleUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-title.txt`
+
       });
 
       // ✅ Redirection après délai
