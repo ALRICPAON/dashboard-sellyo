@@ -48,27 +48,27 @@ document.getElementById("generateVideoBtn").addEventListener("click", async () =
     }
 
     else if (type === "aigen") {
-  try {
-    const { getFunctions, httpsCallable } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js");
-    const functions = getFunctions();
-    const generateImageFromPrompt = httpsCallable(functions, "generateImageFromPrompt");
+      try {
+        const { getFunctions, httpsCallable } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js");
+        const functions = getFunctions();
+        const generateImageFromPrompt = httpsCallable(functions, "generateImageFromPrompt");
 
-    const result = await generateImageFromPrompt({
-      userId: uid,
-      scriptId: scriptId
-    });
+        const result = await generateImageFromPrompt({
+          userId: uid,
+          scriptId: scriptId
+        });
 
-    if (result.data.success) {
-      status.innerText = "✅ Image IA générée avec succès ! (Job ID : " + result.data.runwayJobId + ")";
-    } else {
-      status.innerText = "❌ Erreur lors de la génération de l'image.";
+        if (result.data.success) {
+          status.innerText = "✅ Image IA générée avec succès (Job ID : " + result.data.runwayJobId + ")";
+        } else {
+          status.innerText = "❌ Erreur lors de la génération de l'image.";
+        }
+
+      } catch (err) {
+        console.error("Erreur Cloud Function :", err);
+        status.innerText = "❌ Échec de la génération : " + err.message;
+      }
     }
-
-  } catch (err) {
-    console.error("Erreur Cloud Function :", err);
-    status.innerText = "❌ Échec de la génération : " + err.message;
-  }
-}
 
     else {
       status.innerText = "⚠️ Veuillez sélectionner un type de vidéo.";
