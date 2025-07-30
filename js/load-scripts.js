@@ -42,7 +42,7 @@ onAuthStateChanged(auth, async (user) => {
         
         <button onclick="alert('Exporter à implémenter')">📤 Exporter</button>
         <button onclick="window.location.href='edit-script.html?id=${id}'">✏️ Modifier</button>
-        <button onclick="alert('À connecter à Runway ou Sora')">🤖 Générer vidéo</button>
+        <button onclick="window.location.href='generate-video.html?scriptId=${id}'">🤖 Générer vidéo</button>
         <button class="delete-btn" data-id="${id}">🧨 Supprimer</button>
       </div>
     `;
