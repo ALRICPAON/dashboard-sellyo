@@ -5,8 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     const formData = new FormData(form);
+    const title = formData.get("title");
+    const slugInput = formData.get("slug");
+    const slug = slugInput || generateSlug(title); // ✅ Génère slug si vide
+
     const data = {
-      title: formData.get("title"),
+      slug,
+      title,
       description: formData.get("description"),
       goal: formData.get("goal"),
       audience: formData.get("audience"),
@@ -16,21 +21,18 @@ document.addEventListener("DOMContentLoaded", () => {
       videoType: formData.get("videoType"),
       includeCaption: formData.get("includeCaption") === "on",
       safeContent: formData.get("safeContent") === "on",
+      type: "script" // ✅ important pour Make
     };
 
-   // Ajout ID utilisateur via Firebase Auth
-try {
-  const user = await firebase.auth().currentUser;
-  if (!user) throw new Error("Utilisateur non authentifié");
-  data.userId = user.uid;
-
-  // ✅ Type de contenu (utile pour Make + GitHub)
-  data.type = "script";
-} catch (err) {
-  console.error("Erreur d'authentification :", err);
-  alert("Vous devez être connecté pour créer un script.");
-  return;
-}
+    try {
+      const user = await firebase.auth().currentUser;
+      if (!user) throw new Error("Utilisateur non authentifié");
+      data.userId = user.uid;
+    } catch (err) {
+      console.error("Erreur d'authentification :", err);
+      alert("Vous devez être connecté pour créer un script.");
+      return;
+    }
 
     try {
       const response = await fetch("https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp", {
@@ -52,4 +54,13 @@ try {
       alert("Erreur lors de la soumission du formulaire. Veuillez réessayer.");
     }
   });
+
+  // 🔤 Générateur de slug propre
+  function generateSlug(text) {
+    return text
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
 });
