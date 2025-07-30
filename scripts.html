@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mes Scripts – Sellyo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/load-scripts.js"></script>
+</head>
+
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      });
+  </script>
+
+  <main style="max-width: 900px; margin: auto; padding: 2rem;">
+    <h2 style="margin-bottom: 1rem;">📽️ Mes Scripts Vidéo</h2>
+    <div id="scripts-list">
+      <p>Chargement en cours...</p>
+    </div>
+  </main>
+</body>
+</html>
