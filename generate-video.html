@@ -44,3 +44,45 @@
 
   <p id="generationStatus" style="margin-top:1rem;"></p>
 </section>
+
+<!-- ⚡ Script de génération -->
+<script type="module">
+  import { generateAICompleteVideo } from "./js/generate-ai-complete.js";
+  import { generateAvatar } from "./js/generate-avatar.js";
+  import { handleFacecamUpload } from "./js/generate-facecam.js";
+
+  document.getElementById("videoType").addEventListener("change", function () {
+    const type = this.value;
+    document.getElementById("facecam-options").style.display = type === "facecam" ? "block" : "none";
+    document.getElementById("avatar-options").style.display = type === "avatar" ? "block" : "none";
+    document.getElementById("aigen-options").style.display = type === "aigen" ? "block" : "none";
+  });
+
+  document.getElementById("generateVideoBtn").addEventListener("click", async () => {
+    const type = document.getElementById("videoType").value;
+    const status = document.getElementById("generationStatus");
+    status.innerText = "⏳ Traitement en cours...";
+
+    try {
+      if (type === "facecam") {
+        const file = document.getElementById("facecamFile").files[0];
+        if (!file) throw new Error("Veuillez uploader une vidéo face cam.");
+        await handleFacecamUpload(file);
+      } else if (type === "avatar") {
+        const voice = document.getElementById("avatarVoice").value;
+        const avatarId = document.getElementById("avatarId").value;
+        await generateAvatar(voice, avatarId);
+      } else if (type === "aigen") {
+        await generateAICompleteVideo();
+      } else {
+        status.innerText = "⚠️ Veuillez sélectionner un type de vidéo.";
+        return;
+      }
+
+      status.innerText = "✅ Vidéo en cours de génération. Vous recevrez un lien sous peu.";
+    } catch (err) {
+      console.error(err);
+      status.innerText = `❌ Erreur : ${err.message}`;
+    }
+  });
+</script>
