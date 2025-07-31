@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     const response = await fetch('https://hook.eu2.make.com/enipb4pmk51w44hml32az6q8htnje6kt');
     const data = await response.json();
+    console.log("Réponse webhook voix :", data);
     const voices = data.voices || [];
 
     const popupHtml = `
