@@ -29,42 +29,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fonction pour afficher la popup avec la liste des voix ElevenLabs
   async function afficherPopupChoixVoix() {
-    try {
-      const response = await fetch('https://hook.eu2.make.com/enipb4pmk51w44hml32az6q8htnje6kt');
-      const voices = await response.json();
+  try {
+    const response = await fetch('https://hook.eu2.make.com/enipb4pmk51w44hml32az6q8htnje6kt');
+    const data = await response.json();
+    const voices = data.voices || [];
 
-      const popupHtml = `
-        <div id="popupVoix" style="position:fixed;top:0;left:0;right:0;bottom:0;
-          background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;">
-          <div style="background:#222;padding:20px;border-radius:8px;width:320px;color:white;">
-            <h3>Choisissez votre voix IA</h3>
-            <select id="voiceSelect" style="width:100%;padding:8px;margin-bottom:12px;">
-              ${voices.map(v => `<option value="${v.id}" title="${v.description}">
-                ${v.name} — ${v.description}
-              </option>`).join('')}
-            </select>
-            <button id="validerVoix" style="margin-right:10px;">Valider</button>
-            <button id="fermerPopup">Fermer</button>
-          </div>
+    const popupHtml = `
+      <div id="popupVoix" style="position:fixed;top:0;left:0;right:0;bottom:0;
+        background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div style="background:#222;padding:20px;border-radius:8px;width:320px;color:white;">
+          <h3>Choisissez votre voix IA</h3>
+          <select id="voiceSelect" style="width:100%;padding:8px;margin-bottom:12px;">
+            ${voices.map(v => `<option value="${v.voice_id}" title="${v.description}">
+              ${v.name} — ${v.description}
+            </option>`).join('')}
+          </select>
+          <button id="validerVoix" style="margin-right:10px;">Valider</button>
+          <button id="fermerPopup">Fermer</button>
         </div>
-      `;
-      document.body.insertAdjacentHTML('beforeend', popupHtml);
+      </div>
+    `;
 
-      document.getElementById('fermerPopup').onclick = () => {
-        document.getElementById('popupVoix').remove();
-      };
+    document.body.insertAdjacentHTML('beforeend', popupHtml);
 
-      document.getElementById('validerVoix').onclick = () => {
-        const selectedVoiceId = document.getElementById('voiceSelect').value;
-        formVoiceIdInput.value = selectedVoiceId; // Stockage dans champ caché
-        alert(`Voix sélectionnée : ${selectedVoiceId}`);
-        document.getElementById('popupVoix').remove();
-      };
-    } catch (error) {
-      console.error("Erreur chargement voix :", error);
-      alert("Erreur lors du chargement des voix. Veuillez réessayer plus tard.");
-    }
+    document.getElementById('fermerPopup').onclick = () => {
+      document.getElementById('popupVoix').remove();
+    };
+
+    document.getElementById('validerVoix').onclick = () => {
+      const selectedVoiceId = document.getElementById('voiceSelect').value;
+      formVoiceIdInput.value = selectedVoiceId; // Stockage dans champ caché
+      alert(`Voix sélectionnée : ${selectedVoiceId}`);
+      document.getElementById('popupVoix').remove();
+    };
+  } catch (error) {
+    console.error("Erreur chargement voix :", error);
+    alert("Erreur lors du chargement des voix. Veuillez réessayer plus tard.");
   }
+}
 
   // Soumission du formulaire
   form.addEventListener("submit", async (e) => {
