@@ -32,25 +32,31 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     const response = await fetch('https://hook.eu2.make.com/enipb4pmk51w44hml32az6q8htnje6kt');
     const data = await response.json();
-    console.log("Réponse webhook voix :", data);
-    const voices = data.voices || [];
+
+    const voices = Array.isArray(data.voices) ? data.voices : [data.voices]; // gère tableau ou objet unique
+
+    const voiceOptionsHtml = voices.map(v => `
+      <div style="margin-bottom: 1rem;">
+        <input type="radio" name="selectedVoice" value="${v.id}" id="voice-${v.id}">
+        <label for="voice-${v.id}" style="font-weight: bold;">${v.name}</label>
+        <p style="margin: 0.2rem 0;">${v.description || ""}</p>
+        ${v.previewUrl ? `<audio controls src="${v.previewUrl}" style="width: 100%;"></audio>` : ""}
+      </div>
+    `).join("");
 
     const popupHtml = `
       <div id="popupVoix" style="position:fixed;top:0;left:0;right:0;bottom:0;
         background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;">
-        <div style="background:#222;padding:20px;border-radius:8px;width:320px;color:white;">
+        <div style="background:#222;padding:20px;border-radius:8px;width:400px;color:white;max-height:80vh;overflow-y:auto;">
           <h3>Choisissez votre voix IA</h3>
-          <select id="voiceSelect" style="width:100%;padding:8px;margin-bottom:12px;">
-            ${voices.map(v => `<option value="${v.voice_id}" title="${v.description}">
-              ${v.name} — ${v.description}
-            </option>`).join('')}
-          </select>
-          <button id="validerVoix" style="margin-right:10px;">Valider</button>
-          <button id="fermerPopup">Fermer</button>
+          ${voiceOptionsHtml}
+          <div style="text-align:right;margin-top:1rem;">
+            <button id="validerVoix" style="margin-right:10px;">Valider</button>
+            <button id="fermerPopup">Fermer</button>
+          </div>
         </div>
       </div>
     `;
-
     document.body.insertAdjacentHTML('beforeend', popupHtml);
 
     document.getElementById('fermerPopup').onclick = () => {
@@ -58,17 +64,20 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     document.getElementById('validerVoix').onclick = () => {
-      const selectedVoiceId = document.getElementById('voiceSelect').value;
-      formVoiceIdInput.value = selectedVoiceId; // Stockage dans champ caché
-      alert(`Voix sélectionnée : ${selectedVoiceId}`);
-      document.getElementById('popupVoix').remove();
+      const selected = document.querySelector('input[name="selectedVoice"]:checked');
+      if (selected) {
+        formVoiceIdInput.value = selected.value;
+        alert(`Voix sélectionnée : ${selected.value}`);
+        document.getElementById('popupVoix').remove();
+      } else {
+        alert("Veuillez sélectionner une voix.");
+      }
     };
   } catch (error) {
     console.error("Erreur chargement voix :", error);
     alert("Erreur lors du chargement des voix. Veuillez réessayer plus tard.");
   }
 }
-
   // Soumission du formulaire
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
