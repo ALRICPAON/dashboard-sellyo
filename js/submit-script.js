@@ -93,6 +93,7 @@ await addDoc(collection(userRef, "items"), {
         safeContent,
         createdAt,
         url: `https://alricpaon.github.io/sellyo-hosting/script/${slugFinal}.html`,
+        videoUrl: `https://alricpaon.github.io/sellyo-hosting/videos/${slugFinal}.mp4`,
         status: "pending",
         source: "manuel",
         captionUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-caption.txt`,
