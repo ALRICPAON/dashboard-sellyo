@@ -28,29 +28,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Fonction pour afficher la popup avec la liste des voix ElevenLabs
-  async function afficherPopupChoixVoix() {
+async function afficherPopupChoixVoix() {
   try {
     const response = await fetch('https://hook.eu2.make.com/enipb4pmk51w44hml32az6q8htnje6kt');
     const data = await response.json();
 
-    // 🔁 Parsing du champ formattedVoice (qui est une chaîne JSON)
-    const rawVoices = Array.isArray(data) ? data : [data]; // sécurité si plusieurs bundles Make
-    const voices = rawVoices.map(v => {
-      try {
-        return JSON.parse(v.voices.formattedVoice);
-      } catch (err) {
-        console.error("Erreur parsing voix :", err);
-        return null;
-      }
-    }).filter(Boolean); // filtre les erreurs
+    // ✅ On récupère directement le tableau voices
+    const voices = data.voices || [];
 
     // 🧠 Génération du HTML
     const voiceOptionsHtml = voices.map(v => `
       <div style="margin-bottom: 1rem;">
-        <input type="radio" name="selectedVoice" value="${v.id}" id="voice-${v.id}">
-        <label for="voice-${v.id}" style="font-weight: bold;">${v.name}</label>
+        <input type="radio" name="selectedVoice" value="${v.voice_id}" id="voice-${v.voice_id}">
+        <label for="voice-${v.voice_id}" style="font-weight: bold;">${v.name}</label>
         <p style="margin: 0.2rem 0;">${v.description || ""}</p>
-        ${v.previewUrl ? `<audio controls src="${v.previewUrl}" style="width: 100%;"></audio>` : ""}
+        ${v.preview_url ? `<audio controls src="${v.preview_url}" style="width: 100%;"></audio>` : ""}
       </div>
     `).join("");
 
