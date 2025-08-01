@@ -33,8 +33,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const response = await fetch('https://hook.eu2.make.com/enipb4pmk51w44hml32az6q8htnje6kt');
     const data = await response.json();
 
-    const voices = Array.isArray(data.voices) ? data.voices : [data.voices]; // gère tableau ou objet unique
+    // 🔁 Parsing du champ formattedVoice (qui est une chaîne JSON)
+    const rawVoices = Array.isArray(data) ? data : [data]; // sécurité si plusieurs bundles Make
+    const voices = rawVoices.map(v => {
+      try {
+        return JSON.parse(v.voices.formattedVoice);
+      } catch (err) {
+        console.error("Erreur parsing voix :", err);
+        return null;
+      }
+    }).filter(Boolean); // filtre les erreurs
 
+    // 🧠 Génération du HTML
     const voiceOptionsHtml = voices.map(v => `
       <div style="margin-bottom: 1rem;">
         <input type="radio" name="selectedVoice" value="${v.id}" id="voice-${v.id}">
@@ -44,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `).join("");
 
+    // 📦 Affichage de la popup
     const popupHtml = `
       <div id="popupVoix" style="position:fixed;top:0;left:0;right:0;bottom:0;
         background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;">
@@ -59,10 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     document.body.insertAdjacentHTML('beforeend', popupHtml);
 
+    // 🎯 Fermeture
     document.getElementById('fermerPopup').onclick = () => {
       document.getElementById('popupVoix').remove();
     };
 
+    // ✅ Validation
     document.getElementById('validerVoix').onclick = () => {
       const selected = document.querySelector('input[name="selectedVoice"]:checked');
       if (selected) {
