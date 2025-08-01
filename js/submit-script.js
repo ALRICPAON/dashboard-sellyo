@@ -224,32 +224,37 @@ async function afficherPopupChoixVoix() {
       console.log("📡 Script envoyé à Make avec succès");
 
       // 📝 Ajout Firestore dans scripts/{uid}/items
-     const scriptRef = doc(db, "scripts", user.uid, "items", slugFinal);
-await setDoc(scriptRef, {
-        userId: user.uid,
-        title,
-        slug: slugFinal,
-        description,
-        tone,
-        language,
-        goal,
-        audience,
-        keywords,
-        videoType,
-        includeCaption,
-        safeContent,
-        voiceId, // Stockage de la voix sélectionnée
-        createdAt,
-        url: `https://alricpaon.github.io/sellyo-hosting/script/${slugFinal}.html`,
-        videoUrl: `https://alricpaon.github.io/sellyo-hosting/videos/${slugFinal}.mp4`,
-        status: "pending",
-        source: "manuel",
-        captionUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-caption.txt`,
-        youtubeTitleUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-title.txt`,
-        promptVideoUrl: videoType === "videoia"
-          ? `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-prompt.txt`
-          : null
-      });
+    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Génère un ID manuellement
+const docId = slugFinal; // ou autre valeur unique que tu veux forcer
+
+const userRef = doc(db, "scripts", user.uid, "items", docId);
+await setDoc(userRef, {
+  userId: user.uid,
+  title,
+  slug: slugFinal,
+  description,
+  tone,
+  language,
+  goal,
+  audience,
+  keywords,
+  videoType,
+  includeCaption,
+  safeContent,
+  voiceId,
+  createdAt,
+  url: `https://alricpaon.github.io/sellyo-hosting/script/${slugFinal}.html`,
+  videoUrl: `https://alricpaon.github.io/sellyo-hosting/videos/${slugFinal}.mp4`,
+  status: "pending",
+  source: "manuel",
+  captionUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-caption.txt`,
+  youtubeTitleUrl: `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-title.txt`,
+  promptVideoUrl: videoType === "videoia"
+    ? `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slugFinal}-prompt.txt`
+    : null
+});
 
       // ✅ Redirection après délai
       setTimeout(() => {
