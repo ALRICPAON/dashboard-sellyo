@@ -224,7 +224,7 @@ async function afficherPopupChoixVoix() {
       console.log("📡 Script envoyé à Make avec succès");
 
       // 📝 Ajout Firestore dans scripts/{uid}/items
-    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Génère un ID manuellement
 const docId = slugFinal; // ou autre valeur unique que tu veux forcer
