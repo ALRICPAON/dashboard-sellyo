@@ -224,8 +224,8 @@ async function afficherPopupChoixVoix() {
       console.log("📡 Script envoyé à Make avec succès");
 
       // 📝 Ajout Firestore dans scripts/{uid}/items
-      const userRef = doc(db, "scripts", user.uid);
-      await addDoc(collection(userRef, "items"), {
+     const scriptRef = doc(db, "scripts", user.uid, "items", slugFinal);
+await setDoc(scriptRef, {
         userId: user.uid,
         title,
         slug: slugFinal,
