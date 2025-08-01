@@ -32,27 +32,75 @@ async function afficherPopupChoixVoix() {
   try {
     const response = await fetch('https://hook.eu2.make.com/enipb4pmk51w44hml32az6q8htnje6kt');
     const data = await response.json();
-
-    // ✅ On récupère directement le tableau voices
     const voices = data.voices || [];
 
-    // 🧠 Génération du HTML
-    const voiceOptionsHtml = voices.map(v => `
-      <div style="margin-bottom: 1rem;">
-        <input type="radio" name="selectedVoice" value="${v.voice_id}" id="voice-${v.voice_id}">
-        <label for="voice-${v.voice_id}" style="font-weight: bold;">${v.name}</label>
-        <p style="margin: 0.2rem 0;">${v.description || ""}</p>
-        ${v.preview_url ? `<audio controls src="${v.preview_url}" style="width: 100%;"></audio>` : ""}
-      </div>
-    `).join("");
+    // 🔍 Détection langue et genre
+    function detectLang(description) {
+      const d = (description || "").toLowerCase();
+      if (d.includes("french") || d.includes("français")) return "fr";
+      if (d.includes("english") || d.includes("british") || d.includes("american")) return "en";
+      return "other";
+    }
 
-    // 📦 Affichage de la popup
+    function detectGender(description) {
+      const d = (description || "").toLowerCase();
+      if (d.includes("female") || d.includes("femme") || d.includes("woman")) return "f";
+      if (d.includes("male") || d.includes("homme") || d.includes("man")) return "m";
+      return "u"; // unknown / unisex / neutre
+    }
+
+    voices.forEach(v => {
+      v.lang = detectLang(v.description);
+      v.gender = detectGender(v.description);
+    });
+
+    // 💡 Fonction de rendu avec double filtre
+    function renderVoiceOptions(lang = "fr", gender = "all") {
+      const container = document.getElementById("voixContainer");
+      const filtered = voices.filter(v => {
+        const matchLang = v.lang === lang;
+        const matchGender = gender === "all" || (gender === "m" && v.gender === "m") || (gender === "f" && v.gender === "f");
+        return matchLang && matchGender;
+      });
+
+      if (!filtered.length) {
+        container.innerHTML = "<p>Aucune voix disponible pour cette sélection.</p>";
+        return;
+      }
+
+      container.innerHTML = filtered.map(v => `
+        <div style="margin-bottom: 1rem;">
+          <input type="radio" name="selectedVoice" value="${v.voice_id}" id="voice-${v.voice_id}">
+          <label for="voice-${v.voice_id}" style="font-weight: bold;">${v.name}</label>
+          <p style="margin: 0.2rem 0;">${v.description || ""}</p>
+          ${v.preview_url ? `<audio controls src="${v.preview_url}" style="width: 100%;"></audio>` : ""}
+        </div>
+      `).join("");
+    }
+
+    // 📦 HTML de la popup
     const popupHtml = `
       <div id="popupVoix" style="position:fixed;top:0;left:0;right:0;bottom:0;
         background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;">
-        <div style="background:#222;padding:20px;border-radius:8px;width:400px;color:white;max-height:80vh;overflow-y:auto;">
+        <div style="background:#222;padding:20px;border-radius:8px;width:500px;color:white;max-height:80vh;overflow-y:auto;">
           <h3>Choisissez votre voix IA</h3>
-          ${voiceOptionsHtml}
+
+          <label for="langueVoix">Langue :</label>
+          <select id="langueVoix" style="margin-bottom: 1rem;">
+            <option value="fr">Français</option>
+            <option value="en">Anglais</option>
+            <option value="other">Autres</option>
+          </select>
+
+          <label for="genreVoix">Genre :</label>
+          <select id="genreVoix" style="margin-bottom: 1rem;">
+            <option value="all">Mixte</option>
+            <option value="f">Femme</option>
+            <option value="m">Homme</option>
+          </select>
+
+          <div id="voixContainer"></div>
+
           <div style="text-align:right;margin-top:1rem;">
             <button id="validerVoix" style="margin-right:10px;">Valider</button>
             <button id="fermerPopup">Fermer</button>
@@ -62,7 +110,24 @@ async function afficherPopupChoixVoix() {
     `;
     document.body.insertAdjacentHTML('beforeend', popupHtml);
 
-    // 🎯 Fermeture
+    // 🎯 Rendu initial
+    renderVoiceOptions("fr", "all");
+
+    // 🔄 Réagir au changement de langue ou genre
+    document.getElementById("langueVoix").onchange = () => {
+      renderVoiceOptions(
+        document.getElementById("langueVoix").value,
+        document.getElementById("genreVoix").value
+      );
+    };
+    document.getElementById("genreVoix").onchange = () => {
+      renderVoiceOptions(
+        document.getElementById("langueVoix").value,
+        document.getElementById("genreVoix").value
+      );
+    };
+
+    // ❌ Fermeture
     document.getElementById('fermerPopup').onclick = () => {
       document.getElementById('popupVoix').remove();
     };
