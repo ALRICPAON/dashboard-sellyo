@@ -31,24 +31,32 @@ onAuthStateChanged(auth, async (user) => {
     const id = docSnap.id;
 
     const card = document.createElement("div");
-    card.className = "script-card";
-    card.style = `
-      display: flex;
-      justify-content: space-between;
-      align-items: stretch;
-      background: #222;
-      border-radius: 12px;
-      margin-bottom: 1.5rem;
-      padding: 1rem;
-    `;
+    card.className = "email-card"; // même classe que les emails
+    card.style.display = "flex";
+    card.style.justifyContent = "space-between";
+    card.style.flexDirection = "row";
+    card.style.alignItems = "stretch";
+    card.style.gap = "1rem";
 
     const left = document.createElement("div");
-    left.style = "flex: 1; display: flex; flex-direction: column; gap: 0.5rem;";
+    left.style.flex = "1";
+    left.style.display = "flex";
+    left.style.flexDirection = "column";
+    left.style.gap = "0.5rem";
 
     const right = document.createElement("div");
-    right.style = "display: flex; flex-direction: column; justify-content: space-between; gap: 0.5rem; text-align: right;";
+    right.style.display = "flex";
+    right.style.flexDirection = "column";
+    right.style.justifyContent = "space-between";
+    right.style.alignItems = "flex-end";
+    right.style.gap = "0.5rem";
 
-    // 👉 Côté gauche – boutons de visualisation/export
+    // Titre du script
+    const title = document.createElement("h3");
+    title.textContent = data.title || data.slug || "(sans titre)";
+    left.appendChild(title);
+
+    // Boutons côté gauche
     if (data.url)
       left.appendChild(makeButton("🎬 Voir le script", data.url));
     if (data.voiceUrl)
@@ -58,29 +66,29 @@ onAuthStateChanged(auth, async (user) => {
     if (data.captionUrl)
       left.appendChild(makeButton("💬 Voir la légende", data.captionUrl));
 
-    // Boutons export (même si pas encore implémentés)
+    // Bouton d'export
     left.appendChild(makeButton("📤 Exporter tout", null, () => {
       alert("Fonction Export à implémenter");
     }));
 
-    // 👉 Côté droit – assembler & supprimer
+    // Bouton Assembler
     const assembleBtn = document.createElement("button");
     assembleBtn.textContent = "🎞️ Assembler la vidéo";
-    assembleBtn.style = "padding: 0.6rem 1rem; font-weight: bold;";
+    assembleBtn.className = "btn";
     assembleBtn.onclick = () => {
       window.location.href = `generate-video.html?scriptId=${id}`;
     };
 
+    // Bouton Supprimer
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "🗑️ Supprimer les données";
     deleteBtn.className = "delete-btn";
     deleteBtn.dataset.id = id;
-    deleteBtn.style = "background-color: #822; color: white;";
 
     right.appendChild(assembleBtn);
     right.appendChild(deleteBtn);
 
-    // Assemblage de la carte
+    // Ajouter tout à la carte
     card.appendChild(left);
     card.appendChild(right);
     scriptsList.appendChild(card);
@@ -96,7 +104,7 @@ onAuthStateChanged(auth, async (user) => {
       if (!confirmed) return;
 
       await deleteDoc(doc(db, "scripts", auth.currentUser.uid, "items", id));
-      e.target.closest(".script-card").remove();
+      e.target.closest(".email-card").remove();
     }
   });
 });
@@ -104,7 +112,7 @@ onAuthStateChanged(auth, async (user) => {
 function makeButton(text, url, onClick) {
   const btn = document.createElement("button");
   btn.textContent = text;
-  btn.style = "text-align: left;";
+  btn.className = "btn";
   if (onClick) {
     btn.onclick = onClick;
   } else if (url) {
