@@ -30,8 +30,26 @@ onAuthStateChanged(auth, async (user) => {
     const data = docSnap.data();
     const id = docSnap.id;
 
+    // 🔍 Lecture du voiceUrl depuis la sous-collection meta/voice
+    let voiceUrl = null;
+    try {
+      const metaSnap = await getDocs(
+        collection(db, "scripts", user.uid, "items", id, "meta")
+      );
+      for (const metaDoc of metaSnap.docs) {
+        const metaData = metaDoc.data();
+        if (metaData.voiceUrl) {
+          voiceUrl = metaData.voiceUrl;
+          break;
+        }
+      }
+    } catch (e) {
+      console.warn("Erreur lors de la lecture de meta/voice :", e);
+    }
+
+    // 💡 Construction de la carte
     const card = document.createElement("div");
-    card.className = "email-card"; // même classe que les emails
+    card.className = "email-card";
     card.style.display = "flex";
     card.style.justifyContent = "space-between";
     card.style.flexDirection = "row";
@@ -51,22 +69,22 @@ onAuthStateChanged(auth, async (user) => {
     right.style.alignItems = "flex-end";
     right.style.gap = "0.5rem";
 
-    // Titre du script
+    // Titre
     const title = document.createElement("h3");
     title.textContent = data.title || data.slug || "(sans titre)";
     left.appendChild(title);
 
-    // Boutons côté gauche
+    // Boutons gauche
     if (data.url)
       left.appendChild(makeButton("🎬 Voir le script", data.url));
-    if (data.voiceUrl)
-      left.appendChild(makeButton("🔊 Écouter la voix off", data.voiceUrl));
+    if (voiceUrl)
+      left.appendChild(makeButton("🔊 Écouter la voix off", voiceUrl));
     if (data.videoUrl)
       left.appendChild(makeButton("🎥 Voir la vidéo", data.videoUrl));
     if (data.captionUrl)
       left.appendChild(makeButton("💬 Voir la légende", data.captionUrl));
 
-    // Bouton d'export
+    // Bouton Export (placeholder)
     left.appendChild(makeButton("📤 Exporter tout", null, () => {
       alert("Fonction Export à implémenter");
     }));
@@ -88,7 +106,7 @@ onAuthStateChanged(auth, async (user) => {
     right.appendChild(assembleBtn);
     right.appendChild(deleteBtn);
 
-    // Ajouter tout à la carte
+    // Ajout à la carte
     card.appendChild(left);
     card.appendChild(right);
     scriptsList.appendChild(card);
