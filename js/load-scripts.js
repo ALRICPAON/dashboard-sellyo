@@ -83,17 +83,21 @@ try {
       left.appendChild(makeButton("💬 Voir la légende", data.captionUrl));
 
     // Bouton Export (placeholder)
-    left.appendChild(makeButton("📤 Exporter tout", null, () => {
-      alert("Fonction Export à implémenter");
-    }));
+   const exportBtn = document.createElement("button");
+exportBtn.textContent = "📤 Exporter tout";
+exportBtn.className = "btn";
+exportBtn.onclick = () => {
+  alert("Fonction Export à implémenter");
+};
+left.appendChild(exportBtn);
 
     // Bouton Assembler
     const assembleBtn = document.createElement("button");
-    assembleBtn.textContent = "🎞️ Assembler la vidéo";
-    assembleBtn.className = "btn";
-    assembleBtn.onclick = () => {
-      window.location.href = `generate-video.html?scriptId=${id}`;
-    };
+assembleBtn.textContent = "🎞️ Assembler la vidéo";
+assembleBtn.className = "assemble-btn"; // 💡 classe spécifique
+assembleBtn.onclick = () => {
+  window.location.href = `generate-video.html?scriptId=${id}`;
+};
 
     // Bouton Supprimer
     const deleteBtn = document.createElement("button");
