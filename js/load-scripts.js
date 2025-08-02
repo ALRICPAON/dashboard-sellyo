@@ -91,10 +91,9 @@ onAuthStateChanged(auth, async (user) => {
     const exportBtn = document.createElement("button");
     exportBtn.textContent = "📤 Exporter tout";
     exportBtn.className = "btn";
-    exportBtn.onclick = async () => {
+   exportBtn.onclick = async () => {
   const zip = new JSZip();
 
-  // Fonction pour télécharger un fichier et l’ajouter dans le zip
   async function addToZip(url, filename) {
     try {
       const response = await fetch(url);
@@ -106,15 +105,30 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 
+  // Relecture dynamique du voiceUrl (au moment du clic)
+  let freshVoiceUrl = null;
+  try {
+    const metaDoc = await getDoc(doc(db, "scripts", user.uid, "items", id, "meta", "voice"));
+    if (metaDoc.exists()) {
+      const metaData = metaDoc.data();
+      if (metaData.voiceUrl) {
+        freshVoiceUrl = metaData.voiceUrl;
+      }
+    }
+  } catch (e) {
+    console.warn("Erreur relecture voiceUrl dans export :", e);
+  }
+
   // Ajout des fichiers
   if (data.url) await addToZip(data.url, "script.html");
-  if (voiceUrl) await addToZip(voiceUrl, "voice.mp3");
+  if (freshVoiceUrl) await addToZip(freshVoiceUrl, "voice.mp3");
   if (data.videoUrl) await addToZip(data.videoUrl, "video.mp4");
   if (data.captionUrl) await addToZip(data.captionUrl, "caption.txt");
 
-  // Génération et téléchargement du zip
+  // Téléchargement ZIP
+  const safeName = (data.slug || data.title || "script").replace(/[^a-z0-9_\-]/gi, "_");
   zip.generateAsync({ type: "blob" }).then((content) => {
-    saveAs(content, `${data.slug || data.title || "script"}.zip`);
+    saveAs(content, `${safeName}.zip`);
   });
 };
 
