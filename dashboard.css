@@ -454,3 +454,16 @@ form button:hover {
 .script-card .delete-btn:hover {
   background: #cc0000;
 }
+/* Bouton principal "Assembler la vidéo" */
+.script-card .assemble-btn {
+  background: #007bff;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.script-card .assemble-btn:hover {
+  background: #005fd1;
+}
