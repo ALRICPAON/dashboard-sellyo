@@ -427,43 +427,48 @@ form button:hover {
   margin-bottom: 0.8rem;
 }
 
-.script-card button {
+/* Boutons côté gauche (gris comme les emails) */
+.script-card .btn {
   background: #333;
   color: white;
   border: none;
   border-radius: 6px;
   padding: 0.5rem 0.8rem;
-  margin-bottom: 0.6rem; /* ↑ un peu plus d'air entre les boutons */
+  margin-bottom: 0.5rem;
   cursor: pointer;
   transition: background 0.2s ease;
   text-align: left;
 }
 
-.script-card button:hover {
+.script-card .btn:hover {
   background: #555;
 }
 
+/* Bouton spécial assembler (plus gros et bleu) */
+.script-card .assemble-btn {
+  background: #00ccff;
+  color: #000;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.script-card .assemble-btn:hover {
+  background: #00aacc;
+}
+
+/* Supprimer */
 .script-card .delete-btn {
   background: #aa2222;
   color: white;
   font-weight: bold;
-  padding: 0.4rem 0.8rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
   margin-top: auto;
 }
 
 .script-card .delete-btn:hover {
   background: #cc0000;
-}
-/* Bouton principal "Assembler la vidéo" */
-.script-card .assemble-btn {
-  background: #007bff;
-  font-size: 1rem;
-  font-weight: bold;
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  text-align: center;
-}
-
-.script-card .assemble-btn:hover {
-  background: #005fd1;
 }
