@@ -8,6 +8,7 @@ import {
   collection,
   query,
   getDocs,
+  getDoc,       // ✅ ajoute ceci
   deleteDoc,
   doc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -30,22 +31,19 @@ onAuthStateChanged(auth, async (user) => {
     const data = docSnap.data();
     const id = docSnap.id;
 
-    // 🔍 Lecture du voiceUrl depuis la sous-collection meta/voice
-    let voiceUrl = null;
-    try {
-      const metaSnap = await getDocs(
-        collection(db, "scripts", user.uid, "items", id, "meta")
-      );
-      for (const metaDoc of metaSnap.docs) {
-        const metaData = metaDoc.data();
-        if (metaData.voiceUrl) {
-          voiceUrl = metaData.voiceUrl;
-          break;
-        }
-      }
-    } catch (e) {
-      console.warn("Erreur lors de la lecture de meta/voice :", e);
+   // 🔍 Lecture du voiceUrl depuis le document meta/voice
+let voiceUrl = null;
+try {
+  const metaDoc = await getDoc(doc(db, "scripts", user.uid, "items", id, "meta", "voice"));
+  if (metaDoc.exists()) {
+    const metaData = metaDoc.data();
+    if (metaData.voiceUrl) {
+      voiceUrl = metaData.voiceUrl;
     }
+  }
+} catch (e) {
+  console.warn("Erreur lors de la lecture de meta/voice :", e);
+}
 
     // 💡 Construction de la carte
     const card = document.createElement("div");
