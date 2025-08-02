@@ -8,7 +8,7 @@ import {
   collection,
   query,
   getDocs,
-  getDoc,       // ✅ ajoute ceci
+  getDoc,
   deleteDoc,
   doc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -31,19 +31,19 @@ onAuthStateChanged(auth, async (user) => {
     const data = docSnap.data();
     const id = docSnap.id;
 
-   // 🔍 Lecture du voiceUrl depuis le document meta/voice
-let voiceUrl = null;
-try {
-  const metaDoc = await getDoc(doc(db, "scripts", user.uid, "items", id, "meta", "voice"));
-  if (metaDoc.exists()) {
-    const metaData = metaDoc.data();
-    if (metaData.voiceUrl) {
-      voiceUrl = metaData.voiceUrl;
+    // 🔍 Lecture du voiceUrl depuis le document meta/voice
+    let voiceUrl = null;
+    try {
+      const metaDoc = await getDoc(doc(db, "scripts", user.uid, "items", id, "meta", "voice"));
+      if (metaDoc.exists()) {
+        const metaData = metaDoc.data();
+        if (metaData.voiceUrl) {
+          voiceUrl = metaData.voiceUrl;
+        }
+      }
+    } catch (e) {
+      console.warn("Erreur lecture voiceUrl:", e);
     }
-  }
-} catch (e) {
-  console.warn("Erreur lors de la lecture de meta/voice :", e);
-}
 
     // 💡 Construction de la carte
     const card = document.createElement("div");
@@ -63,52 +63,44 @@ try {
     const right = document.createElement("div");
     right.style.display = "flex";
     right.style.flexDirection = "column";
-    right.style.justifyContent = "space-between";
     right.style.alignItems = "flex-end";
     right.style.gap = "0.5rem";
+    right.style.justifyContent = "flex-start";
 
     // Titre
     const title = document.createElement("h3");
     title.textContent = data.title || data.slug || "(sans titre)";
     left.appendChild(title);
 
-    // Boutons gauche
-    if (data.url)
-      left.appendChild(makeButton("🎬 Voir le script", data.url));
-    if (voiceUrl)
-      left.appendChild(makeButton("🔊 Écouter la voix off", voiceUrl));
-    if (data.videoUrl)
-      left.appendChild(makeButton("🎥 Voir la vidéo", data.videoUrl));
-    if (data.captionUrl)
-      left.appendChild(makeButton("💬 Voir la légende", data.captionUrl));
-
-    // Bouton Export (placeholder)
-   const exportBtn = document.createElement("button");
-exportBtn.textContent = "📤 Exporter tout";
-exportBtn.className = "btn";
-exportBtn.onclick = () => {
-  alert("Fonction Export à implémenter");
-};
-left.appendChild(exportBtn);
+    // Boutons (gauche)
+    if (data.url) left.appendChild(makeButton("🎬 Voir le script", data.url));
+    if (voiceUrl) left.appendChild(makeButton("🔊 Écouter la voix off", voiceUrl));
+    if (data.videoUrl) left.appendChild(makeButton("🎥 Voir la vidéo", data.videoUrl));
+    if (data.captionUrl) left.appendChild(makeButton("💬 Voir la légende", data.captionUrl));
 
     // Bouton Assembler
     const assembleBtn = document.createElement("button");
-assembleBtn.textContent = "🎞️ Assembler la vidéo";
-assembleBtn.className = "assemble-btn"; // 💡 classe spécifique
-assembleBtn.onclick = () => {
-  window.location.href = `generate-video.html?scriptId=${id}`;
-};
+    assembleBtn.textContent = "🎞️ Assembler la vidéo";
+    assembleBtn.className = "assemble-btn";
+    assembleBtn.onclick = () => {
+      window.location.href = `generate-video.html?scriptId=${id}`;
+    };
+    right.appendChild(assembleBtn);
 
-    // Bouton Supprimer
+    // Bouton Export (dans colonne de droite sous assembler)
+    const exportBtn = document.createElement("button");
+    exportBtn.textContent = "📤 Exporter tout";
+    exportBtn.className = "btn";
+    exportBtn.onclick = () => alert("Fonction Export à implémenter");
+    right.appendChild(exportBtn);
+
+    // Bouton Supprimer (petit rouge)
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "🗑️ Supprimer les données";
     deleteBtn.className = "delete-btn";
     deleteBtn.dataset.id = id;
-
-    right.appendChild(assembleBtn);
     right.appendChild(deleteBtn);
 
-    // Ajout à la carte
     card.appendChild(left);
     card.appendChild(right);
     scriptsList.appendChild(card);
