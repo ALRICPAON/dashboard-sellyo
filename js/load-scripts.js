@@ -91,7 +91,33 @@ onAuthStateChanged(auth, async (user) => {
     const exportBtn = document.createElement("button");
     exportBtn.textContent = "📤 Exporter tout";
     exportBtn.className = "btn";
-    exportBtn.onclick = () => alert("Fonction Export à implémenter");
+    exportBtn.onclick = async () => {
+  const zip = new JSZip();
+
+  // Fonction pour télécharger un fichier et l’ajouter dans le zip
+  async function addToZip(url, filename) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Erreur téléchargement : ${filename}`);
+      const blob = await response.blob();
+      zip.file(filename, blob);
+    } catch (e) {
+      console.warn("⚠️ Échec export fichier :", filename, e);
+    }
+  }
+
+  // Ajout des fichiers
+  if (data.url) await addToZip(data.url, "script.html");
+  if (voiceUrl) await addToZip(voiceUrl, "voice.mp3");
+  if (data.videoUrl) await addToZip(data.videoUrl, "video.mp4");
+  if (data.captionUrl) await addToZip(data.captionUrl, "caption.txt");
+
+  // Génération et téléchargement du zip
+  zip.generateAsync({ type: "blob" }).then((content) => {
+    saveAs(content, `${data.slug || data.title || "script"}.zip`);
+  });
+};
+
     right.appendChild(exportBtn);
 
     // Bouton Supprimer (petit rouge)
