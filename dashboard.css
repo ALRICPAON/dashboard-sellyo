@@ -420,13 +420,20 @@ form button:hover {
   transform: translateY(-3px);
 }
 
+.script-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #66ccff;
+  margin-bottom: 0.8rem;
+}
+
 .script-card button {
   background: #333;
   color: white;
   border: none;
   border-radius: 6px;
   padding: 0.5rem 0.8rem;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem; /* ↑ un peu plus d'air entre les boutons */
   cursor: pointer;
   transition: background 0.2s ease;
   text-align: left;
@@ -440,7 +447,8 @@ form button:hover {
   background: #aa2222;
   color: white;
   font-weight: bold;
-  padding: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  margin-top: auto;
 }
 
 .script-card .delete-btn:hover {
