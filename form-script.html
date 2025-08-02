@@ -32,33 +32,57 @@
         <legend>📝 Informations pour générer le script</legend>
 
         <label>Titre de la vidéo :
-          <input type="text" name="title" required style="width: 100%; padding: 0.5rem;" />
+          <input type="text" name="title" required style="width: 100%; padding: 0.5rem;"
+  placeholder="Ex : Comment mieux dormir en 3 minutes ?" />
         </label><br><br>
 
         <label>Description du produit ou service :
-          <textarea name="description" required rows="4" style="width: 100%; padding: 0.5rem;"></textarea>
+          <textarea name="description" required rows="4" style="width: 100%; padding: 0.5rem;"
+  placeholder="Ex : Ce script présente une méthode simple pour mieux s’endormir grâce à la respiration."></textarea>
         </label><br><br>
 
         <label>Objectif marketing :
           <select name="goal" required style="width: 100%; padding: 0.5rem;">
-            <option value="vente">Vente</option>
-            <option value="lead">Collecte de leads</option>
-            <option value="notoriete">Notoriété</option>
-            <option value="engagement">Engagement</option>
-          </select>
+  <option value="">-- Choisir un objectif --</option>
+  <option value="vente">Générer des ventes</option>
+  <option value="emails">Collecter des emails</option>
+  <option value="trafic">Augmenter le trafic</option>
+  <option value="engagement">Créer de l’engagement</option>
+  <option value="notoriete">Booster la notoriété</option>
+  <option value="presentation">Présenter un produit</option>
+  <option value="nouveaute">Lancer une nouveauté</option>
+  <option value="affiliés">Recruter des affiliés</option>
+  <option value="promo">Annoncer une promo ou un événement</option>
+  <option value="viral">Créer du contenu viral</option>
+  <option value="conversion">Convaincre d’acheter</option>
+  <option value="formation">Éduquer / former</option>
+  <option value="expertise">Prouver l’expertise</option>
+  <option value="storytelling">Créer un storytelling</option>
+  <option value="demo">Faire une démonstration</option>
+</select>
         </label><br><br>
 
         <label>Public cible :
-          <input type="text" name="audience" required style="width: 100%; padding: 0.5rem;" />
+          <input type="text" name="audience" required style="width: 100%; padding: 0.5rem;"
+  placeholder="Ex : Personnes stressées, insomniaques, ou entrepreneurs débordés" />
         </label><br><br>
 
         <label>Ton souhaité :
           <select name="tone" required style="width: 100%; padding: 0.5rem;">
-            <option value="serieux">Sérieux</option>
-            <option value="inspirant">Inspirant</option>
-            <option value="fun">Fun</option>
-            <option value="provocateur">Provocateur</option>
-          </select>
+  <option value="">-- Choisir un ton --</option>
+  <option value="enthousiaste">Enthousiaste</option>
+  <option value="professionnel">Sérieux et professionnel</option>
+  <option value="authentique">Authentique et sincère</option>
+  <option value="humoristique">Humoristique</option>
+  <option value="vendeur">Punchy / vendeur</option>
+  <option value="pedagogique">Pédagogique</option>
+  <option value="inspirant">Inspirant / motivant</option>
+  <option value="confessionnel">Confessionnel (storytelling)</option>
+  <option value="court">Court / percutant (TikTok)</option>
+  <option value="premium">Luxueux / premium</option>
+  <option value="familier">Familier / proche</option>
+  <option value="futuriste">Innovant / futuriste</option>
+</select>
         </label><br><br>
 
         <label>Langue :
