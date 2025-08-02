@@ -7,7 +7,6 @@ import {
   getFirestore,
   collection,
   query,
-  where,
   getDocs,
   deleteDoc,
   doc
@@ -31,24 +30,63 @@ onAuthStateChanged(auth, async (user) => {
     const data = docSnap.data();
     const id = docSnap.id;
 
-    const container = document.createElement("div");
-    container.className = "script-card";
-    container.innerHTML = `
-      <h3>${data.title || data.slug || "(sans titre)"}</h3>
-      <div class="script-actions">
-        ${data.url ? `<button onclick="window.open('${data.url}', '_blank')">🎬 Voir script</button>` : ""}
-        ${data.captionUrl ? `<button onclick="window.open('${data.captionUrl}', '_blank')">💬 Voir légende</button>` : ""}
-        ${data.youtubeTitleUrl ? `<button onclick="window.open('${data.youtubeTitleUrl}', '_blank')">📺 Voir titre YouTube</button>` : ""}
-        
-        <button onclick="alert('Exporter à implémenter')">📤 Exporter</button>
-        <button onclick="window.location.href='edit-script.html?id=${id}'">✏️ Modifier</button>
-        <button onclick="window.location.href='generate-video.html?scriptId=${id}'">🤖 Générer vidéo</button>
-        <button class="delete-btn" data-id="${id}">🧨 Supprimer</button>
-      </div>
+    const card = document.createElement("div");
+    card.className = "script-card";
+    card.style = `
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      background: #222;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
     `;
-    scriptsList.appendChild(container);
+
+    const left = document.createElement("div");
+    left.style = "flex: 1; display: flex; flex-direction: column; gap: 0.5rem;";
+
+    const right = document.createElement("div");
+    right.style = "display: flex; flex-direction: column; justify-content: space-between; gap: 0.5rem; text-align: right;";
+
+    // 👉 Côté gauche – boutons de visualisation/export
+    if (data.url)
+      left.appendChild(makeButton("🎬 Voir le script", data.url));
+    if (data.voiceUrl)
+      left.appendChild(makeButton("🔊 Écouter la voix off", data.voiceUrl));
+    if (data.videoUrl)
+      left.appendChild(makeButton("🎥 Voir la vidéo", data.videoUrl));
+    if (data.captionUrl)
+      left.appendChild(makeButton("💬 Voir la légende", data.captionUrl));
+
+    // Boutons export (même si pas encore implémentés)
+    left.appendChild(makeButton("📤 Exporter tout", null, () => {
+      alert("Fonction Export à implémenter");
+    }));
+
+    // 👉 Côté droit – assembler & supprimer
+    const assembleBtn = document.createElement("button");
+    assembleBtn.textContent = "🎞️ Assembler la vidéo";
+    assembleBtn.style = "padding: 0.6rem 1rem; font-weight: bold;";
+    assembleBtn.onclick = () => {
+      window.location.href = `generate-video.html?scriptId=${id}`;
+    };
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️ Supprimer les données";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.dataset.id = id;
+    deleteBtn.style = "background-color: #822; color: white;";
+
+    right.appendChild(assembleBtn);
+    right.appendChild(deleteBtn);
+
+    // Assemblage de la carte
+    card.appendChild(left);
+    card.appendChild(right);
+    scriptsList.appendChild(card);
   }
 
+  // Suppression
   scriptsList.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!id) return;
@@ -57,8 +95,20 @@ onAuthStateChanged(auth, async (user) => {
       const confirmed = confirm("Supprimer ce script ?");
       if (!confirmed) return;
 
-      await deleteDoc(doc(db, "scripts", user.uid, "items", id));
+      await deleteDoc(doc(db, "scripts", auth.currentUser.uid, "items", id));
       e.target.closest(".script-card").remove();
     }
   });
 });
+
+function makeButton(text, url, onClick) {
+  const btn = document.createElement("button");
+  btn.textContent = text;
+  btn.style = "text-align: left;";
+  if (onClick) {
+    btn.onclick = onClick;
+  } else if (url) {
+    btn.onclick = () => window.open(url, "_blank");
+  }
+  return btn;
+}
