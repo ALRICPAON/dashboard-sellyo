@@ -400,3 +400,49 @@ form button:hover {
 .delete-btn:hover {
   background: #cc0000;
 }
+/* ============================
+   📽️ SCRIPTS VIDÉO
+============================ */
+.script-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  background: #1c1c1c;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+.script-card:hover {
+  transform: translateY(-3px);
+}
+
+.script-card button {
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  margin-bottom: 0.4rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: left;
+}
+
+.script-card button:hover {
+  background: #555;
+}
+
+.script-card .delete-btn {
+  background: #aa2222;
+  color: white;
+  font-weight: bold;
+  padding: 0.4rem;
+}
+
+.script-card .delete-btn:hover {
+  background: #cc0000;
+}
