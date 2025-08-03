@@ -36,8 +36,8 @@ onAuthStateChanged(auth, async (user) => {
     // 🔗 On reconstruit les URLs
     const videoUrl = data.videoUrl;
     const subtitleUrl = data.slug
-      ? `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}.srt`
-      : null;
+  ? `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}.srt`
+  : null;
 
     // 🔗 Lecture de la voix off depuis meta/voice
     let voiceUrl = null;
