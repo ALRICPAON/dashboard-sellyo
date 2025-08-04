@@ -71,7 +71,6 @@ onAuthStateChanged(auth, async (user) => {
   setTimeout(() => {
     window.location.href = "mes-videos.html";
   }, 2000); // petite pause avant la redirection
-}
     } else {
       throw new Error(result.error || "Erreur inconnue");
     }
