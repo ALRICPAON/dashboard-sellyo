@@ -67,8 +67,9 @@ onAuthStateChanged(auth, async (user) => {
     });
 
     const result = await res.json();
+console.log("📦 Résultat brut de Cloud Run :", result); // 🪵 Ajouté
 
-    if (res.ok && result.finalVideoUrl) {
+if (res.ok && result.finalVideoUrl) {
       document.getElementById("status").innerText = "✅ Vidéo prête ! Redirection vers votre bibliothèque...";
       setTimeout(() => {
         window.location.href = "mes-videos.html";
