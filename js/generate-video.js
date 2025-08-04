@@ -36,9 +36,10 @@ onAuthStateChanged(auth, async (user) => {
     // 🔗 On reconstruit les URLs
     const videoUrl = data.videoUrl;
     const subtitleUrl = data.slug
-  ? `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}.srt`
-  : null;
-    console.log("🎯 subtitleUrl:", subtitleUrl)
+      ? `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}.srt`
+      : null;
+
+    console.log("🎯 subtitleUrl:", subtitleUrl);
 
     // 🔗 Lecture de la voix off depuis meta/voice
     let voiceUrl = null;
@@ -66,14 +67,16 @@ onAuthStateChanged(auth, async (user) => {
     });
 
     const result = await res.json();
+
     if (res.ok && result.finalVideoUrl) {
-  document.getElementById("status").innerText = "✅ Vidéo prête ! Redirection vers votre bibliothèque...";
-  setTimeout(() => {
-    window.location.href = "mes-videos.html";
-  }, 2000); // petite pause avant la redirection
+      document.getElementById("status").innerText = "✅ Vidéo prête ! Redirection vers votre bibliothèque...";
+      setTimeout(() => {
+        window.location.href = "mes-videos.html";
+      }, 2000);
     } else {
       throw new Error(result.error || "Erreur inconnue");
     }
+
   } catch (err) {
     console.error("❌ Erreur lors de l’assemblage :", err);
     alert("Erreur : " + err.message);
