@@ -83,12 +83,28 @@ onAuthStateChanged(auth, async (user) => {
         exportSection.innerHTML = ""; // reset contenu
 
         // ▶️ Lien de téléchargement
-        const downloadVideo = document.createElement("a");
-        downloadVideo.href = videoUrl;
-        downloadVideo.download = "";
-        downloadVideo.textContent = "📥 Télécharger la vidéo finale (.mp4)";
-        downloadVideo.style = "display:block; margin-bottom:1rem; color:#00ccff; text-decoration:underline;";
-        exportSection.appendChild(downloadVideo);
+       const downloadVideoBtn = document.createElement("button");
+downloadVideoBtn.textContent = "📥 Télécharger la vidéo finale (.mp4)";
+downloadVideoBtn.style = "margin-bottom:1rem; background:#00ccff; color:black; padding:0.5rem 1rem; border:none; border-radius:4px;";
+downloadVideoBtn.onclick = async () => {
+  try {
+    const response = await fetch(videoUrl);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = data.slug ? `${data.slug}.mp4` : "video.mp4";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    alert("Erreur lors du téléchargement de la vidéo.");
+    console.error(error);
+  }
+};
+exportSection.appendChild(downloadVideoBtn);
 
         // 📝 Légende
         const caption = document.createElement("textarea");
