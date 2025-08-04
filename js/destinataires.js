@@ -113,6 +113,36 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("📨 Emails à enregistrer :", emails);
     feedback.textContent = `✅ ${emails.length} destinataire(s) enregistré(s).`;
 
-    // Tu peux ici stocker en Firestore si besoin
+    // 🔁 Lire l'emailId dans l'URL (ex: ?emailId=abc123)
+const urlParams = new URLSearchParams(window.location.search);
+const emailId = urlParams.get("emailId");
+
+if (!emailId) {
+  feedback.textContent = "❌ Erreur : emailId introuvable.";
+  return;
+}
+
+const auth = getAuth(app);
+const user = auth.currentUser;
+
+if (!user) {
+  feedback.textContent = "❌ Utilisateur non connecté.";
+  return;
+}
+
+// 📤 Mise à jour du champ recipients dans Firestore
+try {
+  const emailDocRef = doc(db, "emails", user.uid, "items", emailId);
+  await updateDoc(emailDocRef, {
+    recipients: emails  // ✅ tableau ["email1", "email2", ...]
+  });
+
+  console.log("✅ Destinataires bien enregistrés :", emails);
+  feedback.textContent = `✅ ${emails.length} destinataire(s) enregistrés dans l’email.`;
+} catch (err) {
+  console.error("🔥 Erreur Firestore :", err);
+  feedback.textContent = "❌ Erreur lors de l’enregistrement des destinataires.";
+}
+
   });
 });
