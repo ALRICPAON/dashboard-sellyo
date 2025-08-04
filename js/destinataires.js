@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  saveBtn.addEventListener("click", () => {
+  saveBtn.addEventListener("click", async () => {
     const emails = [];
     table.querySelectorAll("tr").forEach(tr => {
       const email = tr.children[0]?.textContent;
