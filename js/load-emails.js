@@ -126,7 +126,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     if (e.target.classList.contains("target-btn")) {
-      window.location.href = `destinataires.html?id=${id}`;
+      window.location.href = `destinataires.html?emailId=${id}`;
     }
 
     if (e.target.classList.contains("delete-btn")) {
