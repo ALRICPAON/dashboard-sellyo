@@ -10,6 +10,7 @@ import {
   getDocs,
   getDoc,
   doc,
+  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = getAuth(app);
@@ -30,7 +31,8 @@ onAuthStateChanged(auth, async (user) => {
     const data = docSnap.data();
     const slug = data.slug || docSnap.id;
 
-    if (!data.videoUrl) continue; // Afficher uniquement les scripts avec vidéo
+    // ❌ Ignorer si pas de vidéo finale
+    if (!data.assembledVideoUrl) continue;
 
     const card = document.createElement("div");
     card.className = "video-card";
@@ -45,9 +47,9 @@ onAuthStateChanged(auth, async (user) => {
     left.appendChild(title);
 
     const viewBtn = document.createElement("a");
-    viewBtn.href = data.videoUrl;
+    viewBtn.href = data.assembledVideoUrl;
     viewBtn.target = "_blank";
-    viewBtn.textContent = "🎬 Voir la vidéo";
+    viewBtn.textContent = "🎞️ Voir la vidéo finale";
     viewBtn.className = "medium-button";
     viewBtn.style = "display:inline-block; margin-right:0.5rem;";
     left.appendChild(viewBtn);
@@ -58,7 +60,7 @@ onAuthStateChanged(auth, async (user) => {
     exportBtn.style = "margin-top:0.5rem;";
 
     const exportSection = createExportSection(
-      data.videoUrl,
+      data.assembledVideoUrl,
       data.captionUrl,
       data.youtubeTitleUrl
     );
@@ -101,7 +103,7 @@ function createExportSection(videoUrl, captionUrl, youtubeTitleUrl) {
 
   const downloadLink = document.createElement("a");
   downloadLink.href = videoUrl;
-  downloadLink.textContent = "🎬 Télécharger la vidéo";
+  downloadLink.textContent = "📥 Télécharger la vidéo finale (.mp4)";
   downloadLink.target = "_blank";
   downloadLink.style =
     "display:block; margin-bottom:1rem; color:#00ccff; font-weight:bold;";
@@ -133,7 +135,6 @@ function createExportSection(videoUrl, captionUrl, youtubeTitleUrl) {
   copyTitleBtn.onclick = () =>
     navigator.clipboard.writeText(ytTitleArea.value);
 
-  // Charger les fichiers
   if (captionUrl) {
     fetch(captionUrl)
       .then((r) => r.text())
