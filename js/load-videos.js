@@ -31,12 +31,14 @@ onAuthStateChanged(auth, async (user) => {
     const data = docSnap.data();
     const slug = data.slug || docSnap.id;
 
-    // ❌ Ignorer si pas de vidéo finale
-    if (!data.assembledVideoUrl) continue;
+    if (!slug || !data.captionUrl || !data.youtubeTitleUrl) continue;
+
+    const finalVideoUrl = `https://firebasestorage.googleapis.com/v0/b/sellyo-3bbdb.appspot.com/o/scripts%2F${user.uid}%2F${slug}%2Ffinal.mp4?alt=media`;
 
     const card = document.createElement("div");
     card.className = "video-card";
-    card.style = "display:flex; justify-content:space-between; align-items:start; padding:1rem; border:1px solid #333; border-radius:8px; margin-bottom:1rem; background:#181818; color:white;";
+    card.style =
+      "display:flex; justify-content:space-between; align-items:start; padding:1rem; border:1px solid #333; border-radius:8px; margin-bottom:1rem; background:#181818; color:white;";
 
     const left = document.createElement("div");
     left.style = "flex:1;";
@@ -47,7 +49,7 @@ onAuthStateChanged(auth, async (user) => {
     left.appendChild(title);
 
     const viewBtn = document.createElement("a");
-    viewBtn.href = data.assembledVideoUrl;
+    viewBtn.href = finalVideoUrl;
     viewBtn.target = "_blank";
     viewBtn.textContent = "🎞️ Voir la vidéo finale";
     viewBtn.className = "medium-button";
@@ -60,7 +62,7 @@ onAuthStateChanged(auth, async (user) => {
     exportBtn.style = "margin-top:0.5rem;";
 
     const exportSection = createExportSection(
-      data.assembledVideoUrl,
+      finalVideoUrl,
       data.captionUrl,
       data.youtubeTitleUrl
     );
@@ -135,6 +137,7 @@ function createExportSection(videoUrl, captionUrl, youtubeTitleUrl) {
   copyTitleBtn.onclick = () =>
     navigator.clipboard.writeText(ytTitleArea.value);
 
+  // Charger les fichiers texte
   if (captionUrl) {
     fetch(captionUrl)
       .then((r) => r.text())
