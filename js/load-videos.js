@@ -83,29 +83,14 @@ onAuthStateChanged(auth, async (user) => {
         exportSection.innerHTML = ""; // reset contenu
 
         // ▶️ Lien de téléchargement
-       const downloadVideoBtn = document.createElement("button");
+      const downloadVideoBtn = document.createElement("a");
+downloadVideoBtn.href = videoUrl;
+downloadVideoBtn.setAttribute("download", ""); // tente forçage
+downloadVideoBtn.setAttribute("rel", "noopener");
+downloadVideoBtn.setAttribute("target", "_blank"); // évite chargement en plein écran
 downloadVideoBtn.textContent = "📥 Télécharger la vidéo finale (.mp4)";
-downloadVideoBtn.style = "margin-bottom:1rem; background:#00ccff; color:black; padding:0.5rem 1rem; border:none; border-radius:4px;";
-downloadVideoBtn.onclick = async () => {
-  try {
-    const response = await fetch(videoUrl);
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = data.slug ? `${data.slug}.mp4` : "video.mp4";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
-    alert("Erreur lors du téléchargement de la vidéo.");
-    console.error(error);
-  }
-};
+downloadVideoBtn.style = "display:block; margin-bottom:1rem; background:#00ccff; color:black; padding:0.5rem 1rem; border:none; border-radius:4px; text-align:center; text-decoration:none;";
 exportSection.appendChild(downloadVideoBtn);
-
         // 📝 Légende
         const caption = document.createElement("textarea");
         caption.readOnly = true;
