@@ -66,17 +66,17 @@ onAuthStateChanged(auth, async (user) => {
       })
     });
 
-    const result = await res.json();
-console.log("📦 Résultat brut de Cloud Run :", result); // 🪵 Ajouté
+   const result = await res.json();
+console.log("📦 Résultat brut de Cloud Run :", result);
 
-if (res.ok && result.finalVideoUrl) {
-      document.getElementById("status").innerText = "✅ Vidéo prête ! Redirection vers votre bibliothèque...";
-      setTimeout(() => {
-        window.location.href = "mes-videos.html";
-      }, 2000);
-    } else {
-      throw new Error(result.error || "Erreur inconnue");
-    }
+if (res.ok && result.success && result.redirect) {
+  document.getElementById("status").innerText = "✅ Vidéo prête ! Redirection...";
+  setTimeout(() => {
+    window.location.href = result.redirect;
+  }, 2000);
+} else {
+  throw new Error(result.error || "Erreur inconnue");
+}
 
   } catch (err) {
     console.error("❌ Erreur lors de l’assemblage :", err);
