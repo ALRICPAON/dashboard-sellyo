@@ -31,90 +31,109 @@ onAuthStateChanged(auth, async (user) => {
     const data = docSnap.data();
     const videoUrl = data.finalVideoUrl;
 
-    if (videoUrl) {
-      const div = document.createElement("div");
-      div.className = "video-card";
-      div.style = "background:#222; padding:1rem; margin-bottom:1rem; border-radius:8px;";
+    if (!videoUrl) return;
 
-      const title = document.createElement("h3");
-      title.textContent = data.title || "Sans titre";
-      title.style = "margin-bottom: 0.5rem;";
+    const div = document.createElement("div");
+    div.className = "video-card";
+    div.style = "background:#222; padding:1rem; margin-bottom:1rem; border-radius:8px;";
 
-      const viewBtn = document.createElement("a");
-      viewBtn.href = videoUrl;
-      viewBtn.target = "_blank";
-      viewBtn.textContent = "▶️ Voir ma vidéo";
-      viewBtn.style = "margin-right:1rem; background:#00ccff; color:black; padding:0.5rem 1rem; border-radius:4px; text-decoration:none;";
+    // 🔹 Titre
+    const title = document.createElement("h3");
+    title.textContent = data.title || "Sans titre";
+    title.style = "margin-bottom: 0.5rem;";
+    div.appendChild(title);
 
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "🗑️ Supprimer";
-      deleteBtn.style = "background:#cc0000; color:white; padding:0.5rem 1rem; border:none; border-radius:4px;";
-      deleteBtn.onclick = async () => {
-        if (confirm("Supprimer cette vidéo ?")) {
-          await deleteDoc(doc(db, "scripts", user.uid, "items", docSnap.id));
-          div.remove();
+    // 🔹 Boutons actions (voir, supprimer, exporter)
+    const actions = document.createElement("div");
+    actions.style = "margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;";
+
+    const viewBtn = document.createElement("a");
+    viewBtn.href = videoUrl;
+    viewBtn.target = "_blank";
+    viewBtn.textContent = "▶️ Voir ma vidéo";
+    viewBtn.style = "background:#00ccff; color:black; padding:0.5rem 1rem; border-radius:4px; text-decoration:none;";
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️ Supprimer";
+    deleteBtn.style = "background:#cc0000; color:white; padding:0.5rem 1rem; border:none; border-radius:4px;";
+    deleteBtn.onclick = async () => {
+      if (confirm("Supprimer cette vidéo ?")) {
+        await deleteDoc(doc(db, "scripts", user.uid, "items", docSnap.id));
+        div.remove();
+      }
+    };
+
+    const exportBtn = document.createElement("button");
+    exportBtn.textContent = "📤 Exporter";
+    exportBtn.style = "background:#444; color:white; padding:0.5rem 1rem; border:none; border-radius:4px;";
+
+    actions.appendChild(viewBtn);
+    actions.appendChild(deleteBtn);
+    actions.appendChild(exportBtn);
+    div.appendChild(actions);
+
+    // 🔹 Section export (masquée au départ)
+    const exportSection = document.createElement("div");
+    exportSection.style = "margin-top:1rem; display:none; background:#111; padding:1rem; border-radius:6px;";
+    div.appendChild(exportSection);
+
+    exportBtn.onclick = async () => {
+      if (exportSection.style.display === "none") {
+        exportSection.style.display = "block";
+        exportSection.innerHTML = ""; // reset contenu
+
+        // ▶️ Lien de téléchargement
+        const downloadVideo = document.createElement("a");
+        downloadVideo.href = videoUrl;
+        downloadVideo.download = "";
+        downloadVideo.textContent = "📥 Télécharger la vidéo finale (.mp4)";
+        downloadVideo.style = "display:block; margin-bottom:1rem; color:#00ccff; text-decoration:underline;";
+        exportSection.appendChild(downloadVideo);
+
+        // 📝 Légende
+        const caption = document.createElement("textarea");
+        caption.readOnly = true;
+        caption.style = "width:100%; margin-bottom:0.5rem;";
+        caption.placeholder = "Chargement de la légende...";
+        exportSection.appendChild(caption);
+
+        const copyCaption = document.createElement("button");
+        copyCaption.textContent = "📋 Copier la légende";
+        copyCaption.style = "margin-bottom:1rem;";
+        copyCaption.onclick = () => navigator.clipboard.writeText(caption.value);
+        exportSection.appendChild(copyCaption);
+
+        // 📺 Titre YouTube
+        const titleArea = document.createElement("textarea");
+        titleArea.readOnly = true;
+        titleArea.style = "width:100%; margin-top:1rem; margin-bottom:0.5rem;";
+        titleArea.placeholder = "Chargement du titre...";
+        exportSection.appendChild(titleArea);
+
+        const copyTitle = document.createElement("button");
+        copyTitle.textContent = "📋 Copier le titre YouTube";
+        copyTitle.onclick = () => navigator.clipboard.writeText(titleArea.value);
+        exportSection.appendChild(copyTitle);
+
+        // Charger les fichiers texte
+        if (data.captionUrl) {
+          fetch(data.captionUrl)
+            .then((r) => r.text())
+            .then((txt) => caption.value = txt)
+            .catch(() => caption.value = "[Erreur de chargement]");
         }
-      };
-            const exportBtn = document.createElement("button");
-      exportBtn.textContent = "📤 Exporter";
-      exportBtn.style = "margin-left:1rem; background:#444; color:white; padding:0.5rem 1rem; border:none; border-radius:4px;";
-      
-      const exportSection = document.createElement("div");
-      exportSection.style = "margin-top:1rem; display:none; background:#111; padding:1rem; border-radius:6px;";
-      
-      exportBtn.onclick = async () => {
-        if (exportSection.style.display === "none") {
-          exportSection.style.display = "block";
 
-          const caption = document.createElement("textarea");
-          caption.readOnly = true;
-          caption.style = "width:100%; margin-bottom:0.5rem;";
-          caption.placeholder = "Chargement de la légende...";
-          exportSection.appendChild(caption);
-
-          const copyCaption = document.createElement("button");
-          copyCaption.textContent = "📋 Copier la légende";
-          copyCaption.style = "margin-bottom:1rem;";
-          copyCaption.onclick = () => navigator.clipboard.writeText(caption.value);
-          exportSection.appendChild(copyCaption);
-
-          const title = document.createElement("textarea");
-          title.readOnly = true;
-          title.style = "width:100%; margin-top:1rem; margin-bottom:0.5rem;";
-          title.placeholder = "Chargement du titre...";
-          exportSection.appendChild(title);
-
-          const copyTitle = document.createElement("button");
-          copyTitle.textContent = "📋 Copier le titre YouTube";
-          copyTitle.onclick = () => navigator.clipboard.writeText(title.value);
-          exportSection.appendChild(copyTitle);
-
-          // Charger le contenu des fichiers texte
-          if (data.captionUrl) {
-            fetch(data.captionUrl)
-              .then((r) => r.text())
-              .then((txt) => caption.value = txt)
-              .catch(() => caption.value = "[Erreur de chargement]");
-          }
-
-          if (data.youtubeTitleUrl) {
-            fetch(data.youtubeTitleUrl)
-              .then((r) => r.text())
-              .then((txt) => title.value = txt)
-              .catch(() => title.value = "[Erreur de chargement]");
-          }
-        } else {
-          exportSection.style.display = "none";
+        if (data.youtubeTitleUrl) {
+          fetch(data.youtubeTitleUrl)
+            .then((r) => r.text())
+            .then((txt) => titleArea.value = txt)
+            .catch(() => titleArea.value = "[Erreur de chargement]");
         }
-      };
+      } else {
+        exportSection.style.display = "none";
+      }
+    };
 
-      div.appendChild(exportBtn);
-      div.appendChild(exportSection);
-
-      div.appendChild(title);
-      div.appendChild(viewBtn);
-      div.appendChild(deleteBtn);
-      videosList.appendChild(div);
-    }
+    videosList.appendChild(div);
   });
 });
