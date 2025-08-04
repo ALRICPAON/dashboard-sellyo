@@ -29,12 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const auth = getAuth(app);
   const db = getFirestore(app);
   const selectedRecipients = new Set();
+  let modificationsNonEnregistrées = false;
 
   function addToTable(email, source) {
     const key = `${email}-${source}`;
     if (selectedRecipients.has(key)) return;
 
     selectedRecipients.add(key);
+    modificationsNonEnregistrées = true;
 
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -143,6 +145,16 @@ try {
   console.error("🔥 Erreur Firestore :", err);
   feedback.textContent = "❌ Erreur lors de l’enregistrement des destinataires.";
 }
+    modificationsNonEnregistrées = false;
+
 
   });
+  window.addEventListener("beforeunload", (e) => {
+  if (modificationsNonEnregistrées) {
+    e.preventDefault();
+    e.returnValue = ""; // Chrome oblige
+    return "Vous avez des destinataires non enregistrés. Êtes-vous sûr de vouloir quitter ?";
+  }
+});
+
 });
