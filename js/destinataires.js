@@ -132,7 +132,7 @@ if (!user) {
 
 // 📤 Mise à jour du champ recipients dans Firestore
 try {
-  const emailDocRef = doc(db, "emails", user.uid, "items", emailId);
+  const emailDocRef = doc(db, "emails", emailId);
   await updateDoc(emailDocRef, {
     recipients: emails  // ✅ tableau ["email1", "email2", ...]
   });
