@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mes vidéos – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/load-videos.js"></script>
+</head>
+<body style="background:#111; color:white; font-family:sans-serif;">
+  <div id="navbar-container"></div>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("navbar-container").innerHTML = html;
+      });
+  </script>
+
+  <main style="padding:2rem; max-width:900px; margin:auto;">
+    <h2 style="margin-bottom:1rem;">🎞️ Mes vidéos générées</h2>
+    <div id="videos-list"></div>
+  </main>
+</body>
+</html>
