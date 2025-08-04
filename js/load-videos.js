@@ -97,6 +97,11 @@ downloadVideoBtn.onclick = () => {
   document.body.removeChild(a);
 };
 exportSection.appendChild(downloadVideoBtn);
+        const notice = document.createElement("p");
+notice.textContent = "💡 Astuce : faites un clic droit sur la vidéo et choisissez « Enregistrer la vidéo sous... » pour la télécharger.";
+notice.style = "font-size: 0.9rem; color: #aaa; margin-top: 0.5rem;";
+exportSection.appendChild(notice);
+
 
         // 📝 Légende
         const caption = document.createElement("textarea");
