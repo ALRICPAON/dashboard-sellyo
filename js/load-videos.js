@@ -55,6 +55,61 @@ onAuthStateChanged(auth, async (user) => {
           div.remove();
         }
       };
+            const exportBtn = document.createElement("button");
+      exportBtn.textContent = "📤 Exporter";
+      exportBtn.style = "margin-left:1rem; background:#444; color:white; padding:0.5rem 1rem; border:none; border-radius:4px;";
+      
+      const exportSection = document.createElement("div");
+      exportSection.style = "margin-top:1rem; display:none; background:#111; padding:1rem; border-radius:6px;";
+      
+      exportBtn.onclick = async () => {
+        if (exportSection.style.display === "none") {
+          exportSection.style.display = "block";
+
+          const caption = document.createElement("textarea");
+          caption.readOnly = true;
+          caption.style = "width:100%; margin-bottom:0.5rem;";
+          caption.placeholder = "Chargement de la légende...";
+          exportSection.appendChild(caption);
+
+          const copyCaption = document.createElement("button");
+          copyCaption.textContent = "📋 Copier la légende";
+          copyCaption.style = "margin-bottom:1rem;";
+          copyCaption.onclick = () => navigator.clipboard.writeText(caption.value);
+          exportSection.appendChild(copyCaption);
+
+          const title = document.createElement("textarea");
+          title.readOnly = true;
+          title.style = "width:100%; margin-top:1rem; margin-bottom:0.5rem;";
+          title.placeholder = "Chargement du titre...";
+          exportSection.appendChild(title);
+
+          const copyTitle = document.createElement("button");
+          copyTitle.textContent = "📋 Copier le titre YouTube";
+          copyTitle.onclick = () => navigator.clipboard.writeText(title.value);
+          exportSection.appendChild(copyTitle);
+
+          // Charger le contenu des fichiers texte
+          if (data.captionUrl) {
+            fetch(data.captionUrl)
+              .then((r) => r.text())
+              .then((txt) => caption.value = txt)
+              .catch(() => caption.value = "[Erreur de chargement]");
+          }
+
+          if (data.youtubeTitleUrl) {
+            fetch(data.youtubeTitleUrl)
+              .then((r) => r.text())
+              .then((txt) => title.value = txt)
+              .catch(() => title.value = "[Erreur de chargement]");
+          }
+        } else {
+          exportSection.style.display = "none";
+        }
+      };
+
+      div.appendChild(exportBtn);
+      div.appendChild(exportSection);
 
       div.appendChild(title);
       div.appendChild(viewBtn);
