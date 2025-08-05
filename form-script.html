@@ -34,6 +34,7 @@
         <label>Titre de la vidéo :
           <input type="text" name="title" required style="width: 100%; padding: 0.5rem;"
   placeholder="Ex : Comment mieux dormir en 3 minutes ?" />
+          <input type="hidden" name="duration" id="duration-input" value="">
         </label><br><br>
 
         <label>Description du produit ou service :
@@ -125,5 +126,40 @@
       </button>
     </form>
   </main>
+  <div id="duration-popup" class="popup hidden">
+  <div class="popup-content">
+    <h3>⏱️ Choisis la durée de ta vidéo FaceCam</h3>
+    <button class="duration-btn" data-duration="30">30 secondes</button>
+    <button class="duration-btn" data-duration="60">1 minute</button>
+    <button class="duration-btn" data-duration="90">1 min 30</button>
+    <button class="duration-btn" data-duration="120">2 minutes</button>
+  </div>
+</div>
+
+<style>
+  .popup.hidden { display: none; }
+  .popup {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+  .popup-content {
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .duration-btn {
+    background: #00ccff;
+    border: none;
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
 </body>
 </html>
