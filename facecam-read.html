@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lire mon texte & Uploader ma vidéo – Sellyo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/facecam-read.js"></script>
+</head>
+<body style="background-color: #111; color: white; font-family: sans-serif;">
+
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-container').innerHTML = html;
+      });
+  </script>
+
+  <main style="max-width: 800px; margin: auto; padding: 2rem;">
+    <h2 style="margin-bottom: 1.5rem;">🎤 Lis ton texte FaceCam</h2>
+
+    <div id="script-text" style="white-space: pre-wrap; background: #222; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; min-height: 200px;">
+      Chargement du script en cours...
+    </div>
+
+    <h3 style="margin-bottom: 0.5rem;">📤 Uploade ta vidéo brute</h3>
+    <input type="file" id="video-file" accept="video/*" style="margin-bottom: 1rem;" />
+    <br>
+    <button id="upload-btn" style="padding: 1rem 2rem; background-color: #00c278; color: white; border: none; font-size: 1rem; border-radius: 6px;">
+      ✅ Envoyer ma vidéo
+    </button>
+
+    <p id="upload-status" style="margin-top: 1rem;"></p>
+  </main>
+</body>
+</html>
