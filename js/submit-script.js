@@ -240,8 +240,13 @@ document.querySelectorAll(".duration-btn").forEach((btn) => {
       });
 
       setTimeout(() => {
-        window.location.href = "scripts.html";
-      }, 90000);
+  if (videoType === "facecam") {
+    window.location.href = `facecam-read.html?scriptId=${slugFinal}`;
+  } else {
+    window.location.href = "scripts.html";
+  }
+}, 90000);
+
 
     } catch (err) {
       console.error("❌ Erreur de soumission :", err);
