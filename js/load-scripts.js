@@ -18,6 +18,10 @@ const db = getFirestore(app);
 const iaContainer = document.getElementById("videoia-list");
 const facecamContainer = document.getElementById("facecam-list");
 
+iaContainer.innerHTML = "";
+facecamContainer.innerHTML = "";
+
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
