@@ -7,6 +7,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = getFirestore(app);
   const form = document.getElementById("script-form");
   if (!form) return;
+  
+  const durationPopup = document.getElementById("duration-popup");
+const durationInput = document.getElementById("duration-input");
+
+const videoTypeDropdown = document.querySelector('[name="videoType"]');
+if (videoTypeDropdown) {
+  videoTypeDropdown.addEventListener("change", () => {
+    if (videoTypeDropdown.value === "facecam") {
+      durationPopup?.classList.remove("hidden");
+    } else {
+      durationInput.value = "";
+    }
+  });
+}
+
+document.querySelectorAll(".duration-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const selectedDuration = btn.getAttribute("data-duration");
+    durationInput.value = selectedDuration;
+    durationPopup?.classList.add("hidden");
+  });
+});
+
 
   const formVoiceIdInput = document.createElement("input");
   formVoiceIdInput.type = "hidden";
