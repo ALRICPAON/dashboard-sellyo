@@ -240,12 +240,14 @@ document.querySelectorAll(".duration-btn").forEach((btn) => {
       });
 
       setTimeout(() => {
-  if (videoType === "facecam") {
+  const selectedType = document.querySelector('[name="videoType"]')?.value || "";
+  if (selectedType === "facecam") {
     window.location.href = `facecam-read.html?scriptId=${slugFinal}`;
   } else {
     window.location.href = "scripts.html";
   }
 }, 90000);
+
 
 
     } catch (err) {
