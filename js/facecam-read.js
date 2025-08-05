@@ -47,16 +47,27 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const data = docSnap.data();
-    const captionUrl = data.captionUrl;
+    const slug = data.slug;
 
-    if (!captionUrl) {
-      document.getElementById("script-text").textContent = "Aucun script trouvé.";
-      return;
-    }
+if (!slug) {
+  document.getElementById("script-text").textContent = "Aucun script trouvé.";
+  return;
+}
 
-    const res = await fetch(captionUrl);
-    const text = await res.text();
-    document.getElementById("script-text").textContent = text;
+const srtUrl = `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${slug}.srt`;
+
+try {
+  const res = await fetch(srtUrl);
+  if (!res.ok) throw new Error("Fichier SRT introuvable");
+
+  const srtText = await res.text();
+  document.getElementById("script-text").textContent = srtText || "Script vide.";
+
+} catch (err) {
+  console.error("Erreur SRT :", err);
+  document.getElementById("script-text").textContent = "Erreur lors du chargement du script.";
+}
+
 
     const uploadBtn = document.getElementById("upload-btn");
     const fileInput = document.getElementById("video-file");
