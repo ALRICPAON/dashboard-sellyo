@@ -72,7 +72,7 @@ onAuthStateChanged(auth, async (user) => {
     left.appendChild(title);
 
     // 🎛️ Contenu gauche
-    if (data.mode === "facecam") {
+    if (data.videoType === "facecam") {
       left.appendChild(makeButton("📤 Réenregistrer ma vidéo", () => {
         window.location.href = `facecam-read.html?scriptId=${id}`;
       }));
@@ -87,7 +87,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     // 🎞️ Assembler ou Nettoyer
-    if (data.mode === "facecam") {
+    if (data.videoType === "facecam") {
       const cleanBtn = document.createElement("button");
       cleanBtn.textContent = "🧹 Nettoyer ma vidéo";
       cleanBtn.className = "assemble-btn";
@@ -148,7 +148,7 @@ onAuthStateChanged(auth, async (user) => {
     card.appendChild(left);
     card.appendChild(right);
 
-    if (data.mode === "facecam") {
+    if (data.videoType === "facecam") {
       facecamContainer.appendChild(card);
     } else {
       iaContainer.appendChild(card);
@@ -179,3 +179,4 @@ function makeButton(text, urlOrFn) {
   }
   return btn;
 }
+
