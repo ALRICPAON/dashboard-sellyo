@@ -15,7 +15,8 @@ import {
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-const scriptsList = document.getElementById("scripts-list");
+const iaContainer = document.getElementById("videoia-list");
+const facecamContainer = document.getElementById("facecam-list");
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -25,13 +26,12 @@ onAuthStateChanged(auth, async (user) => {
 
   const q = query(collection(db, "scripts", user.uid, "items"));
   const querySnapshot = await getDocs(q);
-  scriptsList.innerHTML = "";
 
   for (const docSnap of querySnapshot.docs) {
     const data = docSnap.data();
     const id = docSnap.id;
 
-    // 🔍 Lecture du voiceUrl depuis le document meta/voice
+    // 🔍 Lecture du voiceUrl
     let voiceUrl = null;
     try {
       const metaDoc = await getDoc(doc(db, "scripts", user.uid, "items", id, "meta", "voice"));
@@ -45,7 +45,7 @@ onAuthStateChanged(auth, async (user) => {
       console.warn("Erreur lecture voiceUrl:", e);
     }
 
-    // 💡 Construction de la carte
+    // 💡 Construction carte
     const card = document.createElement("div");
     card.className = "email-card";
     card.style.display = "flex";
@@ -67,123 +67,115 @@ onAuthStateChanged(auth, async (user) => {
     right.style.gap = "0.5rem";
     right.style.justifyContent = "flex-start";
 
-    // Titre
     const title = document.createElement("h3");
     title.textContent = data.title || data.slug || "(sans titre)";
     left.appendChild(title);
 
-   // Boutons (gauche)
-if (voiceUrl) {
-  left.appendChild(makeButton("🔊 Écouter la voix off", voiceUrl));
-}
-if (data.videoUrl) {
-  left.appendChild(makeButton("🎥 Voir la vidéo", data.videoUrl));
-}
-if (data.slug) {
-  const captionUrl = `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}-caption.txt`;
-  const subtitleUrl = `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}.srt`;
+    // 🎛️ Contenu gauche
+    if (data.mode === "facecam") {
+      left.appendChild(makeButton("📤 Réenregistrer ma vidéo", () => {
+        window.location.href = `facecam-read.html?scriptId=${id}`;
+      }));
+    } else {
+      if (voiceUrl) left.appendChild(makeButton("🔊 Écouter la voix off", voiceUrl));
+      if (data.videoUrl) left.appendChild(makeButton("🎥 Voir la vidéo", data.videoUrl));
+    }
 
-  left.appendChild(makeButton("💬 Voir la légende", captionUrl));
-  left.appendChild(makeButton("📝 Voir les sous-titres", subtitleUrl));
-}
+    if (data.slug) {
+      const captionUrl = `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}-caption.txt`;
+      left.appendChild(makeButton("💬 Voir légende & hashtags", captionUrl));
+    }
 
-    // Bouton Assembler
-    const assembleBtn = document.createElement("button");
-    assembleBtn.textContent = "🎞️ Assembler la vidéo";
-    assembleBtn.className = "assemble-btn";
-    assembleBtn.onclick = () => {
-      window.location.href = `generate-video.html?scriptId=${id}`;
-    };
-    right.appendChild(assembleBtn);
+    // 🎞️ Assembler ou Nettoyer
+    if (data.mode === "facecam") {
+      const cleanBtn = document.createElement("button");
+      cleanBtn.textContent = "🧹 Nettoyer ma vidéo";
+      cleanBtn.className = "assemble-btn";
+      cleanBtn.onclick = () => {
+        window.location.href = `clean-facecam.html?scriptId=${id}`;
+      };
+      right.appendChild(cleanBtn);
+    } else {
+      const assembleBtn = document.createElement("button");
+      assembleBtn.textContent = "🎞️ Assembler la vidéo";
+      assembleBtn.className = "assemble-btn";
+      assembleBtn.onclick = () => {
+        window.location.href = `generate-video.html?scriptId=${id}`;
+      };
+      right.appendChild(assembleBtn);
+    }
 
-    // Bouton Export (dans colonne de droite sous assembler)
+    // 📤 Exporter tout
     const exportBtn = document.createElement("button");
     exportBtn.textContent = "📤 Exporter tout";
     exportBtn.className = "btn";
-   exportBtn.onclick = async () => {
-  const zip = new JSZip();
+    exportBtn.onclick = async () => {
+      const zip = new JSZip();
 
-  async function addToZip(url, filename) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Erreur téléchargement : ${filename}`);
-      const blob = await response.blob();
-      zip.file(filename, blob);
-    } catch (e) {
-      console.warn("⚠️ Échec export fichier :", filename, e);
-    }
-  }
-
-  // Relecture dynamique du voiceUrl (au moment du clic)
-  let freshVoiceUrl = null;
-  try {
-    const metaDoc = await getDoc(doc(db, "scripts", user.uid, "items", id, "meta", "voice"));
-    if (metaDoc.exists()) {
-      const metaData = metaDoc.data();
-      if (metaData.voiceUrl) {
-        freshVoiceUrl = metaData.voiceUrl;
+      async function addToZip(url, filename) {
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`Erreur téléchargement : ${filename}`);
+          const blob = await response.blob();
+          zip.file(filename, blob);
+        } catch (e) {
+          console.warn("⚠️ Échec export fichier :", filename, e);
+        }
       }
-    }
-  } catch (e) {
-    console.warn("Erreur relecture voiceUrl dans export :", e);
-  }
 
- // Ajout des fichiers
-if (data.slug) {
-  const captionUrl = `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}-caption.txt`;
-  const subtitleUrl = `https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}.srt`;
+      if (data.slug) {
+        await addToZip(`https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}-caption.txt`, "caption.txt");
+        await addToZip(`https://raw.githubusercontent.com/ALRICPAON/sellyo-hosting/main/script/${data.slug}.srt`, "subtitles.srt");
+      }
+      if (voiceUrl) await addToZip(voiceUrl, "voice.mp3");
+      if (data.videoUrl) await addToZip(data.videoUrl, "video.mp4");
 
-  await addToZip(captionUrl, "caption.txt");
-  await addToZip(subtitleUrl, "subtitles.srt");
-}
-
-if (freshVoiceUrl) await addToZip(freshVoiceUrl, "voice.mp3");
-if (data.videoUrl) await addToZip(data.videoUrl, "video.mp4");
-     
-  // Téléchargement ZIP
-  const safeName = (data.slug || data.title || "script").replace(/[^a-z0-9_\-]/gi, "_");
-  zip.generateAsync({ type: "blob" }).then((content) => {
-    saveAs(content, `${safeName}.zip`);
-  });
-};
-
+      const safeName = (data.slug || data.title || "script").replace(/[^a-z0-9_\-]/gi, "_");
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        saveAs(content, `${safeName}.zip`);
+      });
+    };
     right.appendChild(exportBtn);
 
-    // Bouton Supprimer (petit rouge)
+    // 🗑️ Supprimer
     const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "🗑️ Supprimer les données";
+    deleteBtn.textContent = "🗑️ Supprimer";
     deleteBtn.className = "delete-btn";
     deleteBtn.dataset.id = id;
     right.appendChild(deleteBtn);
 
+    // Ajout à la bonne colonne
     card.appendChild(left);
     card.appendChild(right);
-    scriptsList.appendChild(card);
+
+    if (data.mode === "facecam") {
+      facecamContainer.appendChild(card);
+    } else {
+      iaContainer.appendChild(card);
+    }
   }
 
   // Suppression
-  scriptsList.addEventListener("click", async (e) => {
+  document.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!id) return;
-
     if (e.target.classList.contains("delete-btn")) {
       const confirmed = confirm("Supprimer ce script ?");
       if (!confirmed) return;
-
       await deleteDoc(doc(db, "scripts", auth.currentUser.uid, "items", id));
       e.target.closest(".email-card").remove();
     }
   });
 });
 
-function makeButton(text, url, onClick) {
+function makeButton(text, urlOrFn) {
   const btn = document.createElement("button");
   btn.textContent = text;
   btn.className = "btn";
-  if (onClick) {
-    btn.onclick = onClick;
-  } else if (url) {
-    btn.onclick = () => window.open(url, "_blank");
+  if (typeof urlOrFn === "function") {
+    btn.onclick = urlOrFn;
+  } else {
+    btn.onclick = () => window.open(urlOrFn, "_blank");
   }
   return btn;
 }
