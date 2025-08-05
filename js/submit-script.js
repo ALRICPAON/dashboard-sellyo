@@ -179,7 +179,8 @@ document.addEventListener("DOMContentLoaded", () => {
           videoType,
           includeCaption,
           safeContent,
-          voiceId
+          voiceId,
+          duration: document.querySelector('[name="duration"]')?.value || ""
         })
       });
 
@@ -192,6 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
         userId: user.uid,
         title,
         slug: slugFinal,
+        duration: document.querySelector('[name="duration"]')?.value || "",
         description,
         tone,
         language,
