@@ -29,7 +29,7 @@ onAuthStateChanged(auth, async (user) => {
 
   querySnapshot.forEach((docSnap) => {
     const data = docSnap.data();
-    const videoUrl = data.finalVideoUrl;
+    const videoUrl = data.finalVideoUrl || data.facecamCleanUrl; // ← prend la facecam nettoyée si pas de finale
 
     if (!videoUrl) return;
 
