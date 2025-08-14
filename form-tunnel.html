@@ -22,29 +22,35 @@
       <!-- Bloc général -->
       <fieldset class="card" style="padding:1rem;border-radius:.5rem;">
         <legend>Informations générales</legend>
+
         <label>Nom du tunnel *
           <input name="name" type="text" required />
         </label>
+
         <label>Objectif / description
           <input name="desc" type="text" placeholder="Promesse ou objectif principal" />
         </label>
+
         <label>Lien produit final (URL)
           <input name="redirectURL" type="url" placeholder="https://…" />
         </label>
-        <label>Couleur principale
-          <input name="mainColor" type="text" placeholder="#00ccff" />
-        </label>
-  <input name="mainColor" type="color" value="#00ccff" />
-</label>
-<label>Couleur des boutons
-  <input name="buttonColor" type="color" value="#00ccff" />
-</label>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <label>Couleur principale
+            <input name="mainColor" type="color" value="#00ccff" />
+          </label>
+
+          <label>Couleur des boutons
+            <input name="buttonColor" type="color" value="#00ccff" />
+          </label>
+        </div>
 
         <!-- Uploads -->
         <label>Logo
           <input type="file" name="logoFile" accept="image/*" />
           <small>Facultatif – apparaîtra sur toutes les pages</small>
         </label>
+
         <label>Image de couverture
           <input type="file" name="coverFile" accept="image/*" />
           <small>Image principale pour la page 1</small>
@@ -54,18 +60,23 @@
       <!-- Paiement & Tracking -->
       <fieldset class="card" style="padding:1rem;border-radius:.5rem;">
         <legend>Paiement & Tracking</legend>
+
         <label>Prix du produit (€)
           <input name="payment_price" type="number" step="0.01" placeholder="49.00" />
         </label>
+
         <label>Devise
           <input name="currency" type="text" value="EUR" />
         </label>
+
         <label>Lien de paiement Stripe
           <input name="payment_link" type="url" placeholder="https://buy.stripe.com/…" />
         </label>
+
         <label>Facebook Pixel ID
           <input name="fb_pixel" type="text" placeholder="1234567890" />
         </label>
+
         <label>Google Tag Manager ID
           <input name="gtm_id" type="text" placeholder="GTM-XXXXXXX" />
         </label>
@@ -106,6 +117,7 @@
       <label>Titre
         <input name="title" type="text" />
       </label>
+
       <label>Sous-titre
         <input name="subtitle" type="text" />
       </label>
@@ -113,6 +125,7 @@
       <label>Image principale (Hero)
         <input type="file" name="heroImageFile" accept="image/*" />
       </label>
+
       <label>Vidéo
         <input type="file" name="videoFile" accept="video/*" />
       </label>
@@ -120,6 +133,7 @@
       <label>Texte du bouton (CTA)
         <input name="ctaText" type="text" placeholder="Je commence maintenant" />
       </label>
+
       <label>Action du bouton
         <select name="ctaAction">
           <option value="next">Aller à la page suivante</option>
@@ -127,6 +141,7 @@
           <option value="checkout">Paiement</option>
         </select>
       </label>
+
       <label>URL du bouton (si action = URL)
         <input name="ctaUrl" type="url" placeholder="https://…" />
       </label>
@@ -134,6 +149,7 @@
       <label>Méta titre (SEO)
         <input name="metaTitle" type="text" placeholder="Titre affiché dans Google" />
       </label>
+
       <label>Méta description (SEO)
         <textarea name="metaDescription" rows="2" placeholder="Texte sous le titre dans Google"></textarea>
       </label>
