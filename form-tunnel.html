@@ -45,7 +45,13 @@
           </label>
         </div>
 
-        <!-- Uploads -->
+        <!-- Produit digital GLOBAL -->
+        <label>Produit digital global (fichier)
+          <input type="file" name="digitalProductFile" accept=".pdf,.zip,.epub,.mp4,.mp3,.docx" />
+          <small>Optionnel — ebook/formation/audio à livrer globalement (en plus d’une URL éventuelle).</small>
+        </label>
+
+        <!-- Uploads visuels -->
         <label>Logo
           <input type="file" name="logoFile" accept="image/*" />
           <small>Facultatif – apparaîtra sur toutes les pages</small>
@@ -129,6 +135,35 @@
       <label>Vidéo
         <input type="file" name="videoFile" accept="video/*" />
       </label>
+
+      <!-- Description PRODUIT (par page) -->
+      <label>Description du produit (si cette page vend quelque chose)
+        <textarea name="productDescription" rows="3" placeholder="Description courte du produit vendu sur cette page."></textarea>
+      </label>
+
+      <!-- FICHIER PRODUIT (par page) -->
+      <label>Fichier produit (par page)
+        <input type="file" name="productFile" accept=".pdf,.zip,.epub,.mp4,.mp3,.docx" />
+        <small>Optionnel — si cette page doit livrer un fichier dédié.</small>
+      </label>
+
+      <!-- Bloc OPTIN -->
+      <div class="optin-fields" style="display:none; margin:.5rem 0;">
+        <p style="margin:.25rem 0 .5rem;opacity:.8;">Champs du formulaire (cochez ce que vous voulez demander) :</p>
+        <label><input type="checkbox" name="formName"> Nom</label>
+        <label><input type="checkbox" name="formFirstname"> Prénom</label>
+        <label><input type="checkbox" name="formEmail" checked> Email</label>
+        <label><input type="checkbox" name="formPhone"> Téléphone</label>
+        <label><input type="checkbox" name="formAddress"> Adresse</label>
+        <small>Les leads seront enregistrés (save-lead) lors de la génération.</small>
+      </div>
+
+      <!-- Bloc THANKYOU -->
+      <div class="thankyou-fields" style="display:none; margin:.5rem 0;">
+        <label>Texte de remerciement
+          <textarea name="thankyouText" rows="3" placeholder="Merci pour votre confiance ! Consultez votre boîte mail."></textarea>
+        </label>
+      </div>
 
       <label>Texte du bouton (CTA)
         <input name="ctaText" type="text" placeholder="Je commence maintenant" />
