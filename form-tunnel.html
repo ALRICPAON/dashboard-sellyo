@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Créer un tunnel – Sellyo</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script type="module" src="js/firebase-auth-check.js"></script>
+  <script type="module" src="js/submit-tunnel.js"></script>
+</head>
+<body style="background:#111;color:#fff;font-family:sans-serif;">
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html').then(r=>r.text()).then(h=>{document.getElementById('navbar-container').innerHTML=h});
+  </script>
+
+  <main style="max-width:900px;margin:2rem auto;padding:1rem;">
+    <h2 style="text-align:center;color:#00ccff;">🆕 Créer un tunnel</h2>
+    <form id="tunnel-form" style="display:grid;gap:1rem;">
+      <label>Nom du tunnel
+        <input name="name" type="text" required />
+      </label>
+
+      <label>Objectif / Description (desc)
+        <textarea name="desc" rows="3" placeholder="But du tunnel, promesse…"></textarea>
+      </label>
+
+      <label>Lien produit (redirectURL)
+        <input name="redirectURL" type="url" placeholder="https://…" />
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <label>Couleur principale (mainColor)
+          <input name="mainColor" type="text" placeholder="#00ccff" />
+        </label>
+        <label>Logo (logoUrl)
+          <input name="logoUrl" type="url" placeholder="https://…/logo.png" />
+        </label>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <label>Image de couverture (coverUrl)
+          <input name="coverUrl" type="url" placeholder="https://…/cover.jpg" />
+        </label>
+        <label>Nombre de pages
+          <input name="pages" type="number" min="1" max="8" value="5" />
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary">✅ Générer le tunnel</button>
+    </form>
+  </main>
+</body>
+</html>
