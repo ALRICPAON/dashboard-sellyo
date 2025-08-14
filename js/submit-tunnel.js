@@ -76,6 +76,7 @@ form.addEventListener("submit", async (e) => {
   const desc = e.target.desc.value.trim();
   const redirectURL = e.target.redirectURL.value.trim() || null;
   const mainColor = e.target.mainColor.value.trim() || "#00ccff";
+  const buttonColor = e.target.buttonColor.value.trim() || "#00ccff";
 
   const slug = slugify(name) || `tunnel-${Date.now()}`;
   const basePath = `tunnels/${user.uid}/${slug}/`;
