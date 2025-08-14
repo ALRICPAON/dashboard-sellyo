@@ -4,8 +4,15 @@ import {
   getAuth,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const auth = getAuth(app);
+const storage = getStorage(app);
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("tunnel-form");
@@ -23,10 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const pageEl = clone.querySelector(".page-block");
     pageEl.dataset.index = pageCount;
 
-    // Index visuel
     clone.querySelector(".page-index").textContent = pageCount;
 
-    // Type de page -> affichage conditionnel des blocs OPTIN / CHECKOUT
     const typeSelect = clone.querySelector('select[name="type"]');
     const optinFields = clone.querySelector(".optin-fields");
     const checkoutFields = clone.querySelector(".checkout-fields");
@@ -37,31 +42,23 @@ document.addEventListener("DOMContentLoaded", () => {
       checkoutFields.style.display = type === "checkout" ? "block" : "none";
     });
 
-    // Suppression de la page
-    const removeBtn = clone.querySelector(".remove-page");
-    removeBtn.addEventListener("click", () => {
+    clone.querySelector(".remove-page").addEventListener("click", () => {
       pageEl.remove();
       pageCount--;
     });
 
-    // Pré-remplissage si fourni
     if (prefill.type) typeSelect.value = prefill.type;
     if (prefill.title) clone.querySelector('input[name="title"]').value = prefill.title;
     if (prefill.subtitle) clone.querySelector('input[name="subtitle"]').value = prefill.subtitle;
     if (prefill.objective) clone.querySelector('textarea[name="objective"]').value = prefill.objective;
 
-    // Forcer l'affichage correct au départ
     typeSelect.dispatchEvent(new Event("change"));
-
     pagesContainer.appendChild(clone);
   };
 
-  // Ajout première page par défaut
   addPage();
-
   addPageBtn.addEventListener("click", () => addPage());
 
-  // Soumission formulaire
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -75,7 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formData = new FormData(form);
 
-    // Données générales
     const tunnelData = {
       userId: user.uid,
       name: formData.get("name")?.trim() || "Tunnel sans nom",
@@ -92,23 +88,35 @@ document.addEventListener("DOMContentLoaded", () => {
         fb_pixel: formData.get("fb_pixel")?.trim() || "",
         gtm_id: formData.get("gtm_id")?.trim() || ""
       },
+      delivery: {
+        productUrl: "" // sera rempli après upload si besoin
+      },
       pages: []
     };
 
-    // Pages
+    // 🔹 Upload produit digital si présent
+    const productFile = formData.get("digitalProductFile");
+    if (productFile && productFile.size > 0) {
+      try {
+        const ext = productFile.name.split(".").pop();
+        const filePath = `tunnels/${user.uid}/${Date.now()}/product.${ext}`;
+        const storageRef = ref(storage, filePath);
+        await uploadBytes(storageRef, productFile);
+        const url = await getDownloadURL(storageRef);
+        tunnelData.delivery.productUrl = url.split("?")[0] + "?alt=media";
+      } catch (err) {
+        console.error("Erreur upload produit digital:", err);
+        alert("⚠️ Erreur lors de l'upload du fichier produit.");
+        return;
+      }
+    }
+
+    // 🔹 Pages
     pagesContainer.querySelectorAll(".page-block").forEach((pageEl, idx) => {
       const g = (selector) => pageEl.querySelector(selector);
 
-      const benefits = g('[name="benefits"]').value
-        .split("\n")
-        .map((b) => b.trim())
-        .filter(Boolean);
-
-      const bullets = g('[name="bullets"]').value
-        .split("\n")
-        .map((b) => b.trim())
-        .filter(Boolean);
-
+      const benefits = g('[name="benefits"]').value.split("\n").map((b) => b.trim()).filter(Boolean);
+      const bullets = g('[name="bullets"]').value.split("\n").map((b) => b.trim()).filter(Boolean);
       const testimonials = g('[name="testimonials"]').value.trim();
       const faqs = g('[name="faqs"]').value.trim();
 
@@ -119,8 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
         title: g('[name="title"]').value.trim(),
         subtitle: g('[name="subtitle"]').value.trim(),
         objective: g('[name="objective"]').value.trim() || null,
-        heroImage: null, // upload géré à part si besoin
-        videoUrl: null,  // idem
+        heroImage: null,
+        videoUrl: null,
         copy: {
           problem: g('[name="problem"]').value.trim() || null,
           solution: g('[name="solution"]').value.trim() || null,
@@ -158,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // 🔹 Envoi vers Make.com
+    // 🔹 Envoi Make.com
     try {
       const makeResp = await fetch("TON_WEBHOOK_MAKE_TUNNEL", {
         method: "POST",
