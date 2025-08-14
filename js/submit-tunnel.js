@@ -47,6 +47,17 @@ function addPage() {
   node.querySelector(".page-index").textContent = count + 1;
   pagesContainer.appendChild(node);
   wireRemoveButtons();
+
++ // toggle optin/checkout UI
++ const block = pagesContainer.querySelectorAll(".page-block")[count];
++ const typeSel = block.querySelector('select[name="type"]');
++ const optinBox = block.querySelector('.optin-fields');
++ const toggle = () => {
++   if (!typeSel) return;
++   if (optinBox) optinBox.style.display = (typeSel.value === 'optin') ? 'block' : 'none';
++ };
++ typeSel.addEventListener('change', toggle);
++ toggle();
 }
 
 addPageBtn.addEventListener("click", addPage);
@@ -110,40 +121,56 @@ form.addEventListener("submit", async (e) => {
     try { faqs = JSON.parse(g("faqs")?.value || "[]"); } catch {}
 
     pagesData.push({
-      index,
-      type: g("type").value,
-      filename: `page${index}.html`,
-      title: g("title").value.trim(),
-      subtitle: g("subtitle").value.trim(),
-      heroImage: heroImageUrl,
-      videoUrl,
-      copy: {
-        problem: g("problem")?.value.trim() || null,
-        solution: g("solution")?.value.trim() || null,
-        benefits,
-        bullets,
-        guarantee: g("guarantee")?.value.trim() || null
-      },
-      testimonials,
-      faqs,
-      components: {
-        timer: g("timerEnabled")?.checked || false,
-        progressBar: true,
-        badges: ["Paiement sécurisé", "SSL"]
-      },
-      timers: {
-        deadlineISO: null,
-        evergreenMinutes: parseInt(g("evergreenMinutes")?.value || "0", 10) || null
-      },
-      ctaText: g("ctaText").value.trim() || "Continuer",
-      ctaAction: g("ctaAction").value,
-      ctaUrl: g("ctaUrl").value.trim() || null,
-      nextFilename: `page${index + 1}.html`,
-      seo: {
-        metaTitle: g("metaTitle").value.trim() || "",
-        metaDescription: g("metaDescription").value.trim() || ""
-      }
-    });
+  index,
+  type: g("type").value,
+  filename: `page${index}.html`,
+  title: g("title").value.trim(),
+  subtitle: g("subtitle").value.trim(),
+  objective: g("objective")?.value.trim() || null, // 🆕 Objectif/présentation
+  heroImage: heroImageUrl,
+  videoUrl,
+  copy: {
+    problem: g("problem")?.value.trim() || null,
+    solution: g("solution")?.value.trim() || null,
+    benefits,
+    bullets,
+    guarantee: g("guarantee")?.value.trim() || null
+  },
+  testimonials,
+  faqs,
+  components: {
+    timer: g("timerEnabled")?.checked || false,
+    progressBar: true,
+    badges: ["Paiement sécurisé", "SSL"],
+    formFields:
+      g("type").value === "optin"
+        ? {
+            name: g("formName")?.checked || false,
+            firstname: g("formFirstname")?.checked || false,
+            email: g("formEmail")?.checked || false,
+            phone: g("formPhone")?.checked || false,
+            address: g("formAddress")?.checked || false
+          }
+        : null, // 🆕 Formulaire capture
+    productRecap:
+      g("type").value === "checkout"
+        ? g("productRecap")?.value.trim() || null
+        : null // 🆕 Récap produit paiement
+  },
+  timers: {
+    deadlineISO: null,
+    evergreenMinutes:
+      parseInt(g("evergreenMinutes")?.value || "0", 10) || null
+  },
+  ctaText: g("ctaText").value.trim() || "Continuer",
+  ctaAction: g("ctaAction").value,
+  ctaUrl: g("ctaUrl").value.trim() || null,
+  nextFilename: `page${index + 1}.html`,
+  seo: {
+    metaTitle: g("metaTitle").value.trim() || "",
+    metaDescription: g("metaDescription").value.trim() || ""
+  }
+});
   }
 
   // Firestore
