@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const addPageBtn = document.getElementById("add-page-btn");
   const tpl = document.getElementById("page-template");
 
-  // Auth guard (comme avant)
   onAuthStateChanged(auth, user => {
     if (!user) {
       alert("Non autorisé");
@@ -50,6 +49,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function renumber() {
     [...pagesContainer.querySelectorAll(".page-block .page-index")]
       .forEach((el, i) => el.textContent = i + 1);
+  }
+
+  function wireTypeToggle(pageEl) {
+    const typeSelect = pageEl.querySelector('[name="type"]');
+    const optinFields = pageEl.querySelector(".optin-fields");
+    const thankyouFields = pageEl.querySelector(".thankyou-fields");
+    const onChange = () => {
+      const t = typeSelect.value;
+      optinFields.style.display = (t === "optin") ? "block" : "none";
+      thankyouFields.style.display = (t === "thankyou") ? "block" : "none";
+    };
+    typeSelect.addEventListener("change", onChange);
+    onChange();
   }
 
   function wireRemoveButtons() {
@@ -65,16 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const count = pagesContainer.querySelectorAll(".page-block").length;
     if (count >= 8) return alert("Max 8 pages");
     const node = tpl.content.cloneNode(true);
+    const el = node.querySelector(".page-block");
     node.querySelector(".page-index").textContent = count + 1;
     pagesContainer.appendChild(node);
     wireRemoveButtons();
+    wireTypeToggle(el);
   }
 
-  // bouton "ajouter une page" — FIX: bind après DOM prêt
   if (addPageBtn) addPageBtn.addEventListener("click", addPage);
-
-  // première page par défaut — FIX: créer après que le conteneur existe
-  addPage();
+  addPage(); // première page
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -91,9 +102,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const basePath = `tunnels/${user.uid}/${slug}/`;
     const baseUrl = `https://alricpaon.github.io/sellyo-hosting/${basePath}`;
 
-    // Uploads globaux (comme ta version)
-    const logoUrl = await uploadIfFile(e.target.logoFile.files[0], `${basePath}logo-${Date.now()}`);
-    const coverUrl = await uploadIfFile(e.target.coverFile.files[0], `${basePath}cover-${Date.now()}`);
+    // Uploads globaux
+    const logoUrl = await uploadIfFile(e.target.logoFile.files?.[0], `${basePath}logo-${Date.now()}`);
+    const coverUrl = await uploadIfFile(e.target.coverFile.files?.[0], `${basePath}cover-${Date.now()}`);
+    // Produit digital GLOBAL → delivery.productUrl attendu par ton prompt
+    const deliveryProductUrl = await uploadIfFile(e.target.digitalProductFile.files?.[0], `${basePath}delivery-product-${Date.now()}`);
 
     const paymentPrice = parseFloat(e.target.payment_price.value || "0") || 0;
     const currency = (e.target.currency.value || "EUR").trim().toUpperCase();
@@ -102,14 +115,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const gtmId = (e.target.gtm_id.value.trim() || null);
 
     // Pages
+    const blocks = [...pagesContainer.querySelectorAll(".page-block")];
     const pagesData = [];
-    let index = 0;
-    for (const block of pagesContainer.querySelectorAll(".page-block")) {
-      index++;
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      const idx = i + 1;
       const g = (name) => block.querySelector(`[name="${name}"]`);
 
-      const heroImageUrl = await uploadIfFile(g("heroImageFile")?.files?.[0], `${basePath}page${index}-hero-${Date.now()}`);
-      const videoUrl = await uploadIfFile(g("videoFile")?.files?.[0], `${basePath}page${index}-video-${Date.now()}`);
+      const heroImageUrl = await uploadIfFile(g("heroImageFile")?.files?.[0], `${basePath}page${idx}-hero-${Date.now()}`);
+      const videoUrl = await uploadIfFile(g("videoFile")?.files?.[0], `${basePath}page${idx}-video-${Date.now()}`);
+
+      // Produit par page
+      const productFileUrl = await uploadIfFile(g("productFile")?.files?.[0], `${basePath}page${idx}-product-${Date.now()}`);
+      const productDescription = (g("productDescription")?.value || "").trim();
 
       const benefits = textToList(g("benefits")?.value);
       const bullets = textToList(g("bullets")?.value);
@@ -118,14 +136,36 @@ document.addEventListener("DOMContentLoaded", () => {
       let faqs = [];
       try { faqs = JSON.parse(g("faqs")?.value || "[]"); } catch {}
 
-      pagesData.push({
-        index,
-        type: g("type").value,
-        filename: `page${index}.html`,
+      const type = g("type").value;
+      const formFieldsObj = {
+        name: !!g("formName")?.checked,
+        firstname: !!g("formFirstname")?.checked,
+        email: !!g("formEmail")?.checked,
+        phone: !!g("formPhone")?.checked,
+        address: !!g("formAddress")?.checked
+      };
+      const isOptin = (type === "optin");
+      const isThankyou = (type === "thankyou");
+      const thankyouText = isThankyou ? ((g("thankyouText")?.value || "").trim()) : null;
+
+      // Compat checkout : si productDescription renseigné et productRecap vide, on envoie aussi productRecap
+      const productRecap = (type === "checkout")
+        ? ((g("productRecap")?.value || "").trim() || productDescription || "")
+        : ((g("productRecap")?.value || "").trim() || "");
+
+      const evergreenMinutesVal = parseInt(g("evergreenMinutes")?.value || "0", 10) || null;
+
+      const pageObj = {
+        index: idx,
+        type,
+        filename: `page${idx}.html`,
         title: (g("title").value || "").trim(),
         subtitle: (g("subtitle").value || "").trim(),
         heroImage: heroImageUrl,
         videoUrl,
+        // Ajouts livraison produit par page
+        productUrl: productFileUrl || null,
+        productDescription: productDescription || "",
         copy: {
           problem: (g("problem")?.value || "").trim() || null,
           solution: (g("solution")?.value || "").trim() || null,
@@ -138,24 +178,34 @@ document.addEventListener("DOMContentLoaded", () => {
         components: {
           timer: !!g("timerEnabled")?.checked,
           progressBar: true,
-          badges: ["Paiement sécurisé", "SSL"]
+          badges: ["Paiement sécurisé", "SSL"],
+          // Compat prompt: certains modèles lisent components.formFields
+          formFields: isOptin ? formFieldsObj : null
         },
         timers: {
           deadlineISO: null,
-          evergreenMinutes: parseInt(g("evergreenMinutes")?.value || "0", 10) || null
+          evergreenMinutes: evergreenMinutesVal
         },
+        // Compat prompt: certains modèles lisent formFields à la racine
+        formFields: isOptin ? formFieldsObj : null,
+        // Compat checkout (déjà existant dans ton prompt)
+        productRecap,
+        // Thankyou
+        thankyouText,
         ctaText: (g("ctaText").value || "Continuer").trim(),
         ctaAction: g("ctaAction").value,
         ctaUrl: (g("ctaUrl").value || "").trim() || null,
-        nextFilename: (index < pagesContainer.querySelectorAll(".page-block").length) ? `page${index + 1}.html` : null,
+        nextFilename: (idx < blocks.length) ? `page${idx + 1}.html` : null,
         seo: {
           metaTitle: (g("metaTitle").value || "").trim(),
           metaDescription: (g("metaDescription").value || "").trim()
         }
-      });
+      };
+
+      pagesData.push(pageObj);
     }
 
-    // Doc Firestore (comme ta version)
+    // Doc Firestore (identique + on ajoute deliveryProductUrl pour suivi)
     const firstPageUrl = `${baseUrl}page1.html`;
     let docRef;
     try {
@@ -174,6 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
         logoUrl,
         coverUrl,
         redirectURL,
+        deliveryProductUrl: deliveryProductUrl || null,
         createdAt: serverTimestamp()
       });
     } catch (err) {
@@ -182,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Payload Make (identique aux clés que tu avais)
+    // Payload Make (mêmes clés qu’avant + ajouts non bloquants)
     const payload = {
       userId: user.uid,
       tunnelId: docRef.id,
@@ -194,9 +245,11 @@ document.addEventListener("DOMContentLoaded", () => {
       logoUrl,
       coverUrl,
       currency,
-      payment: { provider: "stripe", price: paymentPrice, paymentLink },
+      payment: { provider: "stripe", price: parseFloat(e.target.payment_price.value || "0") || 0, paymentLink },
       analytics: { fbPixelId: fbPixel, gtmId },
       seo: { siteTitle: name, siteDescription: desc || "" },
+      // Ajout global pour compat avec ton prompt (1.delivery.productUrl)
+      delivery: { productUrl: deliveryProductUrl || null },
       basePath,
       baseUrl,
       pagesCount: pagesData.length,
@@ -217,3 +270,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
