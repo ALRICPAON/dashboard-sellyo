@@ -12,6 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
 const durationInput = document.getElementById("duration-input");
 
 const videoTypeDropdown = document.querySelector('[name="videoType"]');
+  // Masquer l'option "Avatar IA réaliste" si présente
+const avatarOpt = videoTypeDropdown?.querySelector(
+  'option[value="avatar-realiste"], option[value="avatar"], option[value="avatar_ia"], option[value="avatar-ia"]'
+);
+if (avatarOpt) avatarOpt.remove();
+
+// Si la valeur sélectionnée était un avatar, forcer sur "videoia"
+if (videoTypeDropdown && ["avatar-realiste","avatar","avatar_ia","avatar-ia"].includes(videoTypeDropdown.value)) {
+  videoTypeDropdown.value = "videoia";
+}
 if (videoTypeDropdown) {
   videoTypeDropdown.addEventListener("change", () => {
     if (videoTypeDropdown.value === "facecam") {
@@ -159,7 +169,9 @@ document.querySelectorAll(".duration-btn").forEach((btn) => {
     const tone = document.querySelector('[name="tone"]')?.value || "";
     const language = document.querySelector('[name="language"]')?.value || "";
     const keywords = document.querySelector('[name="keywords"]')?.value || "";
-    const videoType = document.querySelector('[name="videoType"]')?.value || "";
+    const videoTypeRaw = document.querySelector('[name="videoType"]')?.value || "";
+const allowedTypes = new Set(["videoia","facecam"]);
+const videoType = allowedTypes.has(videoTypeRaw) ? videoTypeRaw : "videoia";
     const includeCaption = document.querySelector('[name="includeCaption"]')?.checked;
     const safeContent = document.querySelector('[name="safeContent"]')?.checked;
     const voiceId = document.querySelector('[name="voiceId"]')?.value || "";
@@ -240,7 +252,7 @@ document.querySelectorAll(".duration-btn").forEach((btn) => {
       });
 
       setTimeout(() => {
-  const selectedType = document.querySelector('[name="videoType"]')?.value || "";
+  const selectedType = videoType;
   if (selectedType === "facecam") {
     window.location.href = `facecam-read.html?scriptId=${slugFinal}`;
   } else {
