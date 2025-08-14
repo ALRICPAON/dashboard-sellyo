@@ -127,9 +127,9 @@
         <input name="subtitle" type="text" />
       </label>
 
-      <!-- Objectif / Présentation (affiché au-dessus du contenu de la page) -->
+      <!-- Objectif / Présentation -->
       <label>Objectif / Présentation (optionnel)
-        <textarea name="intro" rows="3" placeholder="Texte d’introduction de la page"></textarea>
+        <textarea name="objective" rows="3" placeholder="Texte d’introduction de la page"></textarea>
       </label>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
@@ -145,11 +145,18 @@
       <!-- Bloc optionnel pour OPTIN -->
       <div class="optin-fields" style="display:none; margin-top:.5rem;">
         <p style="margin:.25rem 0 .5rem;opacity:.8;">Champs du formulaire d’inscription :</p>
-        <label><input type="checkbox" name="fields[]" value="lastname"> Nom</label>
-        <label><input type="checkbox" name="fields[]" value="firstname"> Prénom</label>
-        <label><input type="checkbox" name="fields[]" value="email" checked> Email</label>
-        <label><input type="checkbox" name="fields[]" value="phone"> Téléphone</label>
-        <label><input type="checkbox" name="fields[]" value="address"> Adresse</label>
+        <label><input type="checkbox" name="formName"> Nom</label>
+        <label><input type="checkbox" name="formFirstname"> Prénom</label>
+        <label><input type="checkbox" name="formEmail" checked> Email</label>
+        <label><input type="checkbox" name="formPhone"> Téléphone</label>
+        <label><input type="checkbox" name="formAddress"> Adresse</label>
+      </div>
+
+      <!-- Bloc optionnel pour CHECKOUT -->
+      <div class="checkout-fields" style="display:none; margin-top:.5rem;">
+        <label>Récap produit (checkout)
+          <textarea name="productRecap" rows="2" placeholder="Description courte du produit acheté"></textarea>
+        </label>
       </div>
 
       <label>Texte du bouton (CTA)
