@@ -96,7 +96,8 @@ try {
 
         statusMsg.textContent = "✅ Vidéo envoyée avec succès. Redirection...";
         setTimeout(() => {
-          window.location.href = "mes-videos.html";
+          // redirection vers la liste complète des scripts
+window.location.href = "scripts.html";
         }, 1500);
 
       } catch (err) {
