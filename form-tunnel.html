@@ -18,68 +18,59 @@
     <h2 style="text-align:center;color:#00ccff;">🆕 Créer un tunnel multipage</h2>
 
     <form id="tunnel-form" class="card" style="padding:1.25rem;display:grid;gap:1rem;">
+
       <!-- Bloc général -->
       <fieldset class="card" style="padding:1rem;border-radius:.5rem;">
         <legend>Informations générales</legend>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-          <label>Nom du tunnel
-            <input name="name" type="text" required />
-          </label>
-          <label>Lien produit (redirectURL)
-            <input name="redirectURL" type="url" placeholder="https://…" />
-          </label>
+        <label>Nom du tunnel *
+          <input name="name" type="text" required />
+        </label>
+        <label>Objectif / description
+          <input name="desc" type="text" placeholder="Promesse ou objectif principal" />
+        </label>
+        <label>Lien produit final (URL)
+          <input name="redirectURL" type="url" placeholder="https://…" />
+        </label>
+        <label>Couleur principale
+          <input name="mainColor" type="text" placeholder="#00ccff" />
+        </label>
 
-          <label>Couleur principale (mainColor)
-            <input name="mainColor" type="text" placeholder="#00ccff" />
-          </label>
-          <label>Logo (logoUrl)
-            <input name="logoUrl" type="url" placeholder="https://…/logo.png" />
-          </label>
-
-          <label>Image de couverture (coverUrl)
-            <input name="coverUrl" type="url" placeholder="https://…/cover.jpg" />
-          </label>
-          <label>Pitch / Description (desc)
-            <input name="desc" type="text" placeholder="Promesse, bénéfice clé…" />
-          </label>
-        </div>
+        <!-- Uploads -->
+        <label>Logo
+          <input type="file" name="logoFile" accept="image/*" />
+          <small>Facultatif – apparaîtra sur toutes les pages</small>
+        </label>
+        <label>Image de couverture
+          <input type="file" name="coverFile" accept="image/*" />
+          <small>Image principale pour la page 1</small>
+        </label>
       </fieldset>
 
       <!-- Paiement & Tracking -->
       <fieldset class="card" style="padding:1rem;border-radius:.5rem;">
         <legend>Paiement & Tracking</legend>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
-          <label>Prix (payment.price)
-            <input name="payment_price" type="number" step="0.01" placeholder="49.00" />
-          </label>
-          <label>Devise (currency)
-            <input name="currency" type="text" value="EUR" />
-          </label>
-          <label>Stripe Payment Link
-            <input name="payment_link" type="url" placeholder="https://buy.stripe.com/…" />
-          </label>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.75rem;">
-          <label>Facebook Pixel ID
-            <input name="fb_pixel" type="text" placeholder="1234567890" />
-          </label>
-          <label>GTM ID
-            <input name="gtm_id" type="text" placeholder="GTM-XXXXXXX" />
-          </label>
-        </div>
+        <label>Prix du produit (€)
+          <input name="payment_price" type="number" step="0.01" placeholder="49.00" />
+        </label>
+        <label>Devise
+          <input name="currency" type="text" value="EUR" />
+        </label>
+        <label>Lien de paiement Stripe
+          <input name="payment_link" type="url" placeholder="https://buy.stripe.com/…" />
+        </label>
+        <label>Facebook Pixel ID
+          <input name="fb_pixel" type="text" placeholder="1234567890" />
+        </label>
+        <label>Google Tag Manager ID
+          <input name="gtm_id" type="text" placeholder="GTM-XXXXXXX" />
+        </label>
       </fieldset>
 
       <!-- Pages dynamiques -->
       <fieldset class="card" style="padding:1rem;border-radius:.5rem;">
         <legend>Pages du tunnel (max 8)</legend>
-
         <div id="pages-container"></div>
-
-        <div style="display:flex;gap:.5rem;margin-top:.75rem;">
-          <button type="button" id="add-page-btn" class="btn">➕ Ajouter une page</button>
-          <small style="opacity:.7;">Types : sales, optin, checkout, upsell, downsell, thankyou, webinar, custom</small>
-        </div>
+        <button type="button" id="add-page-btn" class="btn">➕ Ajouter une page</button>
       </fieldset>
 
       <div style="display:flex;gap:.75rem;justify-content:flex-end;">
@@ -89,62 +80,91 @@
     </form>
   </main>
 
-  <!-- Template d'une page -->
+  <!-- Template page -->
   <template id="page-template">
     <fieldset class="page-block" style="border:1px solid #333;padding:1rem;border-radius:.5rem;margin-top:1rem;">
       <legend>Page <span class="page-index"></span></legend>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <label>Type
-          <select name="type">
-           <option value="sales">Page de vente</option>
-<option value="optin">Page de capture</option>
-<option value="checkout">Page de paiement</option>
-<option value="upsell">Upsell (offre complémentaire)</option>
-<option value="downsell">Downsell (offre alternative)</option>
-<option value="thankyou">Page de remerciement</option>
-<option value="webinar">Page de webinaire</option>
-<option value="custom">Personnalisée</option>
-          </select>
-        </label>
+      <label>Type de page
+        <select name="type">
+          <option value="sales">Page de vente</option>
+          <option value="optin">Page de capture</option>
+          <option value="checkout">Page de paiement</option>
+          <option value="upsell">Upsell (offre complémentaire)</option>
+          <option value="downsell">Downsell (offre alternative)</option>
+          <option value="thankyou">Page de remerciement</option>
+          <option value="webinar">Page de webinaire</option>
+          <option value="custom">Page personnalisée</option>
+        </select>
+      </label>
 
-        <label>Titre <input name="title" type="text" /></label>
-        <label>Sous-titre <input name="subtitle" type="text" /></label>
-        <label>Hero image <input name="heroImage" type="url" placeholder="https://…" /></label>
-        <label>Vidéo <input name="videoUrl" type="url" placeholder="https://…" /></label>
+      <label>Titre
+        <input name="title" type="text" />
+      </label>
+      <label>Sous-titre
+        <input name="subtitle" type="text" />
+      </label>
 
-        <label>CTA texte <input name="ctaText" type="text" placeholder="Je commence" /></label>
-        <label>Action du CTA
-          <select name="ctaAction">
-            <option value="next">Aller à la page suivante</option>
-            <option value="url">Ouvrir une URL</option>
-            <option value="checkout">Paiement</option>
-          </select>
-        </label>
-        <label>URL du CTA (si action = url) <input name="ctaUrl" type="url" placeholder="https://…" /></label>
+      <label>Image principale (Hero)
+        <input type="file" name="heroImageFile" accept="image/*" />
+      </label>
+      <label>Vidéo
+        <input type="file" name="videoFile" accept="video/*" />
+      </label>
 
-        <label>Meta title <input name="metaTitle" type="text" /></label>
-        <label>Meta description <input name="metaDescription" type="text" /></label>
-      </div>
+      <label>Texte du bouton (CTA)
+        <input name="ctaText" type="text" placeholder="Je commence maintenant" />
+      </label>
+      <label>Action du bouton
+        <select name="ctaAction">
+          <option value="next">Aller à la page suivante</option>
+          <option value="url">Ouvrir une URL</option>
+          <option value="checkout">Paiement</option>
+        </select>
+      </label>
+      <label>URL du bouton (si action = URL)
+        <input name="ctaUrl" type="url" placeholder="https://…" />
+      </label>
+
+      <label>Méta titre (SEO)
+        <input name="metaTitle" type="text" placeholder="Titre affiché dans Google" />
+      </label>
+      <label>Méta description (SEO)
+        <textarea name="metaDescription" rows="2" placeholder="Texte sous le titre dans Google"></textarea>
+      </label>
 
       <details style="margin-top:.5rem;">
-        <summary>Texte & éléments (optionnels)</summary>
-        <label>Problème <textarea name="problem" rows="2"></textarea></label>
-        <label>Solution <textarea name="solution" rows="2"></textarea></label>
-        <label>Bénéfices (1 par ligne) <textarea name="benefits" rows="3"></textarea></label>
-        <label>Bullets (1 par ligne) <textarea name="bullets" rows="3"></textarea></label>
-        <label>Garantie <input name="guarantee" type="text" placeholder="Satisfait ou remboursé 30j" /></label>
-        <label>Testimonials (JSON) <textarea name="testimonials" rows="2" placeholder='[{"name":"…","text":"…"}]'></textarea></label>
-        <label>FAQs (JSON) <textarea name="faqs" rows="2" placeholder='[{"q":"…","a":"…"}]'></textarea></label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-          <label>Activer timer ? <input name="timerEnabled" type="checkbox" /></label>
-          <label>Evergreen (minutes) <input name="evergreenMinutes" type="number" placeholder="20" /></label>
-        </div>
+        <summary>Texte & contenu optionnel</summary>
+        <label>Problème
+          <textarea name="problem" rows="2"></textarea>
+        </label>
+        <label>Solution
+          <textarea name="solution" rows="2"></textarea>
+        </label>
+        <label>Bénéfices (1 par ligne)
+          <textarea name="benefits" rows="3"></textarea>
+        </label>
+        <label>Points clés (1 par ligne)
+          <textarea name="bullets" rows="3"></textarea>
+        </label>
+        <label>Garantie
+          <input name="guarantee" type="text" placeholder="Satisfait ou remboursé 30j" />
+        </label>
+        <label>Testimonials (JSON)
+          <textarea name="testimonials" rows="2" placeholder='[{"name":"…","text":"…"}]'></textarea>
+        </label>
+        <label>FAQs (JSON)
+          <textarea name="faqs" rows="2" placeholder='[{"q":"…","a":"…"}]'></textarea>
+        </label>
+        <label>Activer timer ?
+          <input name="timerEnabled" type="checkbox" />
+        </label>
+        <label>Durée timer (minutes)
+          <input name="evergreenMinutes" type="number" placeholder="20" />
+        </label>
       </details>
 
-      <div style="display:flex;justify-content:flex-end;margin-top:.5rem;">
-        <button type="button" class="btn btn-danger remove-page">🗑 Supprimer cette page</button>
-      </div>
+      <button type="button" class="btn btn-danger remove-page">🗑 Supprimer cette page</button>
     </fieldset>
   </template>
 </body>
