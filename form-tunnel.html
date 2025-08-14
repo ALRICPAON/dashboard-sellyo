@@ -7,8 +7,18 @@
   <link rel="stylesheet" href="dashboard.css" />
   <script type="module" src="js/firebase-auth-check.js"></script>
   <script type="module" src="js/submit-tunnel.js"></script>
+  <style>
+    .card { background:#191919;border:1px solid #2a2a2a;border-radius:.75rem; }
+    label { display:grid; gap:.35rem; }
+    input, textarea, select { background:#0f0f0f;border:1px solid #2a2a2a;color:#fff;border-radius:.5rem;padding:.6rem; }
+    .btn { background:#222;border:1px solid #3a3a3a;color:#fff;padding:.6rem .9rem;border-radius:.6rem;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem; }
+    .btn:hover { filter:brightness(1.1); }
+    .btn-primary { background:#00ccff;border-color:#00ccff;color:#000;font-weight:700; }
+    .btn-danger { background:#3a0b0b;border-color:#5a1b1b;color:#fff; }
+    legend { padding:0 .5rem;color:#9adfff; }
+  </style>
 </head>
-<body style="background:#111;color:#fff;font-family:sans-serif;">
+<body style="background:#111;color:#fff;font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;">
   <div id="navbar-container"></div>
   <script>
     fetch('navbar.html')
@@ -41,16 +51,16 @@
           <label>Couleur principale
             <input name="mainColor" type="color" value="#00ccff" />
           </label>
-          
-          <label>Produit digital (fichier)
-           <input type="file" name="digitalProductFile" accept=".pdf,.zip,.epub,.mp4,.mp3,.docx" />
-           <small>Optionnel – à utiliser si vous livrez un fichier numérique (ebook, vidéo, audio…)</small>
-          </label>
 
           <label>Couleur des boutons
             <input name="buttonColor" type="color" value="#00ccff" />
           </label>
         </div>
+
+        <label>Produit digital (fichier)
+          <input type="file" name="digitalProductFile" accept=".pdf,.zip,.epub,.mp4,.mp3,.docx" />
+          <small>Optionnel – à utiliser si vous livrez un fichier numérique (ebook, vidéo, audio…)</small>
+        </label>
 
         <label>Logo
           <input type="file" name="logoFile" accept="image/*" />
