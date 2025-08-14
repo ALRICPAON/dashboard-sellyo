@@ -1,34 +1,19 @@
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore, collection, addDoc, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-// ⚠️ Mets ici l'URL EXACTE de ton webhook Make (branche tunnel)
 const MAKE_WEBHOOK_TUNNEL_URL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
 
-// DOM
 const form = document.getElementById("tunnel-form");
 const pagesContainer = document.getElementById("pages-container");
 const addPageBtn = document.getElementById("add-page-btn");
 const tpl = document.getElementById("page-template");
 
-if (!form || !pagesContainer || !addPageBtn || !tpl) {
-  console.error("Formulaire tunnel : éléments manquants.");
-}
-
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    alert("Non autorisé");
-    window.location.href = "index.html";
-    return;
-  }
-});
-
-// Helpers
 function slugify(s) {
   return (s || "")
     .toString()
@@ -48,87 +33,89 @@ function textToList(v) {
 
 function wireRemoveButtons() {
   pagesContainer.querySelectorAll(".remove-page").forEach(btn => {
-    btn.onclick = (e) => {
-      e.preventDefault();
-      const block = e.target.closest(".page-block");
-      if (block) block.remove();
-      // re-index
-      [...pagesContainer.querySelectorAll(".page-block .page-index")]
-        .forEach((el, i) => el.textContent = i + 1);
+    btn.onclick = () => {
+      btn.closest(".page-block").remove();
+      [...pagesContainer.querySelectorAll(".page-block .page-index")].forEach((el, i) => el.textContent = i + 1);
     };
   });
 }
 
-// Ajoute une première page par défaut
-(function initFirstPage() {
-  const node = tpl.content.cloneNode(true);
-  node.querySelector(".page-index").textContent = 1;
-  pagesContainer.appendChild(node);
-  wireRemoveButtons();
-})();
-
-// Ajouter page
-addPageBtn.addEventListener("click", () => {
+function addPage() {
   const count = pagesContainer.querySelectorAll(".page-block").length;
   if (count >= 8) return alert("Max 8 pages");
   const node = tpl.content.cloneNode(true);
   node.querySelector(".page-index").textContent = count + 1;
   pagesContainer.appendChild(node);
   wireRemoveButtons();
+}
+
+addPageBtn.addEventListener("click", addPage);
+
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    alert("Non autorisé");
+    window.location.href = "index.html";
+  }
 });
 
-// Submit
+addPage(); // première page par défaut
+
+async function uploadIfFile(file, path) {
+  if (!file) return null;
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const user = auth.currentUser;
   if (!user) return;
 
   const name = e.target.name.value.trim();
-  if (!name) {
-    alert("Le nom du tunnel est requis.");
-    return;
-  }
-
   const desc = e.target.desc.value.trim();
   const redirectURL = e.target.redirectURL.value.trim() || null;
   const mainColor = e.target.mainColor.value.trim() || "#00ccff";
-  const logoUrl = e.target.logoUrl.value.trim() || null;
-  const coverUrl = e.target.coverUrl.value.trim() || null;
+
+  const slug = slugify(name) || `tunnel-${Date.now()}`;
+  const basePath = `tunnels/${user.uid}/${slug}/`;
+  const baseUrl = `https://alricpaon.github.io/sellyo-hosting/${basePath}`;
+
+  // Uploads globaux
+  const logoUrl = await uploadIfFile(e.target.logoFile.files[0], `${basePath}logo-${Date.now()}`);
+  const coverUrl = await uploadIfFile(e.target.coverFile.files[0], `${basePath}cover-${Date.now()}`);
 
   const paymentPrice = parseFloat(e.target.payment_price.value || "0") || 0;
-  const currency = (e.target.currency.value || "EUR").toUpperCase();
+  const currency = e.target.currency.value.trim().toUpperCase();
   const paymentLink = e.target.payment_link.value.trim() || null;
   const fbPixel = e.target.fb_pixel.value.trim() || null;
   const gtmId = e.target.gtm_id.value.trim() || null;
 
   // Pages
-  const pageBlocks = [...pagesContainer.querySelectorAll(".page-block")];
-  if (pageBlocks.length === 0) {
-    alert("Ajoute au moins une page.");
-    return;
-  }
-
-  const pagesData = pageBlocks.map((block, idx) => {
+  const pagesData = [];
+  let index = 0;
+  for (const block of pagesContainer.querySelectorAll(".page-block")) {
+    index++;
     const g = (name) => block.querySelector(`[name="${name}"]`);
-    const index = idx + 1;
+
+    const heroImageUrl = await uploadIfFile(g("heroImageFile").files[0], `${basePath}page${index}-hero-${Date.now()}`);
+    const videoUrl = await uploadIfFile(g("videoFile").files[0], `${basePath}page${index}-video-${Date.now()}`);
 
     const benefits = textToList(g("benefits")?.value);
     const bullets = textToList(g("bullets")?.value);
-
     let testimonials = [];
     try { testimonials = JSON.parse(g("testimonials")?.value || "[]"); } catch {}
     let faqs = [];
     try { faqs = JSON.parse(g("faqs")?.value || "[]"); } catch {}
 
-    return {
+    pagesData.push({
       index,
       type: g("type").value,
       filename: `page${index}.html`,
       title: g("title").value.trim(),
       subtitle: g("subtitle").value.trim(),
-      heroImage: g("heroImage").value.trim() || null,
-      videoUrl: g("videoUrl").value.trim() || null,
+      heroImage: heroImageUrl,
+      videoUrl,
       copy: {
         problem: g("problem")?.value.trim() || null,
         solution: g("solution")?.value.trim() || null,
@@ -155,23 +142,18 @@ form.addEventListener("submit", async (e) => {
         metaTitle: g("metaTitle").value.trim() || "",
         metaDescription: g("metaDescription").value.trim() || ""
       }
-    };
-  });
+    });
+  }
 
-  // Slug & URLs
-  const slug = slugify(name) || `tunnel-${Date.now()}`;
-  const basePath = `tunnels/${user.uid}/${slug}/`;
-  const baseUrl = `https://alricpaon.github.io/sellyo-hosting/${basePath}`;
+  // Firestore
   const firstPageUrl = `${baseUrl}page1.html`;
-
-  // 1) Créer doc Firestore (collection plate = compat liste actuelle)
   let docRef;
   try {
     docRef = await addDoc(collection(db, "tunnels"), {
       userId: user.uid,
       name,
-      goal: desc || null,     // compat avec load-tunnels.js (affiche data.goal)
-      url: firstPageUrl,      // bouton "Voir"
+      goal: desc || null,
+      url: firstPageUrl,
       type: "tunnel",
       slug,
       basePath,
@@ -190,11 +172,10 @@ form.addEventListener("submit", async (e) => {
     });
   } catch (err) {
     console.error("Firestore addDoc error", err);
-    alert("❌ Erreur lors de l’enregistrement Firestore.");
-    return;
+    return alert("Erreur lors de l’enregistrement Firestore");
   }
 
-  // 2) Appeler Make
+  // Make
   const payload = {
     userId: user.uid,
     tunnelDocId: docRef.id,
@@ -221,11 +202,10 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-
-    alert("✅ Tunnel en cours de génération. Redirection vers la liste.");
+    alert("✅ Tunnel en cours de génération.");
     window.location.href = "tunnels.html";
   } catch (err) {
     console.error("Make webhook error", err);
-    alert("❌ Erreur d’envoi au scénario Make.");
+    alert("Erreur d’envoi au scénario Make");
   }
 });
