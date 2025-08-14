@@ -1,174 +1,54 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Créer un tunnel – Sellyo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="dashboard.css">
   <script type="module" src="js/firebase-auth-check.js"></script>
-  <script type="module" src="js/submit-tunnel.js"></script>
 </head>
 <body style="background:#111;color:#fff;font-family:sans-serif;">
-  <div id="navbar-container"></div>
-  <script>
-    fetch('navbar.html').then(r=>r.text()).then(h=>{document.getElementById('navbar-container').innerHTML=h});
-  </script>
+<div id="navbar-container"></div>
+<script>
+fetch('navbar.html').then(res => res.text()).then(html => {
+  document.getElementById('navbar-container').innerHTML = html;
+});
+</script>
 
-  <main style="max-width:1000px;margin:2rem auto;padding:1rem;">
-    <h2 style="text-align:center;color:#00ccff;">🆕 Créer un tunnel multipage</h2>
+<main style="padding:2rem;max-width:900px;margin:auto;">
+  <h2 style="color:#00ccff;text-align:center;">🚀 Créer un tunnel marketing</h2>
+  
+  <form id="tunnel-form">
+    <h3>Informations globales</h3>
+    <label>Nom du tunnel</label>
+    <input type="text" name="name" required>
 
-    <form id="tunnel-form" class="card" style="padding:1.25rem;display:grid;gap:1rem;">
+    <label>Couleur principale</label>
+    <input type="color" name="mainColor" value="#00ccff">
 
-      <!-- Bloc général -->
-      <fieldset class="card" style="padding:1rem;border-radius:.5rem;">
-        <legend>Informations générales</legend>
-        <label>Nom du tunnel *
-          <input name="name" type="text" required />
-        </label>
-        <label>Objectif / description
-          <input name="desc" type="text" placeholder="Promesse ou objectif principal" />
-        </label>
-        <label>Lien produit final (URL)
-          <input name="redirectURL" type="url" placeholder="https://…" />
-        </label>
-        <label>Couleur principale
-  <input name="mainColor" type="color" value="#00ccff" />
-</label>
-<label>Couleur des boutons
-  <input name="buttonColor" type="color" value="#00ccff" />
-</label>
+    <label>Couleur des boutons</label>
+    <input type="color" name="buttonColor" value="#ff6600">
 
-        <!-- Uploads -->
-        <label>Logo
-          <input type="file" name="logoFile" accept="image/*" />
-          <small>Facultatif – apparaîtra sur toutes les pages</small>
-        </label>
-        <label>Image de couverture
-          <input type="file" name="coverFile" accept="image/*" />
-          <small>Image principale pour la page 1</small>
-        </label>
-      </fieldset>
+    <label>Logo</label>
+    <input type="file" name="logoFile" accept="image/*">
 
-      <!-- Paiement & Tracking -->
-      <fieldset class="card" style="padding:1rem;border-radius:.5rem;">
-        <legend>Paiement & Tracking</legend>
-        <label>Prix du produit (€)
-          <input name="payment_price" type="number" step="0.01" placeholder="49.00" />
-        </label>
-        <label>Devise
-          <input name="currency" type="text" value="EUR" />
-        </label>
-        <label>Lien de paiement Stripe
-          <input name="payment_link" type="url" placeholder="https://buy.stripe.com/…" />
-        </label>
-        <label>Facebook Pixel ID
-          <input name="fb_pixel" type="text" placeholder="1234567890" />
-        </label>
-        <label>Google Tag Manager ID
-          <input name="gtm_id" type="text" placeholder="GTM-XXXXXXX" />
-        </label>
-      </fieldset>
+    <label>Image de couverture</label>
+    <input type="file" name="coverFile" accept="image/*">
 
-      <!-- Pages dynamiques -->
-      <fieldset class="card" style="padding:1rem;border-radius:.5rem;">
-        <legend>Pages du tunnel (max 8)</legend>
-        <div id="pages-container"></div>
-        <button type="button" id="add-page-btn" class="btn">➕ Ajouter une page</button>
-      </fieldset>
+    <label>Lien produit final</label>
+    <input type="url" name="redirectURL">
 
-      <div style="display:flex;gap:.75rem;justify-content:flex-end;">
-        <a href="tunnels.html" class="btn">↩️ Retour</a>
-        <button type="submit" class="btn btn-primary">✅ Générer le tunnel</button>
-      </div>
-    </form>
-  </main>
+    <label>Lien paiement Stripe</label>
+    <input type="url" name="paymentLink">
 
-  <!-- Template page -->
-  <template id="page-template">
-    <fieldset class="page-block" style="border:1px solid #333;padding:1rem;border-radius:.5rem;margin-top:1rem;">
-      <legend>Page <span class="page-index"></span></legend>
+    <h3>Pages du tunnel</h3>
+    <div id="pages-container"></div>
 
-      <label>Type de page
-        <select name="type">
-          <option value="sales">Page de vente</option>
-          <option value="optin">Page de capture</option>
-          <option value="checkout">Page de paiement</option>
-          <option value="upsell">Upsell (offre complémentaire)</option>
-          <option value="downsell">Downsell (offre alternative)</option>
-          <option value="thankyou">Page de remerciement</option>
-          <option value="webinar">Page de webinaire</option>
-          <option value="custom">Page personnalisée</option>
-        </select>
-      </label>
+    <button type="button" id="add-page-btn" class="btn">➕ Ajouter une page</button>
+    <br><br>
+    <button type="submit" class="btn btn-primary">💾 Créer le tunnel</button>
+  </form>
+</main>
 
-      <label>Titre
-        <input name="title" type="text" />
-      </label>
-      <label>Sous-titre
-        <input name="subtitle" type="text" />
-      </label>
-
-      <label>Image principale (Hero)
-        <input type="file" name="heroImageFile" accept="image/*" />
-      </label>
-      <label>Vidéo
-        <input type="file" name="videoFile" accept="video/*" />
-      </label>
-
-      <label>Texte du bouton (CTA)
-        <input name="ctaText" type="text" placeholder="Je commence maintenant" />
-      </label>
-      <label>Action du bouton
-        <select name="ctaAction">
-          <option value="next">Aller à la page suivante</option>
-          <option value="url">Ouvrir une URL</option>
-          <option value="checkout">Paiement</option>
-        </select>
-      </label>
-      <label>URL du bouton (si action = URL)
-        <input name="ctaUrl" type="url" placeholder="https://…" />
-      </label>
-
-      <label>Méta titre (SEO)
-        <input name="metaTitle" type="text" placeholder="Titre affiché dans Google" />
-      </label>
-      <label>Méta description (SEO)
-        <textarea name="metaDescription" rows="2" placeholder="Texte sous le titre dans Google"></textarea>
-      </label>
-
-      <details style="margin-top:.5rem;">
-        <summary>Texte & contenu optionnel</summary>
-        <label>Problème
-          <textarea name="problem" rows="2"></textarea>
-        </label>
-        <label>Solution
-          <textarea name="solution" rows="2"></textarea>
-        </label>
-        <label>Bénéfices (1 par ligne)
-          <textarea name="benefits" rows="3"></textarea>
-        </label>
-        <label>Points clés (1 par ligne)
-          <textarea name="bullets" rows="3"></textarea>
-        </label>
-        <label>Garantie
-          <input name="guarantee" type="text" placeholder="Satisfait ou remboursé 30j" />
-        </label>
-        <label>Testimonials (JSON)
-          <textarea name="testimonials" rows="2" placeholder='[{"name":"…","text":"…"}]'></textarea>
-        </label>
-        <label>FAQs (JSON)
-          <textarea name="faqs" rows="2" placeholder='[{"q":"…","a":"…"}]'></textarea>
-        </label>
-        <label>Activer timer ?
-          <input name="timerEnabled" type="checkbox" />
-        </label>
-        <label>Durée timer (minutes)
-          <input name="evergreenMinutes" type="number" placeholder="20" />
-        </label>
-      </details>
-
-      <button type="button" class="btn btn-danger remove-page">🗑 Supprimer cette page</button>
-    </fieldset>
-  </template>
+<script type="module" src="js/form-tunnel.js"></script>
 </body>
 </html>
