@@ -1,239 +1,177 @@
+// js/submit-tunnel.js
 import { app } from "./firebase-init.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
 
-const MAKE_WEBHOOK_TUNNEL_URL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("tunnel-form");
+  const pagesContainer = document.getElementById("pages-container");
+  const pageTemplate = document.getElementById("page-template");
+  const addPageBtn = document.getElementById("add-page-btn");
 
-const form = document.getElementById("tunnel-form");
-const pagesContainer = document.getElementById("pages-container");
-const addPageBtn = document.getElementById("add-page-btn");
-const tpl = document.getElementById("page-template");
+  let pageCount = 0;
 
-function slugify(s) {
-  return (s || "")
-    .toString()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "")
-    .substring(0, 80);
-}
+  const addPage = (prefill = {}) => {
+    if (pageCount >= 8) return alert("Max 8 pages");
+    pageCount++;
 
-function textToList(v) {
-  return (v || "")
-    .split(/\r?\n/)
-    .map(s => s.trim())
-    .filter(Boolean);
-}
+    const clone = document.importNode(pageTemplate.content, true);
+    const pageEl = clone.querySelector(".page-block");
+    pageEl.dataset.index = pageCount;
 
-function wireRemoveButtons() {
-  pagesContainer.querySelectorAll(".remove-page").forEach(btn => {
-    btn.onclick = () => {
-      btn.closest(".page-block").remove();
-      [...pagesContainer.querySelectorAll(".page-block .page-index")].forEach((el, i) => el.textContent = i + 1);
-    };
-  });
-}
+    // Index visuel
+    clone.querySelector(".page-index").textContent = pageCount;
 
-function addPage() {
-  const count = pagesContainer.querySelectorAll(".page-block").length;
-  if (count >= 8) return alert("Max 8 pages");
+    // Type de page -> affichage conditionnel des blocs OPTIN / CHECKOUT
+    const typeSelect = clone.querySelector('select[name="type"]');
+    const optinFields = clone.querySelector(".optin-fields");
+    const checkoutFields = clone.querySelector(".checkout-fields");
 
-  const node = tpl.content.cloneNode(true);
-  node.querySelector(".page-index").textContent = count + 1;
-  
-  // Attache directement le toggle sur ce bloc, pas sur tout le container
-  const block = node.querySelector(".page-block");
-  const typeSel = block.querySelector('select[name="type"]');
-  const optinBox = block.querySelector('.optin-fields');
+    typeSelect.addEventListener("change", () => {
+      const type = typeSelect.value;
+      optinFields.style.display = type === "optin" ? "block" : "none";
+      checkoutFields.style.display = type === "checkout" ? "block" : "none";
+    });
 
-  const toggle = () => {
-    if (!typeSel || !optinBox) return;
-    optinBox.style.display = (typeSel.value === 'optin') ? 'block' : 'none';
+    // Suppression de la page
+    const removeBtn = clone.querySelector(".remove-page");
+    removeBtn.addEventListener("click", () => {
+      pageEl.remove();
+      pageCount--;
+    });
+
+    // Pré-remplissage si fourni
+    if (prefill.type) typeSelect.value = prefill.type;
+    if (prefill.title) clone.querySelector('input[name="title"]').value = prefill.title;
+    if (prefill.subtitle) clone.querySelector('input[name="subtitle"]').value = prefill.subtitle;
+    if (prefill.objective) clone.querySelector('textarea[name="objective"]').value = prefill.objective;
+
+    // Forcer l'affichage correct au départ
+    typeSelect.dispatchEvent(new Event("change"));
+
+    pagesContainer.appendChild(clone);
   };
 
-  if (typeSel) {
-    typeSel.addEventListener('change', toggle);
-    toggle(); // init
-  }
+  // Ajout première page par défaut
+  addPage();
 
-  pagesContainer.appendChild(node);
-  wireRemoveButtons();
-}
+  addPageBtn.addEventListener("click", () => addPage());
 
-addPageBtn.addEventListener("click", addPage);
-addPage(); // première page par défaut
+  // Soumission formulaire
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-async function uploadIfFile(file, path) {
-  if (!file) return null;
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, file);
-  return await getDownloadURL(storageRef);
-}
+    const user = await new Promise((resolve) => {
+      onAuthStateChanged(auth, (u) => resolve(u));
+    });
+    if (!user) {
+      alert("Veuillez vous reconnecter.");
+      return;
+    }
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const user = auth.currentUser;
-  if (!user) return;
+    const formData = new FormData(form);
 
-  const name = e.target.name.value.trim();
-  const desc = e.target.desc.value.trim();
-  const redirectURL = e.target.redirectURL.value.trim() || null;
-  const mainColor = e.target.mainColor.value.trim() || "#00ccff";
-  const buttonColor = e.target.buttonColor.value.trim() || "#00ccff";
-
-  const slug = slugify(name) || `tunnel-${Date.now()}`;
-  const basePath = `tunnels/${user.uid}/${slug}/`;
-  const baseUrl = `https://alricpaon.github.io/sellyo-hosting/${basePath}`;
-
-  // Uploads globaux
-  const logoUrl = await uploadIfFile(e.target.logoFile.files[0], `${basePath}logo-${Date.now()}`);
-  const coverUrl = await uploadIfFile(e.target.coverFile.files[0], `${basePath}cover-${Date.now()}`);
-
-  const paymentPrice = parseFloat(e.target.payment_price.value || "0") || 0;
-  const currency = e.target.currency.value.trim().toUpperCase();
-  const paymentLink = e.target.payment_link.value.trim() || null;
-  const fbPixel = e.target.fb_pixel.value.trim() || null;
-  const gtmId = e.target.gtm_id.value.trim() || null;
-
-  // Pages
-  const pagesData = [];
-  let index = 0;
-  for (const block of pagesContainer.querySelectorAll(".page-block")) {
-    index++;
-    const g = (name) => block.querySelector(`[name="${name}"]`);
-
-    const heroImageUrl = await uploadIfFile(g("heroImageFile").files[0], `${basePath}page${index}-hero-${Date.now()}`);
-    const videoUrl = await uploadIfFile(g("videoFile").files[0], `${basePath}page${index}-video-${Date.now()}`);
-
-    const benefits = textToList(g("benefits")?.value);
-    const bullets = textToList(g("bullets")?.value);
-    let testimonials = [];
-    try { testimonials = JSON.parse(g("testimonials")?.value || "[]"); } catch {}
-    let faqs = [];
-    try { faqs = JSON.parse(g("faqs")?.value || "[]"); } catch {}
-
-    pagesData.push({
-  index,
-  type: g("type").value,
-  filename: `page${index}.html`,
-  title: g("title").value.trim(),
-  subtitle: g("subtitle").value.trim(),
-  objective: g("objective")?.value.trim() || null, // 🆕 Objectif/présentation
-  heroImage: heroImageUrl,
-  videoUrl,
-  copy: {
-    problem: g("problem")?.value.trim() || null,
-    solution: g("solution")?.value.trim() || null,
-    benefits,
-    bullets,
-    guarantee: g("guarantee")?.value.trim() || null
-  },
-  testimonials,
-  faqs,
-  components: {
-    timer: g("timerEnabled")?.checked || false,
-    progressBar: true,
-    badges: ["Paiement sécurisé", "SSL"],
-    formFields:
-      g("type").value === "optin"
-        ? {
-            name: g("formName")?.checked || false,
-            firstname: g("formFirstname")?.checked || false,
-            email: g("formEmail")?.checked || false,
-            phone: g("formPhone")?.checked || false,
-            address: g("formAddress")?.checked || false
-          }
-        : null, // 🆕 Formulaire capture
-    productRecap:
-      g("type").value === "checkout"
-        ? g("productRecap")?.value.trim() || null
-        : null // 🆕 Récap produit paiement
-  },
-  timers: {
-    deadlineISO: null,
-    evergreenMinutes:
-      parseInt(g("evergreenMinutes")?.value || "0", 10) || null
-  },
-  ctaText: g("ctaText").value.trim() || "Continuer",
-  ctaAction: g("ctaAction").value,
-  ctaUrl: g("ctaUrl").value.trim() || null,
-  nextFilename: `page${index + 1}.html`,
-  seo: {
-    metaTitle: g("metaTitle").value.trim() || "",
-    metaDescription: g("metaDescription").value.trim() || ""
-  }
-});
-  }
-
-  // Firestore
-  const firstPageUrl = `${baseUrl}page1.html`;
-  let docRef;
-  try {
-    docRef = await addDoc(collection(db, "tunnels"), {
+    // Données générales
+    const tunnelData = {
       userId: user.uid,
-      name,
-      goal: desc || null,
-      url: firstPageUrl,
-      type: "tunnel",
-      slug,
-      basePath,
-      baseUrl,
-      pagesCount: pagesData.length,
-      mainColor,
-      buttonColor,
-      logoUrl,
-      coverUrl,
-      redirectURL,
-      currency,
-      payment: { provider: "stripe", price: paymentPrice, paymentLink },
-      analytics: { fbPixelId: fbPixel, gtmId },
-      seo: { siteTitle: name, siteDescription: desc || "" },
-      status: "generating",
-      createdAt: serverTimestamp()
-    });
-  } catch (err) {
-    console.error("Firestore addDoc error", err);
-    return alert("Erreur lors de l’enregistrement Firestore");
-  }
+      name: formData.get("name")?.trim() || "Tunnel sans nom",
+      desc: formData.get("desc")?.trim() || "",
+      redirectURL: formData.get("redirectURL")?.trim() || "",
+      mainColor: formData.get("mainColor") || "#00ccff",
+      buttonColor: formData.get("buttonColor") || "#00ccff",
+      payment: {
+        price: parseFloat(formData.get("payment_price")) || 0,
+        currency: formData.get("currency") || "EUR",
+        link: formData.get("payment_link")?.trim() || ""
+      },
+      tracking: {
+        fb_pixel: formData.get("fb_pixel")?.trim() || "",
+        gtm_id: formData.get("gtm_id")?.trim() || ""
+      },
+      pages: []
+    };
 
-  // Make
-  const payload = {
-    userId: user.uid,
-    tunnelDocId: docRef.id,
-    name,
-    slug,
-    desc,
-    redirectURL,
-    mainColor,
-    buttonColor,
-    logoUrl,
-    coverUrl,
-    currency,
-    payment: { provider: "stripe", price: paymentPrice, paymentLink },
-    analytics: { fbPixelId: fbPixel, gtmId },
-    seo: { siteTitle: name, siteDescription: desc || "" },
-    basePath,
-    baseUrl,
-    pagesCount: pagesData.length,
-    pagesData
-  };
+    // Pages
+    pagesContainer.querySelectorAll(".page-block").forEach((pageEl, idx) => {
+      const g = (selector) => pageEl.querySelector(selector);
 
-  try {
-    await fetch(MAKE_WEBHOOK_TUNNEL_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      const benefits = g('[name="benefits"]').value
+        .split("\n")
+        .map((b) => b.trim())
+        .filter(Boolean);
+
+      const bullets = g('[name="bullets"]').value
+        .split("\n")
+        .map((b) => b.trim())
+        .filter(Boolean);
+
+      const testimonials = g('[name="testimonials"]').value.trim();
+      const faqs = g('[name="faqs"]').value.trim();
+
+      tunnelData.pages.push({
+        index: idx + 1,
+        type: g('[name="type"]').value,
+        filename: `page${idx + 1}.html`,
+        title: g('[name="title"]').value.trim(),
+        subtitle: g('[name="subtitle"]').value.trim(),
+        objective: g('[name="objective"]').value.trim() || null,
+        heroImage: null, // upload géré à part si besoin
+        videoUrl: null,  // idem
+        copy: {
+          problem: g('[name="problem"]').value.trim() || null,
+          solution: g('[name="solution"]').value.trim() || null,
+          benefits,
+          bullets,
+          guarantee: g('[name="guarantee"]').value.trim() || null
+        },
+        testimonials: testimonials ? JSON.parse(testimonials) : [],
+        faqs: faqs ? JSON.parse(faqs) : [],
+        components: {
+          timer: g('[name="timerEnabled"]').checked || false,
+          progressBar: true,
+          badges: ["Paiement sécurisé", "SSL"]
+        },
+        timers: {
+          deadlineISO: null,
+          evergreenMinutes: parseInt(g('[name="evergreenMinutes"]').value || "0", 10) || null
+        },
+        formFields: {
+          name: g('[name="formName"]').checked,
+          firstname: g('[name="formFirstname"]').checked,
+          email: g('[name="formEmail"]').checked,
+          phone: g('[name="formPhone"]').checked,
+          address: g('[name="formAddress"]').checked
+        },
+        productRecap: g('[name="productRecap"]')?.value.trim() || "",
+        ctaText: g('[name="ctaText"]').value.trim() || "Continuer",
+        ctaAction: g('[name="ctaAction"]').value,
+        ctaUrl: g('[name="ctaUrl"]').value.trim() || null,
+        nextFilename: `page${idx + 2}.html`,
+        seo: {
+          metaTitle: g('[name="metaTitle"]').value.trim() || "",
+          metaDescription: g('[name="metaDescription"]').value.trim() || ""
+        }
+      });
     });
-    alert("✅ Tunnel en cours de génération.");
-    window.location.href = "tunnels.html";
-  } catch (err) {
-    console.error("Make webhook error", err);
-    alert("Erreur d’envoi au scénario Make");
-  }
+
+    // 🔹 Envoi vers Make.com
+    try {
+      const makeResp = await fetch("TON_WEBHOOK_MAKE_TUNNEL", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(tunnelData)
+      });
+
+      if (!makeResp.ok) throw new Error("Erreur Make");
+      alert("Tunnel envoyé à la génération !");
+      window.location.href = "tunnels.html";
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de l'envoi à Make.");
+    }
+  });
 });
