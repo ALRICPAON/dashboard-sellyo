@@ -43,31 +43,29 @@ function wireRemoveButtons() {
 function addPage() {
   const count = pagesContainer.querySelectorAll(".page-block").length;
   if (count >= 8) return alert("Max 8 pages");
+
   const node = tpl.content.cloneNode(true);
   node.querySelector(".page-index").textContent = count + 1;
+  
+  // Attache directement le toggle sur ce bloc, pas sur tout le container
+  const block = node.querySelector(".page-block");
+  const typeSel = block.querySelector('select[name="type"]');
+  const optinBox = block.querySelector('.optin-fields');
+
+  const toggle = () => {
+    if (!typeSel || !optinBox) return;
+    optinBox.style.display = (typeSel.value === 'optin') ? 'block' : 'none';
+  };
+
+  if (typeSel) {
+    typeSel.addEventListener('change', toggle);
+    toggle(); // init
+  }
+
   pagesContainer.appendChild(node);
   wireRemoveButtons();
-
-+ // toggle optin/checkout UI
-+ const block = pagesContainer.querySelectorAll(".page-block")[count];
-+ const typeSel = block.querySelector('select[name="type"]');
-+ const optinBox = block.querySelector('.optin-fields');
-+ const toggle = () => {
-+   if (!typeSel) return;
-+   if (optinBox) optinBox.style.display = (typeSel.value === 'optin') ? 'block' : 'none';
-+ };
-+ typeSel.addEventListener('change', toggle);
-+ toggle();
 }
 
-addPageBtn.addEventListener("click", addPage);
-
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    alert("Non autorisé");
-    window.location.href = "index.html";
-  }
-});
 
 addPage(); // première page par défaut
 
