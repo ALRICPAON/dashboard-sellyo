@@ -66,7 +66,7 @@ function addPage() {
   wireRemoveButtons();
 }
 
-
+addPageBtn.addEventListener("click", addPage);
 addPage(); // première page par défaut
 
 async function uploadIfFile(file, path) {
