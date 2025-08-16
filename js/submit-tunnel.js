@@ -98,7 +98,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const mainColor = (e.target.mainColor.value || "#00ccff");
     const buttonColor = (e.target.buttonColor.value || "#00ccff");
 
-    const slug = slugify(name) || `tunnel-${Date.now()}`;
+    const baseSlug = slugify(name) || "tunnel";
+const uniq = Date.now().toString(36).slice(-5); // ex: "mb4k2"
+const slug = `${baseSlug}-${uniq}`;             // ex: "telephone-mb4k2"
     const basePath = `tunnels/${user.uid}/${slug}/`;
     const baseUrl = `https://alricpaon.github.io/sellyo-hosting/${basePath}`;
 
@@ -238,6 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
       userId: user.uid,
       tunnelId: docRef.id,
       name,
+      slug,
       desc,
       redirectURL,
       mainColor,
