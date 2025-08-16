@@ -181,13 +181,17 @@
         <input name="ctaUrl" type="url" placeholder="https://…" />
       </label>
 
-      <label>Méta titre (SEO)
-        <input name="metaTitle" type="text" placeholder="Titre affiché dans Google" />
-      </label>
-
-      <label>Méta description (SEO)
-        <textarea name="metaDescription" rows="2" placeholder="Texte sous le titre dans Google"></textarea>
-      </label>
+      <label style="display:block;margin-top:.5rem;">
+  <input type="checkbox" class="toggle-seo"> Personnaliser le SEO sur cette page
+</label>
+<div class="seo-fields">
+  <label>Méta titre (SEO)
+    <input name="metaTitle" type="text" placeholder="Titre affiché dans Google" />
+  </label>
+  <label>Méta description (SEO)
+    <textarea name="metaDescription" rows="2" placeholder="Texte sous le titre dans Google"></textarea>
+  </label>
+</div>
 
       <details style="margin-top:.5rem;">
         <summary>Texte & contenu optionnel</summary>
