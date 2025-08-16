@@ -51,18 +51,112 @@ document.addEventListener("DOMContentLoaded", () => {
       .forEach((el, i) => el.textContent = i + 1);
   }
 
-  function wireTypeToggle(pageEl) {
-    const typeSelect = pageEl.querySelector('[name="type"]');
-    const optinFields = pageEl.querySelector(".optin-fields");
-    const thankyouFields = pageEl.querySelector(".thankyou-fields");
-    const onChange = () => {
-      const t = typeSelect.value;
-      optinFields.style.display = (t === "optin") ? "block" : "none";
-      thankyouFields.style.display = (t === "thankyou") ? "block" : "none";
-    };
-    typeSelect.addEventListener("change", onChange);
-    onChange();
+  function wireTypeToggle(pageEl, index) {
+  const typeSelect = pageEl.querySelector('[name="type"]');
+
+  const titleRow = pageEl.querySelector('[name="title"]')?.closest('label');
+  const subtitleRow = pageEl.querySelector('[name="subtitle"]')?.closest('label');
+  const heroRow = pageEl.querySelector('[name="heroImageFile"]')?.closest('label');
+  const videoRow = pageEl.querySelector('[name="videoFile"]')?.closest('label');
+  const productDescRow = pageEl.querySelector('[name="productDescription"]')?.closest('label');
+  const productFileRow = pageEl.querySelector('[name="productFile"]')?.closest('label');
+
+  const optinFields = pageEl.querySelector('.optin-fields');
+  const thankyouFields = pageEl.querySelector('.thankyou-fields');
+
+  const ctaTextRow = pageEl.querySelector('[name="ctaText"]')?.closest('label');
+  const ctaAction = pageEl.querySelector('[name="ctaAction"]');
+  const ctaActionRow = ctaAction?.closest('label');
+  const ctaUrlRow = pageEl.querySelector('[name="ctaUrl"]')?.closest('label');
+
+  const seoToggle = pageEl.querySelector('.toggle-seo');
+  const seoFields = pageEl.querySelector('.seo-fields');
+
+  const setReq = (inputEl, on) => {
+    if (!inputEl) return;
+    if (on) inputEl.setAttribute('required', '');
+    else inputEl.removeAttribute('required');
+  };
+  const show = (el, on) => { if (el) el.style.display = on ? '' : 'none'; };
+
+  // SEO: actif par défaut uniquement sur page 1
+  if (seoToggle && seoFields) {
+    if (typeof index === 'number' && index > 1) {
+      seoToggle.checked = false;
+      show(seoFields, false);
+    } else {
+      seoToggle.checked = true;
+      show(seoFields, true);
+    }
+    seoToggle.onchange = () => show(seoFields, seoToggle.checked);
   }
+
+  const onChange = () => {
+    const t = typeSelect.value;
+
+    // Par défaut on montre presque tout (puis on masque par type)
+    show(titleRow, true); setReq(titleRow?.querySelector('input'), false);
+    show(subtitleRow, true);
+    show(heroRow, true);
+    show(videoRow, true);
+    show(productDescRow, false);
+    show(productFileRow, false);
+    show(optinFields, false);
+    show(thankyouFields, false);
+    show(ctaTextRow, true);
+    show(ctaActionRow, true);
+    show(ctaUrlRow, true);
+
+    if (t === 'optin') {
+      show(optinFields, true);
+      if (ctaAction) ctaAction.value = 'next';
+      setReq(titleRow?.querySelector('input'), false);
+      show(productDescRow, false);
+      show(productFileRow, false);
+    }
+
+    if (t === 'sales') {
+      setReq(titleRow?.querySelector('input'), true);
+    }
+
+    if (t === 'checkout') {
+      setReq(titleRow?.querySelector('input'), true);
+      show(subtitleRow, false);
+      show(heroRow, false);
+      show(videoRow, false);
+      show(productDescRow, true);
+      if (ctaAction) ctaAction.value = 'checkout';
+      show(ctaUrlRow, false);
+    }
+
+    if (t === 'thankyou') {
+      show(titleRow, false);
+      show(subtitleRow, false);
+      show(heroRow, false);
+      show(videoRow, false);
+      show(optinFields, false);
+      show(productDescRow, false);
+      show(productFileRow, false);
+      show(ctaTextRow, false);
+      show(ctaActionRow, false);
+      show(ctaUrlRow, false);
+      show(thankyouFields, true);
+    }
+
+    if (t === 'upsell' || t === 'downsell') {
+      setReq(titleRow?.querySelector('input'), true);
+    }
+
+    if (t === 'webinar') {
+      setReq(titleRow?.querySelector('input'), true);
+      show(heroRow, false);
+      show(videoRow, true);
+    }
+  };
+
+  typeSelect.addEventListener('change', onChange);
+  onChange();
+}
 
   function wireRemoveButtons() {
     pagesContainer.querySelectorAll(".remove-page").forEach(btn => {
@@ -74,15 +168,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function addPage() {
-    const count = pagesContainer.querySelectorAll(".page-block").length;
-    if (count >= 8) return alert("Max 8 pages");
-    const node = tpl.content.cloneNode(true);
-    const el = node.querySelector(".page-block");
-    node.querySelector(".page-index").textContent = count + 1;
-    pagesContainer.appendChild(node);
-    wireRemoveButtons();
-    wireTypeToggle(el);
-  }
+  const count = pagesContainer.querySelectorAll(".page-block").length;
+  if (count >= 8) return alert("Max 8 pages");
+  const node = tpl.content.cloneNode(true);
+  const el = node.querySelector(".page-block");
+  const idx = count + 1;
+  node.querySelector(".page-index").textContent = idx;
+  pagesContainer.appendChild(node);
+  wireRemoveButtons();
+  wireTypeToggle(el, idx); // ✅ passe l’index pour gérer SEO par défaut (page 1)
+}
 
   if (addPageBtn) addPageBtn.addEventListener("click", addPage);
   addPage(); // première page
@@ -156,6 +251,11 @@ const slug = `${baseSlug}-${uniq}`;             // ex: "telephone-mb4k2"
         : ((g("productRecap")?.value || "").trim() || "");
 
       const evergreenMinutesVal = parseInt(g("evergreenMinutes")?.value || "0", 10) || null;
+      const seoToggleChecked = block.querySelector('.toggle-seo')?.checked;
+      const seoOn = (typeof seoToggleChecked === 'boolean') ? seoToggleChecked : (idx === 1);
+      const metaTitle = (g("metaTitle")?.value || "").trim();
+      const metaDescription = (g("metaDescription")?.value || "").trim();
+
 
       const pageObj = {
         index: idx,
@@ -198,10 +298,7 @@ const slug = `${baseSlug}-${uniq}`;             // ex: "telephone-mb4k2"
         ctaAction: g("ctaAction").value,
         ctaUrl: (g("ctaUrl").value || "").trim() || null,
         nextFilename: (idx < blocks.length) ? `page${idx + 1}.html` : null,
-        seo: {
-          metaTitle: (g("metaTitle").value || "").trim(),
-          metaDescription: (g("metaDescription").value || "").trim()
-        }
+        seo: seoOn ? { metaTitle, metaDescription } : { metaTitle: "", metaDescription: "" }
       };
 
       pagesData.push(pageObj);
