@@ -52,111 +52,111 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function wireTypeToggle(pageEl, index) {
-  const typeSelect = pageEl.querySelector('[name="type"]');
+    const typeSelect = pageEl.querySelector('[name="type"]');
 
-  const titleRow = pageEl.querySelector('[name="title"]')?.closest('label');
-  const subtitleRow = pageEl.querySelector('[name="subtitle"]')?.closest('label');
-  const heroRow = pageEl.querySelector('[name="heroImageFile"]')?.closest('label');
-  const videoRow = pageEl.querySelector('[name="videoFile"]')?.closest('label');
-  const productDescRow = pageEl.querySelector('[name="productDescription"]')?.closest('label');
-  const productFileRow = pageEl.querySelector('[name="productFile"]')?.closest('label');
+    const titleRow = pageEl.querySelector('[name="title"]')?.closest('label');
+    const subtitleRow = pageEl.querySelector('[name="subtitle"]')?.closest('label');
+    const heroRow = pageEl.querySelector('[name="heroImageFile"]')?.closest('label');
+    const videoRow = pageEl.querySelector('[name="videoFile"]')?.closest('label');
+    const productDescRow = pageEl.querySelector('[name="productDescription"]')?.closest('label');
+    const productFileRow = pageEl.querySelector('[name="productFile"]')?.closest('label');
 
-  const optinFields = pageEl.querySelector('.optin-fields');
-  const thankyouFields = pageEl.querySelector('.thankyou-fields');
+    const optinFields = pageEl.querySelector('.optin-fields');
+    const thankyouFields = pageEl.querySelector('.thankyou-fields');
 
-  const ctaTextRow = pageEl.querySelector('[name="ctaText"]')?.closest('label');
-  const ctaAction = pageEl.querySelector('[name="ctaAction"]');
-  const ctaActionRow = ctaAction?.closest('label');
-  const ctaUrlRow = pageEl.querySelector('[name="ctaUrl"]')?.closest('label');
+    const ctaTextRow = pageEl.querySelector('[name="ctaText"]')?.closest('label');
+    const ctaAction = pageEl.querySelector('[name="ctaAction"]');
+    const ctaActionRow = ctaAction?.closest('label');
+    const ctaUrlRow = pageEl.querySelector('[name="ctaUrl"]')?.closest('label');
 
-  const seoToggle = pageEl.querySelector('.toggle-seo');
-  const seoFields = pageEl.querySelector('.seo-fields');
+    const seoToggle = pageEl.querySelector('.toggle-seo');
+    const seoFields = pageEl.querySelector('.seo-fields');
 
-  const setReq = (inputEl, on) => {
-    if (!inputEl) return;
-    if (on) inputEl.setAttribute('required', '');
-    else inputEl.removeAttribute('required');
-  };
-  const show = (el, on) => { if (el) el.style.display = on ? '' : 'none'; };
+    const setReq = (inputEl, on) => {
+      if (!inputEl) return;
+      if (on) inputEl.setAttribute('required', '');
+      else inputEl.removeAttribute('required');
+    };
+    const show = (el, on) => { if (el) el.style.display = on ? '' : 'none'; };
 
-  // SEO: actif par défaut uniquement sur page 1
-  if (seoToggle && seoFields) {
-    if (typeof index === 'number' && index > 1) {
-      seoToggle.checked = false;
-      show(seoFields, false);
-    } else {
-      seoToggle.checked = true;
-      show(seoFields, true);
-    }
-    seoToggle.onchange = () => show(seoFields, seoToggle.checked);
-  }
-
-  const onChange = () => {
-    const t = typeSelect.value;
-
-    // Par défaut on montre presque tout (puis on masque par type)
-    show(titleRow, true); setReq(titleRow?.querySelector('input'), false);
-    show(subtitleRow, true);
-    show(heroRow, true);
-    show(videoRow, true);
-    show(productDescRow, false);
-    show(productFileRow, false);
-    show(optinFields, false);
-    show(thankyouFields, false);
-    show(ctaTextRow, true);
-    show(ctaActionRow, true);
-    show(ctaUrlRow, true);
-
-    if (t === 'optin') {
-      show(optinFields, true);
-      if (ctaAction) ctaAction.value = 'next';
-      setReq(titleRow?.querySelector('input'), false);
-      show(productDescRow, false);
-      show(productFileRow, false);
+    // SEO: actif par défaut uniquement sur page 1
+    if (seoToggle && seoFields) {
+      if (typeof index === 'number' && index > 1) {
+        seoToggle.checked = false;
+        show(seoFields, false);
+      } else {
+        seoToggle.checked = true;
+        show(seoFields, true);
+      }
+      seoToggle.onchange = () => show(seoFields, seoToggle.checked);
     }
 
-    if (t === 'sales') {
-      setReq(titleRow?.querySelector('input'), true);
-    }
+    const onChange = () => {
+      const t = typeSelect.value;
 
-    if (t === 'checkout') {
-      setReq(titleRow?.querySelector('input'), true);
-      show(subtitleRow, false);
-      show(heroRow, false);
-      show(videoRow, false);
-      show(productDescRow, true);
-      if (ctaAction) ctaAction.value = 'checkout';
-      show(ctaUrlRow, false);
-    }
-
-    if (t === 'thankyou') {
-      show(titleRow, false);
-      show(subtitleRow, false);
-      show(heroRow, false);
-      show(videoRow, false);
-      show(optinFields, false);
-      show(productDescRow, false);
-      show(productFileRow, false);
-      show(ctaTextRow, false);
-      show(ctaActionRow, false);
-      show(ctaUrlRow, false);
-      show(thankyouFields, true);
-    }
-
-    if (t === 'upsell' || t === 'downsell') {
-      setReq(titleRow?.querySelector('input'), true);
-    }
-
-    if (t === 'webinar') {
-      setReq(titleRow?.querySelector('input'), true);
-      show(heroRow, false);
+      // Par défaut on montre presque tout (puis on masque par type)
+      show(titleRow, true); setReq(titleRow?.querySelector('input'), false);
+      show(subtitleRow, true);
+      show(heroRow, true);
       show(videoRow, true);
-    }
-  };
+      show(productDescRow, false);
+      show(productFileRow, false);
+      show(optinFields, false);
+      show(thankyouFields, false);
+      show(ctaTextRow, true);
+      show(ctaActionRow, true);
+      show(ctaUrlRow, true);
 
-  typeSelect.addEventListener('change', onChange);
-  onChange();
-}
+      if (t === 'optin') {
+        show(optinFields, true);
+        if (ctaAction) ctaAction.value = 'next';
+        setReq(titleRow?.querySelector('input'), false);
+        show(productDescRow, false);
+        show(productFileRow, false);
+      }
+
+      if (t === 'sales') {
+        setReq(titleRow?.querySelector('input'), true);
+      }
+
+      if (t === 'checkout') {
+        setReq(titleRow?.querySelector('input'), true);
+        show(subtitleRow, false);
+        show(heroRow, false);
+        show(videoRow, false);
+        show(productDescRow, true);
+        if (ctaAction) ctaAction.value = 'checkout';
+        show(ctaUrlRow, false);
+      }
+
+      if (t === 'thankyou') {
+        show(titleRow, false);
+        show(subtitleRow, false);
+        show(heroRow, false);
+        show(videoRow, false);
+        show(optinFields, false);
+        show(productDescRow, false);
+        show(productFileRow, false);
+        show(ctaTextRow, false);
+        show(ctaActionRow, false);
+        show(ctaUrlRow, false);
+        show(thankyouFields, true);
+      }
+
+      if (t === 'upsell' || t === 'downsell') {
+        setReq(titleRow?.querySelector('input'), true);
+      }
+
+      if (t === 'webinar') {
+        setReq(titleRow?.querySelector('input'), true);
+        show(heroRow, false);
+        show(videoRow, true);
+      }
+    };
+
+    typeSelect.addEventListener('change', onChange);
+    onChange();
+  }
 
   function wireRemoveButtons() {
     pagesContainer.querySelectorAll(".remove-page").forEach(btn => {
@@ -168,16 +168,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function addPage() {
-  const count = pagesContainer.querySelectorAll(".page-block").length;
-  if (count >= 8) return alert("Max 8 pages");
-  const node = tpl.content.cloneNode(true);
-  const el = node.querySelector(".page-block");
-  const idx = count + 1;
-  node.querySelector(".page-index").textContent = idx;
-  pagesContainer.appendChild(node);
-  wireRemoveButtons();
-  wireTypeToggle(el, idx); // ✅ passe l’index pour gérer SEO par défaut (page 1)
-}
+    const count = pagesContainer.querySelectorAll(".page-block").length;
+    if (count >= 8) return alert("Max 8 pages");
+    const node = tpl.content.cloneNode(true);
+    const el = node.querySelector(".page-block");
+    const idx = count + 1;
+    node.querySelector(".page-index").textContent = idx;
+    pagesContainer.appendChild(node);
+    wireRemoveButtons();
+    wireTypeToggle(el, idx); // ✅ passe l’index pour gérer SEO par défaut (page 1)
+  }
 
   if (addPageBtn) addPageBtn.addEventListener("click", addPage);
   addPage(); // première page
@@ -194,23 +194,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const buttonColor = (e.target.buttonColor.value || "#00ccff");
 
     const baseSlug = slugify(name) || "tunnel";
-const uniq = Date.now().toString(36).slice(-5); // ex: "mb4k2"
-const slug = `${baseSlug}-${uniq}`;             // ex: "telephone-mb4k2"
-    const basePath = `tunnels/${user.uid}/${slug}/`;
-    const baseUrl = `https://alricpaon.github.io/sellyo-hosting/${basePath}`;
+    const uniq = Date.now().toString(36).slice(-5); // ex: "mb4k2"
+    const slug = `${baseSlug}-${uniq}`;             // ex: "telephone-mb4k2"
+
+    const siteRoot = "https://alricpaon.github.io/sellyo-hosting"; // 🔵 racine publique (HTML fixes)
+    const basePath = `tunnels/${user.uid}/${slug}/`;                // 📦 Storage chemins
+    const baseUrl  = siteRoot;                                      // 🌐 racine publique (pour front)
+
+    // première page → on suppose optin pour démarrer (adapte si besoin)
+    const firstPageSlug = `${slug}-p1`;
+    const firstPageUrl  = `${siteRoot}/optin.html?userId=${user.uid}&slug=${firstPageSlug}`;
 
     // Uploads globaux
-    const logoUrl = await uploadIfFile(e.target.logoFile.files?.[0], `${basePath}logo-${Date.now()}`);
+    const logoUrl = await uploadIfFile(e.target.logoFile.files?.[0],  `${basePath}logo-${Date.now()}`);
     const coverUrl = await uploadIfFile(e.target.coverFile.files?.[0], `${basePath}cover-${Date.now()}`);
-    // Produit digital GLOBAL → delivery.productUrl attendu par ton prompt
     const deliveryProductUrl = await uploadIfFile(e.target.digitalProductFile.files?.[0], `${basePath}delivery-product-${Date.now()}`);
 
     const paymentPrice = parseFloat(e.target.payment_price.value || "0") || 0;
     const currency = (e.target.currency.value || "EUR").trim().toUpperCase();
     const paymentLink = (e.target.payment_link.value.trim() || null);
     const stripePk = (e.target.stripe_pk?.value?.trim() || null);
-const stripePriceId = (e.target.stripe_price_id?.value?.trim() || null);
-const paypalClientId = (e.target.paypal_client_id?.value?.trim() || null);
+    const stripePriceId = (e.target.stripe_price_id?.value?.trim() || null);
+    const paypalClientId = (e.target.paypal_client_id?.value?.trim() || null);
     const fbPixel = (e.target.fb_pixel.value.trim() || null);
     const gtmId = (e.target.gtm_id.value.trim() || null);
 
@@ -259,11 +264,14 @@ const paypalClientId = (e.target.paypal_client_id?.value?.trim() || null);
       const metaTitle = (g("metaTitle")?.value || "").trim();
       const metaDescription = (g("metaDescription")?.value || "").trim();
 
+      const pageSlug = `${slug}-p${idx}`;                         // ✅ slug unique par page
+      const nextSlug = (idx < blocks.length) ? `${slug}-p${idx+1}` : null;
 
       const pageObj = {
         index: idx,
+        slug: pageSlug,            // ✅
         type,
-        filename: `page${idx}.html`,
+        filename: `page${idx}.html`, // (legacy facultatif)
         title: (g("title").value || "").trim(),
         subtitle: (g("subtitle").value || "").trim(),
         heroImage: heroImageUrl,
@@ -284,38 +292,33 @@ const paypalClientId = (e.target.paypal_client_id?.value?.trim() || null);
           timer: !!g("timerEnabled")?.checked,
           progressBar: true,
           badges: ["Paiement sécurisé", "SSL"],
-          // Compat prompt: certains modèles lisent components.formFields
           formFields: isOptin ? formFieldsObj : null
         },
         timers: {
           deadlineISO: null,
           evergreenMinutes: evergreenMinutesVal
         },
-        // Compat prompt: certains modèles lisent formFields à la racine
         formFields: isOptin ? formFieldsObj : null,
-        // Compat checkout (déjà existant dans ton prompt)
         productRecap,
-        // Thankyou
         thankyouText,
         ctaText: (g("ctaText").value || "Continuer").trim(),
         ctaAction: g("ctaAction").value,
         ctaUrl: (g("ctaUrl").value || "").trim() || null,
-        nextFilename: (idx < blocks.length) ? `page${idx + 1}.html` : null,
+        flow: { nextSlug },        // ✅ objet flow propre (slug, pas filename)
         seo: seoOn ? { metaTitle, metaDescription } : { metaTitle: "", metaDescription: "" }
       };
 
       pagesData.push(pageObj);
     }
 
-    // Doc Firestore (identique + on ajoute deliveryProductUrl pour suivi)
-    const firstPageUrl = `${baseUrl}page1.html`;
+    // Doc Firestore (URL d'entrée correcte)
     let docRef;
     try {
       docRef = await addDoc(collection(db, "tunnels"), {
         userId: user.uid,
         name,
         goal: desc || null,
-        url: firstPageUrl,
+        url: firstPageUrl,      // ✅ optin.html?userId=...&slug=...-p1
         type: "tunnel",
         slug,
         basePath,
@@ -327,6 +330,7 @@ const paypalClientId = (e.target.paypal_client_id?.value?.trim() || null);
         coverUrl,
         redirectURL,
         deliveryProductUrl: deliveryProductUrl || null,
+        currency,
         createdAt: serverTimestamp()
       });
     } catch (err) {
@@ -335,7 +339,7 @@ const paypalClientId = (e.target.paypal_client_id?.value?.trim() || null);
       return;
     }
 
-    // Payload Make (mêmes clés qu’avant + ajouts non bloquants)
+    // Payload Make
     const payload = {
       userId: user.uid,
       tunnelId: docRef.id,
@@ -349,16 +353,15 @@ const paypalClientId = (e.target.paypal_client_id?.value?.trim() || null);
       coverUrl,
       currency,
       payment: {
-  provider: "stripe",
-  price: paymentPrice,           // on réutilise la variable déjà calculée
-  paymentLink,                   // lien Stripe (fallback)
-  stripePublishableKey: stripePk,
-  stripePriceId: stripePriceId,
-  paypalClientId: paypalClientId
-},
+        provider: "stripe",
+        price: paymentPrice,
+        paymentLink,
+        stripePublishableKey: stripePk,
+        stripePriceId: stripePriceId,
+        paypalClientId: paypalClientId
+      },
       analytics: { fbPixelId: fbPixel, gtmId },
       seo: { siteTitle: name, siteDescription: desc || "" },
-      // Ajout global pour compat avec ton prompt (1.delivery.productUrl)
       delivery: { productUrl: deliveryProductUrl || null },
       basePath,
       baseUrl,
