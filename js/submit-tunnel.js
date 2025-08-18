@@ -280,6 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
   imageUrl: heroImageUrl || null,
   videoMp4: videoUrl || null
 },
+        logoUrl: logoUrl || null,
         // Ajouts livraison produit par page
         productUrl: productFileUrl || null,
         productDescription: productDescription || "",
