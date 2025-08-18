@@ -1,3 +1,4 @@
+// js/submit-tunnel.js
 import { app } from "./firebase-init.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -198,12 +199,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const slug = `${baseSlug}-${uniq}`;             // ex: "telephone-mb4k2"
 
     const siteRoot = "https://alricpaon.github.io/sellyo-hosting"; // 🔵 racine publique (HTML fixes)
-    const basePath = `tunnels/${user.uid}/${slug}/`;                // 📦 Storage chemins
-    const baseUrl  = siteRoot;                                      // 🌐 racine publique (pour front)
+    const basePath = `tunnels/${user.uid}/${slug}/`;                // 📦 Storage chemins (uploads)
+    const baseUrl  = `${siteRoot}/tunnels/${user.uid}`;             // 🌐 racine publique HTML (pour les pages .html)
 
-    // première page → on suppose optin pour démarrer (adapte si besoin)
-    const firstPageSlug = `${slug}-p1`;
-    const firstPageUrl  = `${siteRoot}/optin.html?userId=${user.uid}&slug=${firstPageSlug}`;
+    const firstPageSlug = `${slug}-p1`;                              // ✅ première page (p1)
+    const viewUrl       = `${baseUrl}/${firstPageSlug}.html`;        // ✅ URL directe de la page 1
 
     // Uploads globaux
     const logoUrl = await uploadIfFile(e.target.logoFile.files?.[0],  `${basePath}logo-${Date.now()}`);
@@ -264,12 +264,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const metaTitle = (g("metaTitle")?.value || "").trim();
       const metaDescription = (g("metaDescription")?.value || "").trim();
 
-      const pageSlug = `${slug}-p${idx}`;                         // ✅ slug unique par page
+      const pageSlug = `${slug}-p${idx}`;               // ✅ slug unique par page (p1..pN)
       const nextSlug = (idx < blocks.length) ? `${slug}-p${idx+1}` : null;
 
       const pageObj = {
         index: idx,
-        slug: pageSlug,            // ✅
+        slug: pageSlug,            // ✅ utilisé par Make pour nommer la page .html
         type,
         filename: `page${idx}.html`, // (legacy facultatif)
         title: (g("title").value || "").trim(),
@@ -277,9 +277,9 @@ document.addEventListener("DOMContentLoaded", () => {
         heroImage: heroImageUrl,
         videoUrl,
         media: {
-  imageUrl: heroImageUrl || null,
-  videoMp4: videoUrl || null
-},
+          imageUrl: heroImageUrl || null,
+          videoMp4: videoUrl || null
+        },
         logoUrl: logoUrl || null,
         // Ajouts livraison produit par page
         productUrl: productFileUrl || null,
@@ -316,18 +316,20 @@ document.addEventListener("DOMContentLoaded", () => {
       pagesData.push(pageObj);
     }
 
-    // Doc Firestore (URL d'entrée correcte)
+    // Doc Firestore (URL d'entrée -> HTML direct .html)
     let docRef;
     try {
       docRef = await addDoc(collection(db, "tunnels"), {
         userId: user.uid,
         name,
         goal: desc || null,
-        url: firstPageUrl,      // ✅ optin.html?userId=...&slug=...-p1
         type: "tunnel",
         slug,
-        basePath,
-        baseUrl,
+        basePath,                // uploads Storage
+        baseUrl,                 // ✅ ex: https://.../tunnels/<uid>
+        firstPageSlug,           // ✅ ex: <slug>-p1
+        viewUrl,                 // ✅ ex: <baseUrl>/<firstPageSlug>.html
+        url: viewUrl,            // (compat ancien code)
         pagesCount: pagesData.length,
         mainColor,
         buttonColor,
@@ -344,7 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Payload Make
+    // Payload Make (pour génération des pages HTML)
     const payload = {
       userId: user.uid,
       tunnelId: docRef.id,
@@ -368,10 +370,10 @@ document.addEventListener("DOMContentLoaded", () => {
       analytics: { fbPixelId: fbPixel, gtmId },
       seo: { siteTitle: name, siteDescription: desc || "" },
       delivery: { productUrl: deliveryProductUrl || null },
-      basePath,
-      baseUrl,
+      basePath,                  // Storage
+      baseUrl,                   // ✅ GitHub Pages root pour ce user: /tunnels/<uid>
       pagesCount: pagesData.length,
-      pagesData
+      pagesData                  // ✅ contient slug (ex: <global-slug>-pN) pour chaque page
     };
 
     try {
