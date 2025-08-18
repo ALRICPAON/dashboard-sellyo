@@ -29,9 +29,19 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   let html = '';
-  querySnapshot.forEach((docSnap) => {
+   querySnapshot.forEach((docSnap) => {
     const data = docSnap.data();
     const id = docSnap.id;
+
+    // 🔁 NEW: calcule l'URL "Voir" (HTML direct) avec fallbacks
+    const base = (data.baseUrl || '').replace(/\/$/, '');
+    const firstPageSlug = data.firstPageSlug || (data.slug ? `${data.slug}-p1` : '');
+    const directHtml = (base && firstPageSlug) ? `${base}/${firstPageSlug}.html` : '';
+    const viewUrl =
+      data.viewUrl ||                // si déjà stocké en base
+      directHtml ||                  // sinon construit à partir de baseUrl + firstPageSlug
+      data.url ||                    // fallback éventuel (ancien champ)
+      (data.slug ? `optin.html?p=${data.slug}-p1&uid=${user.uid}` : '#'); // dernier recours (loader JSON)
 
     html += `
       <div class="card">
@@ -39,7 +49,8 @@ onAuthStateChanged(auth, async (user) => {
           <h3>${data.name || 'Sans nom'}</h3>
           <p>${data.goal || '—'}</p>
           <div class="card-buttons">
-            <a href="${data.url}" target="_blank" class="btn">🌐 Voir</a>
+            <!-- ⬇️ use viewUrl au lieu de data.url -->
+            <a href="${viewUrl}" target="_blank" rel="noopener" class="btn">🌐 Voir</a>
             <a href="edit-tunnel.html?id=${id}" class="btn">✏️ Modifier</a>
             <button class="btn btn-danger" onclick="deleteTunnel('${id}')">🗑 Supprimer</button>
           </div>
@@ -47,7 +58,6 @@ onAuthStateChanged(auth, async (user) => {
       </div>
     `;
   });
-
   container.innerHTML = html;
 });
 
