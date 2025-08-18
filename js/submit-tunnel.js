@@ -276,6 +276,10 @@ document.addEventListener("DOMContentLoaded", () => {
         subtitle: (g("subtitle").value || "").trim(),
         heroImage: heroImageUrl,
         videoUrl,
+        media: {
+  imageUrl: heroImageUrl || null,
+  videoMp4: videoUrl || null
+},
         // Ajouts livraison produit par page
         productUrl: productFileUrl || null,
         productDescription: productDescription || "",
