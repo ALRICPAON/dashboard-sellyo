@@ -95,13 +95,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const onChange = () => {
       const t = typeSelect.value;
 
-      // Par défaut on montre presque tout (puis on masque par type)
+      // Par défaut on montre la plupart des blocs
       show(titleRow, true); setReq(titleRow?.querySelector('input'), false);
       show(subtitleRow, true);
       show(heroRow, true);
       show(videoRow, true);
-      show(productDescRow, false);
-      show(productFileRow, false);
+
+      // ⬇️ Nouveau: description & fichier produit visibles sur toutes les pages sauf "thankyou"
+      show(productDescRow, t !== 'thankyou');
+      show(productFileRow, t !== 'thankyou');
+
       show(optinFields, false);
       show(thankyouFields, false);
       show(ctaTextRow, true);
@@ -112,8 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
         show(optinFields, true);
         if (ctaAction) ctaAction.value = 'next';
         setReq(titleRow?.querySelector('input'), false);
-        show(productDescRow, false);
-        show(productFileRow, false);
       }
 
       if (t === 'sales') {
@@ -122,10 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (t === 'checkout') {
         setReq(titleRow?.querySelector('input'), true);
-        show(subtitleRow, false);
-        show(heroRow, false);
-        show(videoRow, false);
-        show(productDescRow, true);
+        // on laisse hero/video optionnels (template supporte déjà), inutile de les masquer
         if (ctaAction) ctaAction.value = 'checkout';
         show(ctaUrlRow, false);
       }
@@ -144,14 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
         show(thankyouFields, true);
       }
 
-      if (t === 'upsell' || t === 'downsell') {
+      if (t === 'upsell' || t === 'downsell' || t === 'webinar') {
         setReq(titleRow?.querySelector('input'), true);
-      }
-
-      if (t === 'webinar') {
-        setReq(titleRow?.querySelector('input'), true);
-        show(heroRow, false);
-        show(videoRow, true);
       }
     };
 
@@ -177,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
     node.querySelector(".page-index").textContent = idx;
     pagesContainer.appendChild(node);
     wireRemoveButtons();
-    wireTypeToggle(el, idx); // ✅ passe l’index pour gérer SEO par défaut (page 1)
+    wireTypeToggle(el, idx);
   }
 
   if (addPageBtn) addPageBtn.addEventListener("click", addPage);
@@ -189,26 +181,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!user) return;
 
     const name = e.target.name.value.trim();
-    const desc = e.target.desc.value.trim();
     const redirectURL = (e.target.redirectURL.value.trim() || null);
     const mainColor = (e.target.mainColor.value || "#00ccff");
     const buttonColor = (e.target.buttonColor.value || "#00ccff");
 
     const baseSlug = slugify(name) || "tunnel";
-    const uniq = Date.now().toString(36).slice(-5); // ex: "mb4k2"
-    const slug = `${baseSlug}-${uniq}`;             // ex: "telephone-mb4k2"
+    const uniq = Date.now().toString(36).slice(-5);
+    const slug = `${baseSlug}-${uniq}`;
 
-    const siteRoot = "https://alricpaon.github.io/sellyo-hosting"; // 🔵 racine publique (HTML fixes)
-    const basePath = `tunnels/${user.uid}/${slug}/`;                // 📦 Storage chemins (uploads)
-    const baseUrl  = `${siteRoot}/tunnels/${user.uid}`;             // 🌐 racine publique HTML (pour les pages .html)
+    const siteRoot = "https://alricpaon.github.io/sellyo-hosting";
+    const basePath = `tunnels/${user.uid}/${slug}/`;
+    const baseUrl  = `${siteRoot}/tunnels/${user.uid}`;
 
-    const firstPageSlug = `${slug}-p1`;                              // ✅ première page (p1)
-    const viewUrl       = `${baseUrl}/${firstPageSlug}.html`;        // ✅ URL directe de la page 1
+    const firstPageSlug = `${slug}-p1`;
+    const viewUrl       = `${baseUrl}/${firstPageSlug}.html`;
 
     // Uploads globaux
-    const logoUrl = await uploadIfFile(e.target.logoFile.files?.[0],  `${basePath}logo-${Date.now()}`);
-    const coverUrl = await uploadIfFile(e.target.coverFile.files?.[0], `${basePath}cover-${Date.now()}`);
-    const deliveryProductUrl = await uploadIfFile(e.target.digitalProductFile.files?.[0], `${basePath}delivery-product-${Date.now()}`);
+    const logoUrl = await uploadIfFile(e.target.logoFile?.files?.[0],  `${basePath}logo-${Date.now()}`);
+    // (supprimé) coverFile
+    const deliveryProductUrl = await uploadIfFile(e.target.digitalProductFile?.files?.[0], `${basePath}delivery-product-${Date.now()}`);
 
     const paymentPrice = parseFloat(e.target.payment_price.value || "0") || 0;
     const currency = (e.target.currency.value || "EUR").trim().toUpperCase();
@@ -264,14 +255,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const metaTitle = (g("metaTitle")?.value || "").trim();
       const metaDescription = (g("metaDescription")?.value || "").trim();
 
-      const pageSlug = `${slug}-p${idx}`;               // ✅ slug unique par page (p1..pN)
+      const pageSlug = `${slug}-p${idx}`;
       const nextSlug = (idx < blocks.length) ? `${slug}-p${idx+1}` : null;
 
       const pageObj = {
         index: idx,
-        slug: pageSlug,            // ✅ utilisé par Make pour nommer la page .html
+        slug: pageSlug,
         type,
-        filename: `page${idx}.html`, // (legacy facultatif)
+        filename: `page${idx}.html`,
         title: (g("title").value || "").trim(),
         subtitle: (g("subtitle").value || "").trim(),
         heroImage: heroImageUrl,
@@ -281,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
           videoMp4: videoUrl || null
         },
         logoUrl: logoUrl || null,
-        // Ajouts livraison produit par page
+        // Livraison produit par page
         productUrl: productFileUrl || null,
         productDescription: productDescription || "",
         copy: {
@@ -309,32 +300,30 @@ document.addEventListener("DOMContentLoaded", () => {
         ctaText: (g("ctaText").value || "Continuer").trim(),
         ctaAction: g("ctaAction").value,
         ctaUrl: (g("ctaUrl").value || "").trim() || null,
-        flow: { nextSlug },        // ✅ objet flow propre (slug, pas filename)
+        flow: { nextSlug },
         seo: seoOn ? { metaTitle, metaDescription } : { metaTitle: "", metaDescription: "" }
       };
 
       pagesData.push(pageObj);
     }
 
-    // Doc Firestore (URL d'entrée -> HTML direct .html)
+    // Doc Firestore (vue d’ensemble)
     let docRef;
     try {
       docRef = await addDoc(collection(db, "tunnels"), {
         userId: user.uid,
         name,
-        goal: desc || null,
         type: "tunnel",
         slug,
-        basePath,                // uploads Storage
-        baseUrl,                 // ✅ ex: https://.../tunnels/<uid>
-        firstPageSlug,           // ✅ ex: <slug>-p1
-        viewUrl,                 // ✅ ex: <baseUrl>/<firstPageSlug>.html
-        url: viewUrl,            // (compat ancien code)
+        basePath,
+        baseUrl,
+        firstPageSlug,
+        viewUrl,
+        url: viewUrl, // legacy
         pagesCount: pagesData.length,
         mainColor,
         buttonColor,
         logoUrl,
-        coverUrl,
         redirectURL,
         deliveryProductUrl: deliveryProductUrl || null,
         currency,
@@ -346,18 +335,16 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Payload Make (pour génération des pages HTML)
+    // Payload Make (génération HTML)
     const payload = {
       userId: user.uid,
       tunnelId: docRef.id,
       name,
       slug,
-      desc,
       redirectURL,
       mainColor,
       buttonColor,
       logoUrl,
-      coverUrl,
       currency,
       payment: {
         provider: "stripe",
@@ -368,12 +355,12 @@ document.addEventListener("DOMContentLoaded", () => {
         paypalClientId: paypalClientId
       },
       analytics: { fbPixelId: fbPixel, gtmId },
-      seo: { siteTitle: name, siteDescription: desc || "" },
+      seo: { siteTitle: name, siteDescription: "" },
       delivery: { productUrl: deliveryProductUrl || null },
-      basePath,                  // Storage
-      baseUrl,                   // ✅ GitHub Pages root pour ce user: /tunnels/<uid>
+      basePath,
+      baseUrl,
       pagesCount: pagesData.length,
-      pagesData                  // ✅ contient slug (ex: <global-slug>-pN) pour chaque page
+      pagesData
     };
 
     try {
