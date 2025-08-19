@@ -27,9 +27,7 @@
           <input name="name" type="text" required />
         </label>
 
-        <label>Objectif / description
-          <input name="desc" type="text" placeholder="Promesse ou objectif principal" />
-        </label>
+        <!-- (supprimé) Objectif / description -->
 
         <label>Lien produit final (URL)
           <input name="redirectURL" type="url" placeholder="https://…" />
@@ -57,10 +55,7 @@
           <small>Facultatif – apparaîtra sur toutes les pages</small>
         </label>
 
-        <label>Image de couverture
-          <input type="file" name="coverFile" accept="image/*" />
-          <small>Image principale pour la page 1</small>
-        </label>
+        <!-- (supprimé) Image de couverture globale : chaque page a son Hero -->
       </fieldset>
 
       <!-- Paiement & Tracking -->
@@ -83,14 +78,13 @@
           <input name="stripe_pk" type="text" placeholder="pk_live_... ou pk_test_..." />
         </label>
 
-       <label>Stripe Price ID
-         <input name="stripe_price_id" type="text" placeholder="price_12345..." />
-       </label>
+        <label>Stripe Price ID
+          <input name="stripe_price_id" type="text" placeholder="price_12345..." />
+        </label>
 
-       <label>PayPal Client ID
-         <input name="paypal_client_id" type="text" placeholder="Aexxxxxx... (Live ou Sandbox)" />
-       </label>
-
+        <label>PayPal Client ID
+          <input name="paypal_client_id" type="text" placeholder="Aexxxxxx... (Live ou Sandbox)" />
+        </label>
 
         <label>Facebook Pixel ID
           <input name="fb_pixel" type="text" placeholder="1234567890" />
@@ -195,16 +189,16 @@
       </label>
 
       <label style="display:block;margin-top:.5rem;">
-  <input type="checkbox" class="toggle-seo"> Personnaliser le SEO sur cette page
-</label>
-<div class="seo-fields">
-  <label>Méta titre (SEO)
-    <input name="metaTitle" type="text" placeholder="Titre affiché dans Google" />
-  </label>
-  <label>Méta description (SEO)
-    <textarea name="metaDescription" rows="2" placeholder="Texte sous le titre dans Google"></textarea>
-  </label>
-</div>
+        <input type="checkbox" class="toggle-seo"> Personnaliser le SEO sur cette page
+      </label>
+      <div class="seo-fields">
+        <label>Méta titre (SEO)
+          <input name="metaTitle" type="text" placeholder="Titre affiché dans Google" />
+        </label>
+        <label>Méta description (SEO)
+          <textarea name="metaDescription" rows="2" placeholder="Texte sous le titre dans Google"></textarea>
+        </label>
+      </div>
 
       <details style="margin-top:.5rem;">
         <summary>Texte & contenu optionnel</summary>
