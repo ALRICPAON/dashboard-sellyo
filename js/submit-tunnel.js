@@ -227,11 +227,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const benefits = textToList(g("benefits")?.value);
       const bullets = textToList(g("bullets")?.value);
-      let testimonials = [];
-      try { testimonials = JSON.parse(g("testimonials")?.value || "[]"); } catch {}
-      let faqs = [];
-      try { faqs = JSON.parse(g("faqs")?.value || "[]"); } catch {}
-
+      const testimonials = textToList(g("testimonials")?.value);
+      const faqs = textToList(g("faqs")?.value);
       const type = g("type").value;
       const formFieldsObj = {
         name: !!g("formName")?.checked,
