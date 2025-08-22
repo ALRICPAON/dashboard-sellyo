@@ -154,6 +154,18 @@
         <small>Optionnel — si cette page doit livrer un fichier dédié.</small>
       </label>
 
+      <!-- Mode de livraison du produit -->
+<label>Mode de livraison de ce produit
+  <select name="deliveryMode" class="delivery-mode">
+    <option value="none" selected>Aucun produit livré sur cette page</option>
+    <option value="lead">Livrer après enregistrement du lead</option>
+    <option value="payment">Livrer après paiement</option>
+    <option value="instant">Livrer immédiatement sur cette page</option>
+  </select>
+  <small>Définis comment ce produit (global ou fichier par page) sera remis à l’utilisateur.</small>
+</label>
+
+
       <!-- Bloc OPTIN -->
       <div class="optin-fields" style="display:none; margin:.5rem 0;">
         <p style="margin:.25rem 0 .5rem;opacity:.8;">Champs du formulaire (cochez ce que vous voulez demander) :</p>
