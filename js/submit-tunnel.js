@@ -311,7 +311,6 @@ const pageObj = {
 pagesData.push(pageObj);
 } // 👈 ferme la boucle for (let i = 0; i < blocks.length; i++)
 
-      // ✅ Merci obligatoire si produit global (fichier ou URL)
 // ✅ Merci obligatoire si produit global (fichier OU URL)
 const hasGlobalProduct = !!redirectURL || !!deliveryProductUrl;
 const hasThankYouPage = pagesData.some(p => p.type === "thankyou");
@@ -341,6 +340,10 @@ if (hasGlobalProduct && !hasThankYouPage) {
         logoUrl,
         redirectURL,
         deliveryProductUrl: deliveryProductUrl || null,
+        deliveryGlobal: {
+  fileUrl: deliveryProductUrl || null,
+  url: redirectURL || null
+},
         currency,
         createdAt: serverTimestamp()
       });
