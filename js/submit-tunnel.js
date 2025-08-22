@@ -221,6 +221,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const heroImageUrl = await uploadIfFile(g("heroImageFile")?.files?.[0], `${basePath}page${idx}-hero-${Date.now()}`);
       const videoUrl = await uploadIfFile(g("videoFile")?.files?.[0], `${basePath}page${idx}-video-${Date.now()}`);
 
+      // Vérification cohérence CTA / mode de livraison
+const ctaAction = g("ctaAction").value;
+const deliveryMode = g("deliveryMode") ? g("deliveryMode").value : "none";
+
+// Si le bouton déclenche un paiement, on impose un mode "payment"
+if (ctaAction === "checkout" && deliveryMode !== "payment") {
+  alert(`⚠️ Page ${idx}: si l'action du bouton est "Paiement", tu dois sélectionner "Livrer après paiement" dans le mode de livraison.`);
+  return; // bloque l'envoi du tunnel
+}
+      
       // Produit par page
       const productFileUrl = await uploadIfFile(g("productFile")?.files?.[0], `${basePath}page${idx}-product-${Date.now()}`);
       const productDescription = (g("productDescription")?.value || "").trim();
@@ -272,6 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Livraison produit par page
         productUrl: productFileUrl || null,
         productDescription: productDescription || "",
+        deliveryMode: deliveryMode,
         copy: {
           problem: (g("problem")?.value || "").trim() || null,
           solution: (g("solution")?.value || "").trim() || null,
