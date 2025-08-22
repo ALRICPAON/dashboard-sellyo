@@ -228,43 +228,87 @@ __isSubmitting = true;
       const videoUrl = await uploadIfFile(g("videoFile")?.files?.[0], `${basePath}page${idx}-video-${Date.now()}`);
       
       // Produit par page
-      const productFileUrl = await uploadIfFile(g("productFile")?.files?.[0], `${basePath}page${idx}-product-${Date.now()}`);
-      const productDescription = (g("productDescription")?.value || "").trim();
-      
-        // Livraison produit par page
-productUrl: productFileUrl || null,
-productDescription: productDescription,
-copy: {
-          problem: (g("problem")?.value || "").trim() || null,
-          solution: (g("solution")?.value || "").trim() || null,
-          benefits,
-          bullets,
-          guarantee: (g("guarantee")?.value || "").trim() || null
-        },
-        testimonials,
-        faqs,
-        components: {
-          timer: !!g("timerEnabled")?.checked,
-          progressBar: true,
-          badges: ["Paiement sécurisé", "SSL"],
-          formFields: isOptin ? formFieldsObj : null
-        },
-        timers: {
-          deadlineISO: null,
-          evergreenMinutes: evergreenMinutesVal
-        },
-        formFields: isOptin ? formFieldsObj : null,
-        productRecap,
-        thankyouText,
-        ctaText: (g("ctaText").value || "Continuer").trim(),
-        ctaAction: g("ctaAction").value,
-        ctaUrl: (g("ctaUrl").value || "").trim() || null,
-        flow: { nextSlug },
-        seo: seoOn ? { metaTitle, metaDescription } : { metaTitle: "", metaDescription: "" }
-      };
+const productFileUrl   = await uploadIfFile(g("productFile")?.files?.[0], `${basePath}page${idx}-product-${Date.now()}`);
+const productDescription = (g("productDescription")?.value || "").trim();
 
-      pagesData.push(pageObj);
-    }
+// Champs texte
+const benefits      = textToList(g("benefits")?.value);
+const bullets       = textToList(g("bullets")?.value);
+const testimonials  = textToList(g("testimonials")?.value);
+const faqs          = textToList(g("faqs")?.value);
+
+// Form / SEO / flow
+const type = g("type").value;
+const formFieldsObj = {
+  name: !!g("formName")?.checked,
+  firstname: !!g("formFirstname")?.checked,
+  email: !!g("formEmail")?.checked,
+  phone: !!g("formPhone")?.checked,
+  address: !!g("formAddress")?.checked,
+};
+const isOptin = (type === "optin");
+const isThankyou = (type === "thankyou");
+const thankyouText = isThankyou ? ((g("thankyouText")?.value || "").trim()) : null;
+
+const evergreenMinutesVal = parseInt(g("evergreenMinutes")?.value || "0", 10) || null;
+const seoToggleChecked = pageEl.querySelector?.('.toggle-seo')?.checked ?? true; // page 1 cochée par défaut
+const seoOn = (typeof seoToggleChecked === 'boolean') ? seoToggleChecked : (idx === 1);
+const metaTitle = (g("metaTitle")?.value || "").trim();
+const metaDescription = (g("metaDescription")?.value || "").trim();
+
+const pageSlug = `${slug}-p${idx}`;
+const nextSlug = (idx < blocks.length) ? `${slug}-p${idx+1}` : null;
+
+// ✅ Ici on ouvre bien l’objet
+const pageObj = {
+  index: idx,
+  slug: pageSlug,
+  type,
+  filename: `page${idx}.html`,
+  title: (g("title").value || "").trim(),
+  subtitle: (g("subtitle").value || "").trim(),
+  heroImage: heroImageUrl,
+  videoUrl,
+  media: { imageUrl: heroImageUrl || null, videoMp4: videoUrl || null },
+  logoUrl: logoUrl || null,
+
+  // Livraison produit par page
+  productUrl: productFileUrl || null,
+  productDescription: productDescription,
+
+  copy: {
+    problem:  (g("problem")?.value  || "").trim() || null,
+    solution: (g("solution")?.value || "").trim() || null,
+    benefits,
+    bullets,
+    guarantee: (g("guarantee")?.value || "").trim() || null,
+  },
+
+  testimonials,
+  faqs,
+
+  components: {
+    timer: !!g("timerEnabled")?.checked,
+    progressBar: true,
+    badges: ["Paiement sécurisé", "SSL"],
+    formFields: isOptin ? formFieldsObj : null,
+  },
+  timers: {
+    deadlineISO: null,
+    evergreenMinutes: evergreenMinutesVal,
+  },
+
+  formFields: isOptin ? formFieldsObj : null,
+  productRecap: (g("productRecap")?.value || "").trim() || "",
+  thankyouText,
+  ctaText: (g("ctaText").value || "Continuer").trim(),
+  ctaAction: g("ctaAction").value,
+  ctaUrl: (g("ctaUrl").value || "").trim() || null,
+  flow: { nextSlug },
+  seo: seoOn ? { metaTitle, metaDescription } : { metaTitle: "", metaDescription: "" },
+}; // 👈 fermeture de l’objet
+
+pagesData.push(pageObj);
 
       // ✅ Merci obligatoire si produit global (fichier ou URL)
 const hasGlobalProduct = !!redirectURL || !!deliveryProductUrl;
