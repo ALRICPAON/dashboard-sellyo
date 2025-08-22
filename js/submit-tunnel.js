@@ -251,7 +251,7 @@ const isThankyou = (type === "thankyou");
 const thankyouText = isThankyou ? ((g("thankyouText")?.value || "").trim()) : null;
 
 const evergreenMinutesVal = parseInt(g("evergreenMinutes")?.value || "0", 10) || null;
-const seoToggleChecked = pageEl.querySelector?.('.toggle-seo')?.checked ?? true; // page 1 cochée par défaut
+const seoToggleChecked = block.querySelector?.('.toggle-seo')?.checked ?? true;
 const seoOn = (typeof seoToggleChecked === 'boolean') ? seoToggleChecked : (idx === 1);
 const metaTitle = (g("metaTitle")?.value || "").trim();
 const metaDescription = (g("metaDescription")?.value || "").trim();
@@ -309,6 +309,7 @@ const pageObj = {
 }; // 👈 fermeture de l’objet
 
 pagesData.push(pageObj);
+} // 👈 ferme la boucle for (let i = 0; i < blocks.length; i++)
 
       // ✅ Merci obligatoire si produit global (fichier ou URL)
 const hasGlobalProduct = !!redirectURL || !!deliveryProductUrl;
