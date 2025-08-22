@@ -232,9 +232,9 @@ __isSubmitting = true;
       const productDescription = (g("productDescription")?.value || "").trim();
       
         // Livraison produit par page
-        productUrl: productFileUrl || null,
-        productDescription: productDescription || ""
-        copy: {
+productUrl: productFileUrl || null,
+productDescription, // <- la variable déjà nettoyée plus haut
+copy: {
           problem: (g("problem")?.value || "").trim() || null,
           solution: (g("solution")?.value || "").trim() || null,
           benefits,
