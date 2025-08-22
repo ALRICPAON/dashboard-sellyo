@@ -9,6 +9,8 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 const MAKE_WEBHOOK_TUNNEL_URL = "https://hook.eu2.make.com/tepvi5cc9ieje6cp9bmcaq7u6irs58dp";
+// Anti double-submit
+let __isSubmitting = false;
 
 function slugify(s) {
   return (s || "")
@@ -179,6 +181,10 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const user = auth.currentUser;
     if (!user) return;
+    
+    // Anti double-clic
+if (__isSubmitting) return;
+__isSubmitting = true;
 
     const name = e.target.name.value.trim();
     const redirectURL = (e.target.redirectURL.value.trim() || null);
@@ -220,16 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const heroImageUrl = await uploadIfFile(g("heroImageFile")?.files?.[0], `${basePath}page${idx}-hero-${Date.now()}`);
       const videoUrl = await uploadIfFile(g("videoFile")?.files?.[0], `${basePath}page${idx}-video-${Date.now()}`);
-
-      // Vérification cohérence CTA / mode de livraison
-const ctaAction = g("ctaAction").value;
-const deliveryMode = g("deliveryMode") ? g("deliveryMode").value : "none";
-
-// Si le bouton déclenche un paiement, on impose un mode "payment"
-if (ctaAction === "checkout" && deliveryMode !== "payment") {
-  alert(`⚠️ Page ${idx}: si l'action du bouton est "Paiement", tu dois sélectionner "Livrer après paiement" dans le mode de livraison.`);
-  return; // bloque l'envoi du tunnel
-}
       
       // Produit par page
       const productFileUrl = await uploadIfFile(g("productFile")?.files?.[0], `${basePath}page${idx}-product-${Date.now()}`);
@@ -238,7 +234,6 @@ if (ctaAction === "checkout" && deliveryMode !== "payment") {
         // Livraison produit par page
         productUrl: productFileUrl || null,
         productDescription: productDescription || "",
-        deliveryMode: deliveryMode,
         copy: {
           problem: (g("problem")?.value || "").trim() || null,
           solution: (g("solution")?.value || "").trim() || null,
@@ -271,6 +266,16 @@ if (ctaAction === "checkout" && deliveryMode !== "payment") {
       pagesData.push(pageObj);
     }
 
+      // ✅ Merci obligatoire si produit global (fichier ou URL)
+const hasGlobalProduct = !!redirectURL || !!deliveryProductUrl;
+const hasThankYouPage = pagesData.some(p => p.type === "thankyou");
+
+if (hasGlobalProduct && !hasThankYouPage) {
+  alert("⚠️ Tu dois ajouter une page de remerciement pour livrer ton produit (fichier ou lien).");
+  __isSubmitting = false;
+  return;
+}
+
     // Doc Firestore (vue d’ensemble)
     let docRef;
     try {
@@ -294,10 +299,11 @@ if (ctaAction === "checkout" && deliveryMode !== "payment") {
         createdAt: serverTimestamp()
       });
     } catch (err) {
-      console.error("Firestore error", err);
-      alert("Erreur lors de l’enregistrement du tunnel.");
-      return;
-    }
+  console.error("Firestore error", err);
+  alert("Erreur lors de l’enregistrement du tunnel.");
+  __isSubmitting = false;   // ← AJOUTER ICI
+  return;
+}
 
     // Payload Make (génération HTML)
     const payload = {
@@ -336,8 +342,9 @@ if (ctaAction === "checkout" && deliveryMode !== "payment") {
       alert("✅ Tunnel en cours de génération.");
       window.location.href = "tunnels.html";
     } catch (err) {
-      console.error("Make webhook error", err);
-      alert("Erreur d’envoi au scénario Make");
-    }
+  console.error("Make webhook error", err);
+  alert("Erreur d’envoi au scénario Make");
+  __isSubmitting = false;   // ← AJOUTER ICI
+}
   });
 });
