@@ -230,7 +230,7 @@ __isSubmitting = true;
       // Produit par page
       const productFileUrl = await uploadIfFile(g("productFile")?.files?.[0], `${basePath}page${idx}-product-${Date.now()}`);
       const productDescription = (g("productDescription")?.value || "").trim();
-@@ -272,105 +282,106 @@
+      
         // Livraison produit par page
         productUrl: productFileUrl || null,
         productDescription: productDescription || "",
