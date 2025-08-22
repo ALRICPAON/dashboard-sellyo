@@ -233,7 +233,7 @@ __isSubmitting = true;
       
         // Livraison produit par page
         productUrl: productFileUrl || null,
-        productDescription: productDescription || "",
+        productDescription: productDescription || ""
         copy: {
           problem: (g("problem")?.value || "").trim() || null,
           solution: (g("solution")?.value || "").trim() || null,
