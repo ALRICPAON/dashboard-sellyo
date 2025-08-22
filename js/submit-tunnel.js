@@ -312,11 +312,12 @@ pagesData.push(pageObj);
 } // 👈 ferme la boucle for (let i = 0; i < blocks.length; i++)
 
       // ✅ Merci obligatoire si produit global (fichier ou URL)
+// ✅ Merci obligatoire si produit global (fichier OU URL)
 const hasGlobalProduct = !!redirectURL || !!deliveryProductUrl;
 const hasThankYouPage = pagesData.some(p => p.type === "thankyou");
 
 if (hasGlobalProduct && !hasThankYouPage) {
-  alert("⚠️ Tu dois ajouter une page de remerciement pour livrer ton produit (fichier ou lien).");
+  alert("⚠️ Tu dois ajouter une page de remerciement pour livrer ton produit (fichier global ou URL).");
   __isSubmitting = false;
   return;
 }
@@ -371,7 +372,11 @@ if (hasGlobalProduct && !hasThankYouPage) {
       },
       analytics: { fbPixelId: fbPixel, gtmId },
       seo: { siteTitle: name, siteDescription: "" },
-      delivery: { productUrl: deliveryProductUrl || null },
+      delivery: {
+  fileUrl: deliveryProductUrl || null,
+  url: redirectURL || null,
+  productUrl: deliveryProductUrl || redirectURL || null
+},
       basePath,
       baseUrl,
       pagesCount: pagesData.length,
