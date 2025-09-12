@@ -54,29 +54,29 @@ document.addEventListener("DOMContentLoaded", () => {
       .forEach((el, i) => el.textContent = i + 1);
   }
 
-  function wireTypeToggle(pageEl, index) {
-  const typeSelect = pageEl.querySelector('[name="type"]');
+ function wireTypeToggle(pageEl, index) {
+  const typeSelect     = pageEl.querySelector('[name="type"]');
 
-  const titleRow        = pageEl.querySelector('[name="title"]')?.closest('label');
-  const subtitleRow     = pageEl.querySelector('[name="subtitle"]')?.closest('label');
-  const heroRow         = pageEl.querySelector('[name="heroImageFile"]')?.closest('label');
-  const videoRow        = pageEl.querySelector('[name="videoFile"]')?.closest('label');
-  const productDescRow  = pageEl.querySelector('[name="productDescription"]')?.closest('label');
+  const titleRow       = pageEl.querySelector('[name="title"]')?.closest('label');
+  const subtitleRow    = pageEl.querySelector('[name="subtitle"]')?.closest('label');
+  const heroRow        = pageEl.querySelector('[name="heroImageFile"]')?.closest('label');
+  const videoRow       = pageEl.querySelector('[name="videoFile"]')?.closest('label');
+  const productDescRow = pageEl.querySelector('[name="productDescription"]')?.closest('label');
 
-  const optinFields     = pageEl.querySelector('.optin-fields');
-  const thankyouFields  = pageEl.querySelector('.thankyou-fields');
+  const optinFields    = pageEl.querySelector('.optin-fields');
+  const thankyouFields = pageEl.querySelector('.thankyou-fields');
 
-  const ctaTextRow      = pageEl.querySelector('[name="ctaText"]')?.closest('label');
-  const ctaAction       = pageEl.querySelector('[name="ctaAction"]');
-  const ctaActionRow    = ctaAction?.closest('label');
-  const ctaUrlRow       = pageEl.querySelector('[name="ctaUrl"]')?.closest('label');
+  const ctaTextRow     = pageEl.querySelector('[name="ctaText"]')?.closest('label');
+  const ctaAction      = pageEl.querySelector('[name="ctaAction"]');
+  const ctaActionRow   = ctaAction?.closest('label');
+  const ctaUrlRow      = pageEl.querySelector('[name="ctaUrl"]')?.closest('label');
 
-  const seoToggle       = pageEl.querySelector('.toggle-seo');
-  const seoFields       = pageEl.querySelector('.seo-fields');
+  const seoToggle      = pageEl.querySelector('.toggle-seo');
+  const seoFields      = pageEl.querySelector('.seo-fields');
 
   // 👉 Nouveau : toggle pour "Texte & contenu optionnel"
-  const extraToggle     = pageEl.querySelector('.toggle-extra');   // <input type="checkbox" class="toggle-extra" checked>
-  const extraFields     = pageEl.querySelector('.extra-fields');   // <div class="extra-fields"> … </div>
+  const extraToggle    = pageEl.querySelector('.toggle-extra');
+  const extraFields    = pageEl.querySelector('.extra-fields');
 
   const setReq = (inputEl, on) => {
     if (!inputEl) return;
@@ -97,19 +97,19 @@ document.addEventListener("DOMContentLoaded", () => {
     seoToggle.onchange = () => show(seoFields, seoToggle.checked);
   }
 
-  // 👉 Nouveau : branchement de la case "contenu optionnel"
+  // branchement toggle extra
   if (extraToggle && extraFields) {
     const updateExtra = () => {
       extraFields.style.display = extraToggle.checked ? '' : 'none';
     };
     extraToggle.addEventListener('change', updateExtra);
-    updateExtra(); // état initial
+    updateExtra();
   }
 
   const onChange = () => {
     const t = typeSelect.value;
 
-    // Par défaut on montre la plupart des blocs
+    // Par défaut
     show(titleRow, true); setReq(titleRow?.querySelector('input'), false);
     show(subtitleRow, true);
     show(heroRow, true);
@@ -121,8 +121,18 @@ document.addEventListener("DOMContentLoaded", () => {
     show(ctaActionRow, true);
     show(ctaUrlRow, true);
 
-    // Description produit visible partout SAUF "thankyou"
     show(productDescRow, t !== 'thankyou');
+
+    // Extra-fields visibles sauf sur thankyou
+    if (t === 'thankyou') {
+      show(extraToggle?.closest('label'), false);
+      show(extraFields, false);
+    } else {
+      show(extraToggle?.closest('label'), true);
+      if (extraToggle) {
+        extraFields.style.display = extraToggle.checked ? '' : 'none';
+      }
+    }
 
     if (t === 'optin') {
       show(optinFields, true);
@@ -152,14 +162,11 @@ document.addEventListener("DOMContentLoaded", () => {
       show(ctaUrlRow, false);
       show(thankyouFields, true);
     }
-
-    // ❌ Supprimé : upsell / downsell / webinar
   };
 
   typeSelect.addEventListener('change', onChange);
   onChange();
 }
-
   function wireRemoveButtons() {
     pagesContainer.querySelectorAll(".remove-page").forEach(btn => {
       btn.onclick = () => {
