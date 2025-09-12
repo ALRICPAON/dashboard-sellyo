@@ -183,39 +183,43 @@
         </label>
       </div>
 
-      <details style="margin-top:.5rem;">
-        <summary>Texte & contenu optionnel</summary>
-        <label>Problème
-          <textarea name="problem" rows="2"></textarea>
-        </label>
-        <label>Solution
-          <textarea name="solution" rows="2"></textarea>
-        </label>
-        <label>Bénéfices (1 par ligne)
-          <textarea name="benefits" rows="3"></textarea>
-        </label>
-        <label>Points clés (1 par ligne)
-          <textarea name="bullets" rows="3"></textarea>
-        </label>
-        <label>Garantie
-          <input name="guarantee" type="text" placeholder="Satisfait ou remboursé 30j" />
-        </label>
-        <label>Témoignages (un par ligne)
-          <textarea name="testimonials" rows="4" placeholder="Super formation !
-           Très bon service !"></textarea>
-        </label>
-        <label>FAQ (une question par ligne)
-          <textarea name="faqs" rows="4" placeholder="Comment ça marche ?
-           Quel est le prix ?"></textarea>
-        </label>
-        <label>Activer timer ?
-          <input name="timerEnabled" type="checkbox" />
-        </label>
-        <label>Durée timer (minutes)
-          <input name="evergreenMinutes" type="number" placeholder="20" />
-        </label>
-      </details>
+      <label style="display:block;margin:.5rem 0;">
+  <input type="checkbox" class="toggle-extra" checked />
+  Activer le contenu optionnel
+</label>
 
+<div class="extra-fields">
+  <label>Problème
+    <textarea name="problem" rows="2"></textarea>
+  </label>
+  <label>Solution
+    <textarea name="solution" rows="2"></textarea>
+  </label>
+  <label>Bénéfices (1 par ligne)
+    <textarea name="benefits" rows="3"></textarea>
+  </label>
+  <label>Points clés (1 par ligne)
+    <textarea name="bullets" rows="3"></textarea>
+  </label>
+  <label>Garantie
+    <input name="guarantee" type="text" placeholder="Satisfait ou remboursé 30j" />
+  </label>
+  <label>Témoignages (un par ligne)
+    <textarea name="testimonials" rows="4" placeholder="Super formation !
+     Très bon service !"></textarea>
+  </label>
+  <label>FAQ (une question par ligne)
+    <textarea name="faqs" rows="4" placeholder="Comment ça marche ?
+     Quel est le prix ?"></textarea>
+  </label>
+  <label>Activer timer ?
+    <input name="timerEnabled" type="checkbox" />
+  </label>
+  <label>Durée timer (minutes)
+    <input name="evergreenMinutes" type="number" placeholder="20" />
+  </label>
+</div>
+      
       <button type="button" class="btn btn-danger remove-page">🗑 Supprimer cette page</button>
     </fieldset>
   </template>
