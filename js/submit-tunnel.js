@@ -204,10 +204,8 @@ __isSubmitting = true;
 
     const paymentPrice = parseFloat(e.target.payment_price.value || "0") || 0;
     const currency = (e.target.currency.value || "EUR").trim().toUpperCase();
-    const paymentLink = (e.target.payment_link.value.trim() || null);
     const stripePk = (e.target.stripe_pk?.value?.trim() || null);
     const stripePriceId = (e.target.stripe_price_id?.value?.trim() || null);
-    const paypalClientId = (e.target.paypal_client_id?.value?.trim() || null);
     const fbPixel = (e.target.fb_pixel.value.trim() || null);
     const gtmId = (e.target.gtm_id.value.trim() || null);
 
