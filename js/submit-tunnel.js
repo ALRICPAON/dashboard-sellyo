@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const heroRow = pageEl.querySelector('[name="heroImageFile"]')?.closest('label');
     const videoRow = pageEl.querySelector('[name="videoFile"]')?.closest('label');
     const productDescRow = pageEl.querySelector('[name="productDescription"]')?.closest('label');
-    const productFileRow = pageEl.querySelector('[name="productFile"]')?.closest('label');
+  
 
     const optinFields = pageEl.querySelector('.optin-fields');
     const thankyouFields = pageEl.querySelector('.thankyou-fields');
@@ -102,10 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       show(subtitleRow, true);
       show(heroRow, true);
       show(videoRow, true);
-
-      // ⬇️ Nouveau: description & fichier produit visibles sur toutes les pages sauf "thankyou"
-      show(productDescRow, t !== 'thankyou');
-      show(productFileRow, t !== 'thankyou');
+    
 
       show(optinFields, false);
       show(thankyouFields, false);
@@ -137,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
         show(videoRow, false);
         show(optinFields, false);
         show(productDescRow, false);
-        show(productFileRow, false);
         show(ctaTextRow, false);
         show(ctaActionRow, false);
         show(ctaUrlRow, false);
@@ -226,9 +222,6 @@ __isSubmitting = true;
       const heroImageUrl = await uploadIfFile(g("heroImageFile")?.files?.[0], `${basePath}page${idx}-hero-${Date.now()}`);
       const videoUrl = await uploadIfFile(g("videoFile")?.files?.[0], `${basePath}page${idx}-video-${Date.now()}`);
       
-      // Produit par page
-const productFileUrl   = await uploadIfFile(g("productFile")?.files?.[0], `${basePath}page${idx}-product-${Date.now()}`);
-const productDescription = (g("productDescription")?.value || "").trim();
 
 // Champs texte
 const benefits      = textToList(g("benefits")?.value);
@@ -271,9 +264,6 @@ const pageObj = {
   media: { imageUrl: heroImageUrl || null, videoMp4: videoUrl || null },
   logoUrl: logoUrl || null,
 
-  // Livraison produit par page
-  productUrl: productFileUrl || null,
-  productDescription: productDescription,
 
   copy: {
     problem:  (g("problem")?.value  || "").trim() || null,
