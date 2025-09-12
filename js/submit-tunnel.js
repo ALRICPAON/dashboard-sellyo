@@ -55,99 +55,110 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function wireTypeToggle(pageEl, index) {
-    const typeSelect = pageEl.querySelector('[name="type"]');
+  const typeSelect = pageEl.querySelector('[name="type"]');
 
-    const titleRow = pageEl.querySelector('[name="title"]')?.closest('label');
-    const subtitleRow = pageEl.querySelector('[name="subtitle"]')?.closest('label');
-    const heroRow = pageEl.querySelector('[name="heroImageFile"]')?.closest('label');
-    const videoRow = pageEl.querySelector('[name="videoFile"]')?.closest('label');
-    const productDescRow = pageEl.querySelector('[name="productDescription"]')?.closest('label');
-  
+  const titleRow        = pageEl.querySelector('[name="title"]')?.closest('label');
+  const subtitleRow     = pageEl.querySelector('[name="subtitle"]')?.closest('label');
+  const heroRow         = pageEl.querySelector('[name="heroImageFile"]')?.closest('label');
+  const videoRow        = pageEl.querySelector('[name="videoFile"]')?.closest('label');
+  const productDescRow  = pageEl.querySelector('[name="productDescription"]')?.closest('label');
 
-    const optinFields = pageEl.querySelector('.optin-fields');
-    const thankyouFields = pageEl.querySelector('.thankyou-fields');
+  const optinFields     = pageEl.querySelector('.optin-fields');
+  const thankyouFields  = pageEl.querySelector('.thankyou-fields');
 
-    const ctaTextRow = pageEl.querySelector('[name="ctaText"]')?.closest('label');
-    const ctaAction = pageEl.querySelector('[name="ctaAction"]');
-    const ctaActionRow = ctaAction?.closest('label');
-    const ctaUrlRow = pageEl.querySelector('[name="ctaUrl"]')?.closest('label');
+  const ctaTextRow      = pageEl.querySelector('[name="ctaText"]')?.closest('label');
+  const ctaAction       = pageEl.querySelector('[name="ctaAction"]');
+  const ctaActionRow    = ctaAction?.closest('label');
+  const ctaUrlRow       = pageEl.querySelector('[name="ctaUrl"]')?.closest('label');
 
-    const seoToggle = pageEl.querySelector('.toggle-seo');
-    const seoFields = pageEl.querySelector('.seo-fields');
+  const seoToggle       = pageEl.querySelector('.toggle-seo');
+  const seoFields       = pageEl.querySelector('.seo-fields');
 
-    const setReq = (inputEl, on) => {
-      if (!inputEl) return;
-      if (on) inputEl.setAttribute('required', '');
-      else inputEl.removeAttribute('required');
+  // 👉 Nouveau : toggle pour "Texte & contenu optionnel"
+  const extraToggle     = pageEl.querySelector('.toggle-extra');   // <input type="checkbox" class="toggle-extra" checked>
+  const extraFields     = pageEl.querySelector('.extra-fields');   // <div class="extra-fields"> … </div>
+
+  const setReq = (inputEl, on) => {
+    if (!inputEl) return;
+    if (on) inputEl.setAttribute('required', '');
+    else inputEl.removeAttribute('required');
+  };
+  const show = (el, on) => { if (el) el.style.display = on ? '' : 'none'; };
+
+  // SEO: actif par défaut uniquement sur page 1
+  if (seoToggle && seoFields) {
+    if (typeof index === 'number' && index > 1) {
+      seoToggle.checked = false;
+      show(seoFields, false);
+    } else {
+      seoToggle.checked = true;
+      show(seoFields, true);
+    }
+    seoToggle.onchange = () => show(seoFields, seoToggle.checked);
+  }
+
+  // 👉 Nouveau : branchement de la case "contenu optionnel"
+  if (extraToggle && extraFields) {
+    const updateExtra = () => {
+      extraFields.style.display = extraToggle.checked ? '' : 'none';
     };
-    const show = (el, on) => { if (el) el.style.display = on ? '' : 'none'; };
+    extraToggle.addEventListener('change', updateExtra);
+    updateExtra(); // état initial
+  }
 
-    // SEO: actif par défaut uniquement sur page 1
-    if (seoToggle && seoFields) {
-      if (typeof index === 'number' && index > 1) {
-        seoToggle.checked = false;
-        show(seoFields, false);
-      } else {
-        seoToggle.checked = true;
-        show(seoFields, true);
-      }
-      seoToggle.onchange = () => show(seoFields, seoToggle.checked);
+  const onChange = () => {
+    const t = typeSelect.value;
+
+    // Par défaut on montre la plupart des blocs
+    show(titleRow, true); setReq(titleRow?.querySelector('input'), false);
+    show(subtitleRow, true);
+    show(heroRow, true);
+    show(videoRow, true);
+
+    show(optinFields, false);
+    show(thankyouFields, false);
+    show(ctaTextRow, true);
+    show(ctaActionRow, true);
+    show(ctaUrlRow, true);
+
+    // Description produit visible partout SAUF "thankyou"
+    show(productDescRow, t !== 'thankyou');
+
+    if (t === 'optin') {
+      show(optinFields, true);
+      if (ctaAction) ctaAction.value = 'next';
+      setReq(titleRow?.querySelector('input'), false);
     }
 
-    const onChange = () => {
-      const t = typeSelect.value;
+    if (t === 'sales') {
+      setReq(titleRow?.querySelector('input'), true);
+    }
 
-      // Par défaut on montre la plupart des blocs
-      show(titleRow, true); setReq(titleRow?.querySelector('input'), false);
-      show(subtitleRow, true);
-      show(heroRow, true);
-      show(videoRow, true);
-    
+    if (t === 'checkout') {
+      setReq(titleRow?.querySelector('input'), true);
+      if (ctaAction) ctaAction.value = 'checkout';
+      show(ctaUrlRow, false);
+    }
 
+    if (t === 'thankyou') {
+      show(titleRow, false);
+      show(subtitleRow, false);
+      show(heroRow, false);
+      show(videoRow, false);
       show(optinFields, false);
-      show(thankyouFields, false);
-      show(ctaTextRow, true);
-      show(ctaActionRow, true);
-      show(ctaUrlRow, true);
+      show(productDescRow, false);
+      show(ctaTextRow, false);
+      show(ctaActionRow, false);
+      show(ctaUrlRow, false);
+      show(thankyouFields, true);
+    }
 
-      if (t === 'optin') {
-        show(optinFields, true);
-        if (ctaAction) ctaAction.value = 'next';
-        setReq(titleRow?.querySelector('input'), false);
-      }
+    // ❌ Supprimé : upsell / downsell / webinar
+  };
 
-      if (t === 'sales') {
-        setReq(titleRow?.querySelector('input'), true);
-      }
-
-      if (t === 'checkout') {
-        setReq(titleRow?.querySelector('input'), true);
-        // on laisse hero/video optionnels (template supporte déjà), inutile de les masquer
-        if (ctaAction) ctaAction.value = 'checkout';
-        show(ctaUrlRow, false);
-      }
-
-      if (t === 'thankyou') {
-        show(titleRow, false);
-        show(subtitleRow, false);
-        show(heroRow, false);
-        show(videoRow, false);
-        show(optinFields, false);
-        show(productDescRow, false);
-        show(ctaTextRow, false);
-        show(ctaActionRow, false);
-        show(ctaUrlRow, false);
-        show(thankyouFields, true);
-      }
-
-      if (t === 'upsell' || t === 'downsell' || t === 'webinar') {
-        setReq(titleRow?.querySelector('input'), true);
-      }
-    };
-
-    typeSelect.addEventListener('change', onChange);
-    onChange();
-  }
+  typeSelect.addEventListener('change', onChange);
+  onChange();
+}
 
   function wireRemoveButtons() {
     pagesContainer.querySelectorAll(".remove-page").forEach(btn => {
