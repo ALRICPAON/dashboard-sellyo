@@ -164,7 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function addPage() {
     const count = pagesContainer.querySelectorAll(".page-block").length;
-    if (count >= 8) return alert("Max 8 pages");
     const node = tpl.content.cloneNode(true);
     const el = node.querySelector(".page-block");
     const idx = count + 1;
