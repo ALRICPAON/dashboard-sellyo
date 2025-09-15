@@ -454,15 +454,15 @@ if (hasGlobalProduct && !hasThankYouPage) {
   body: JSON.stringify(payload)
 });
 
-// Phase 2 : assemblage / propagation GitHub Pages (90–120s conseillé)
-setPhase2AndCountdown(100); // tu peux mettre 90, 100 ou 120
+// Phase 2 : assemblage / propagation GitHub Pages (≈ 3min)
+setPhase2AndCountdown(180); // 180 secondes
 
-// Redirection automatique vers la première page à la fin (fallback 100s + 2s de marge)
+// Redirection automatique vers "Mes tunnels" après 3min + marge
 setTimeout(() => {
-  // on coupe l’overlay juste au moment de partir
   showOverlay(false);
-  window.location.href = viewUrl; // ex: https://.../<slug>-p1.html
-}, 102000); // 100s + 2s
+  window.location.href = "tunnels.html";
+}, 182000); // 180s + 2s de marge
+
     
     } catch (err) {
   console.error("Make webhook error", err);
