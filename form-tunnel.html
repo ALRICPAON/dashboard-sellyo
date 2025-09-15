@@ -223,5 +223,31 @@
       <button type="button" class="btn btn-danger remove-page">🗑 Supprimer cette page</button>
     </fieldset>
   </template>
+
+  <!-- Overlay de génération -->
+<div id="gen-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:9999;">
+  <div style="width:min(520px,92vw);background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:20px;font-family:system-ui,-apple-system,Roboto,sans-serif;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.5)">
+    <h3 style="margin:0 0 8px;color:#00ccff;font-size:20px;">⚙️ Génération du tunnel</h3>
+    <p id="gen-status" style="margin:0 0 12px;opacity:.9;">Préparation…</p>
+
+    <div style="display:flex;gap:10px;align-items:center;margin:12px 0;">
+      <div class="spinner" style="width:18px;height:18px;border:3px solid #333;border-top-color:#00ccff;border-radius:50%;animation:spin 1s linear infinite;"></div>
+      <div id="gen-step" style="font-weight:600;">Phase 1/2 — Génération en cours…</div>
+    </div>
+
+    <div style="height:8px;background:#1e1e1e;border-radius:6px;overflow:hidden;">
+      <div id="gen-progress" style="height:100%;width:0%;background:linear-gradient(90deg,#00ccff,#4df);transition:width .3s;"></div>
+    </div>
+
+    <div id="gen-countdown-wrap" style="margin-top:10px;display:none;">
+      <small id="gen-countdown" style="opacity:.85;">Propagation GitHub Pages : ~120s restantes…</small>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
 </body>
 </html>
