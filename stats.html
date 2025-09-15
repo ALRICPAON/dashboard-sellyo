@@ -1,0 +1,35 @@
+<!-- stats.html -->
+<main id="stats-root" style="max-width:1100px;margin:0 auto;padding:24px">
+  <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h1 style="margin:0;font-size:22px">Statistiques — V1</h1>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select id="period-select">
+        <option value="today">Aujourd’hui</option>
+        <option value="7d" selected>7 derniers jours</option>
+        <option value="30d">30 derniers jours</option>
+        <option value="all">Tout</option>
+      </select>
+      <input id="from-date" type="date" style="display:none">
+      <input id="to-date" type="date" style="display:none">
+      <button id="apply-custom" style="display:none">Appliquer</button>
+    </div>
+  </header>
+
+  <section id="kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+    <div class="card"><div class="kpi-label">Leads</div><div id="kpi-leads" class="kpi-value">—</div></div>
+    <div class="card"><div class="kpi-label">Emails envoyés</div><div id="kpi-emails" class="kpi-value">—</div></div>
+    <div class="card"><div class="kpi-label">Scripts vidéo</div><div id="kpi-scripts" class="kpi-value">—</div></div>
+    <div class="card"><div class="kpi-label">Ventes (Stripe)</div><div id="kpi-sales" class="kpi-value">—</div></div>
+  </section>
+</main>
+
+<style>
+  .card{background:#111; color:#fff; border:1px solid #222; border-radius:12px; padding:16px}
+  .kpi-label{font-size:12px; opacity:.7; margin-bottom:6px}
+  .kpi-value{font-size:28px; font-weight:700}
+  select, input, button{height:34px; padding:0 8px}
+  @media (max-width:900px){ #kpis{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:520px){ #kpis{grid-template-columns:1fr} }
+</style>
+
+<script type="module" src="/js/stats-dashboard.js"></script>
