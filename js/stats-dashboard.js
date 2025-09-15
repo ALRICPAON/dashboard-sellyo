@@ -187,13 +187,14 @@ onAuthStateChanged(auth, async (user) => {
   window.__uid = user.uid;
 
   // Ajoute l’option "Période personnalisée"
-  const sel = document.getElementById("period-select");
+  const sel = document.getElementById("period-select");  // ⚠️ il faut la redéclarer ici
   const customOpt = document.createElement("option");
   customOpt.value = "custom";
   customOpt.textContent = "Période personnalisée";
   sel.appendChild(customOpt);
 
   setupPeriodUI();
+
   // Par défaut : 7 jours
   await refreshAll(sel.value || "7d");
 });
