@@ -49,7 +49,7 @@ function setPhase1() {
   const bar = document.getElementById('gen-progress');
   const cdWrap = document.getElementById('gen-countdown-wrap');
   if (step) step.textContent = 'Phase 1/2 — Génération en cours…';
-  if (status) status.textContent = 'Envoi à Make et création des pages…';
+  if (status) status.textContent = 'Génération en cours. Merci de patienter et de ne pas recharger la page.';
   if (bar) bar.style.width = '30%';
   if (cdWrap) cdWrap.style.display = 'none';
 }
@@ -63,7 +63,7 @@ function setPhase2AndCountdown(seconds = 100) { // 90–120s recommandé ; ici ~
   const cd = document.getElementById('gen-countdown');
 
   if (step) step.textContent = 'Phase 2/2 — Assemblage du tunnel…';
-  if (status) status.textContent = 'Propagation GitHub Pages, presque fini…';
+  if (status) status.textContent = 'Finalisation du tunnel. Merci de patienter et de ne pas recharger la page.';
   if (bar) bar.style.width = '70%';
   if (cdWrap) cdWrap.style.display = '';
 
