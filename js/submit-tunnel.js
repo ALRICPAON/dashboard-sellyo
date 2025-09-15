@@ -265,7 +265,7 @@ setPhase1();
     const uniq = Date.now().toString(36).slice(-5);
     const slug = `${baseSlug}-${uniq}`;
 
-    const siteRoot = "https://alricpaon.github.io/sellyo-hosting";
+    const siteRoot = "https://tunnels.sellyo.fr";
     const basePath = `tunnels/${user.uid}/${slug}/`;
     const baseUrl  = `${siteRoot}/tunnels/${user.uid}`;
 
