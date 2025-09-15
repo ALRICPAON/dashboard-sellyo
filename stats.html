@@ -83,19 +83,34 @@
 <body>
   <main>
     <header>
-      <h1>📊 Statistiques globales</h1>
-      <div style="display:flex;gap:8px;align-items:center">
-        <select id="period-select">
-          <option value="today">Aujourd’hui</option>
-          <option value="7d" selected>7 derniers jours</option>
-          <option value="30d">30 derniers jours</option>
-          <option value="all">Tout</option>
-        </select>
-        <input id="from-date" type="date" style="display:none">
-        <input id="to-date" type="date" style="display:none">
-        <button id="apply-custom" style="display:none">Appliquer</button>
-      </div>
-    </header>
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="dashboard.html" style="
+      display:inline-block;
+      padding:6px 12px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:6px;
+      color:var(--text);
+      text-decoration:none;
+      font-size:14px;">
+      ⬅️ Retour
+    </a>
+    <h1>📊 Statistiques globales</h1>
+  </div>
+
+  <div style="display:flex;gap:8px;align-items:center">
+    <!-- select + inputs période -->
+    <select id="period-select">
+      <option value="today">Aujourd’hui</option>
+      <option value="7d" selected>7 derniers jours</option>
+      <option value="30d">30 derniers jours</option>
+      <option value="all">Tout</option>
+    </select>
+    <input id="from-date" type="date" style="display:none">
+    <input id="to-date" type="date" style="display:none">
+    <button id="apply-custom" style="display:none">Appliquer</button>
+  </div>
+</header>
 
     <section id="kpis">
       <div class="card"><div class="kpi-label">Leads</div><div id="kpi-leads" class="kpi-value">—</div></div>
