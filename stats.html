@@ -1,35 +1,111 @@
-<!-- stats.html -->
-<main id="stats-root" style="max-width:1100px;margin:0 auto;padding:24px">
-  <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h1 style="margin:0;font-size:22px">Statistiques — V1</h1>
-    <div style="display:flex;gap:8px;align-items:center">
-      <select id="period-select">
-        <option value="today">Aujourd’hui</option>
-        <option value="7d" selected>7 derniers jours</option>
-        <option value="30d">30 derniers jours</option>
-        <option value="all">Tout</option>
-      </select>
-      <input id="from-date" type="date" style="display:none">
-      <input id="to-date" type="date" style="display:none">
-      <button id="apply-custom" style="display:none">Appliquer</button>
-    </div>
-  </header>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>📊 Statistiques globales</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <section id="kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
-    <div class="card"><div class="kpi-label">Leads</div><div id="kpi-leads" class="kpi-value">—</div></div>
-    <div class="card"><div class="kpi-label">Emails envoyés</div><div id="kpi-emails" class="kpi-value">—</div></div>
-    <div class="card"><div class="kpi-label">Scripts vidéo</div><div id="kpi-scripts" class="kpi-value">—</div></div>
-    <div class="card"><div class="kpi-label">Ventes (Stripe)</div><div id="kpi-sales" class="kpi-value">—</div></div>
-  </section>
-</main>
+  <style>
+    :root {
+      --bg: #0d0d0d;       /* fond sombre */
+      --card: #1a1a1a;     /* cartes */
+      --border: #333;
+      --btn: #2e7dff;      /* bleu accent */
+      --text: #fff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      line-height: 1.5;
+    }
+    main { max-width: 1100px; margin: 0 auto; padding: 24px; }
 
-<style>
-  .card{background:#111; color:#fff; border:1px solid #222; border-radius:12px; padding:16px}
-  .kpi-label{font-size:12px; opacity:.7; margin-bottom:6px}
-  .kpi-value{font-size:28px; font-weight:700}
-  select, input, button{height:34px; padding:0 8px}
-  @media (max-width:900px){ #kpis{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:520px){ #kpis{grid-template-columns:1fr} }
-</style>
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-<script type="module" src="/js/stats-dashboard.js"></script>
+    /* Cartes KPI */
+    #kpis {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .kpi-label {
+      font-size: 13px;
+      opacity: .7;
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    /* Inputs filtres */
+    select, input, button {
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+    }
+    button {
+      background: var(--btn);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) { #kpis { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 520px) { #kpis { grid-template-columns: 1fr; } }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <h1>📊 Statistiques globales</h1>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="period-select">
+          <option value="today">Aujourd’hui</option>
+          <option value="7d" selected>7 derniers jours</option>
+          <option value="30d">30 derniers jours</option>
+          <option value="all">Tout</option>
+        </select>
+        <input id="from-date" type="date" style="display:none">
+        <input id="to-date" type="date" style="display:none">
+        <button id="apply-custom" style="display:none">Appliquer</button>
+      </div>
+    </header>
+
+    <section id="kpis">
+      <div class="card"><div class="kpi-label">Leads</div><div id="kpi-leads" class="kpi-value">—</div></div>
+      <div class="card"><div class="kpi-label">Emails envoyés</div><div id="kpi-emails" class="kpi-value">—</div></div>
+      <div class="card"><div class="kpi-label">Scripts vidéo</div><div id="kpi-scripts" class="kpi-value">—</div></div>
+      <div class="card"><div class="kpi-label">Ventes Stripe</div><div id="kpi-sales" class="kpi-value">—</div></div>
+    </section>
+  </main>
+
+  <!-- Ton script KPI -->
+  <script type="module" src="/js/stats-dashboard.js"></script>
+</body>
+</html>
