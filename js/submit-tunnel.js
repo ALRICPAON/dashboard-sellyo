@@ -429,13 +429,11 @@ if (hasGlobalProduct && !hasThankYouPage) {
       logoUrl,
       currency,
       payment: {
-        provider: "stripe",
-        price: paymentPrice,
-        paymentLink,
-        stripePublishableKey: stripePk,
-        stripePriceId: stripePriceId,
-        paypalClientId: paypalClientId
-      },
+  provider: "stripe",
+  price: paymentPrice,
+  stripePublishableKey: stripePk,
+  stripePriceId: stripePriceId
+},
       analytics: { fbPixelId: fbPixel, gtmId },
       seo: { siteTitle: name, siteDescription: "" },
       delivery: {
