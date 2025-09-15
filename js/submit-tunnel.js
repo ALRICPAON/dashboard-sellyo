@@ -36,6 +36,59 @@ async function uploadIfFile(file, path) {
   return await getDownloadURL(storageRef);
 }
 
+// --- UI de génération (overlay) ---
+function showOverlay(on) {
+  const ov = document.getElementById('gen-overlay');
+  if (!ov) return;
+  ov.style.display = on ? 'flex' : 'none';
+}
+
+function setPhase1() {
+  const step = document.getElementById('gen-step');
+  const status = document.getElementById('gen-status');
+  const bar = document.getElementById('gen-progress');
+  const cdWrap = document.getElementById('gen-countdown-wrap');
+  if (step) step.textContent = 'Phase 1/2 — Génération en cours…';
+  if (status) status.textContent = 'Envoi à Make et création des pages…';
+  if (bar) bar.style.width = '30%';
+  if (cdWrap) cdWrap.style.display = 'none';
+}
+
+let __phase2Timer = null;
+function setPhase2AndCountdown(seconds = 100) { // 90–120s recommandé ; ici ~100s par défaut
+  const step = document.getElementById('gen-step');
+  const status = document.getElementById('gen-status');
+  const bar = document.getElementById('gen-progress');
+  const cdWrap = document.getElementById('gen-countdown-wrap');
+  const cd = document.getElementById('gen-countdown');
+
+  if (step) step.textContent = 'Phase 2/2 — Assemblage du tunnel…';
+  if (status) status.textContent = 'Propagation GitHub Pages, presque fini…';
+  if (bar) bar.style.width = '70%';
+  if (cdWrap) cdWrap.style.display = '';
+
+  let remain = Math.max(30, Math.min(180, seconds)); // sécurité 30–180s
+  if (cd) cd.textContent = `Propagation GitHub Pages : ~${remain}s restantes…`;
+
+  if (__phase2Timer) clearInterval(__phase2Timer);
+  __phase2Timer = setInterval(() => {
+    remain -= 1;
+    if (cd) cd.textContent = `Propagation GitHub Pages : ~${remain}s restantes…`;
+    // petite progression visuelle
+    if (bar) {
+      const p = 70 + Math.min(30, Math.floor(((seconds - remain) / seconds) * 30));
+      bar.style.width = p + '%';
+    }
+    if (remain <= 0) {
+      clearInterval(__phase2Timer);
+      __phase2Timer = null;
+      if (bar) bar.style.width = '100%';
+      if (status) status.textContent = 'Terminé ✔︎';
+    }
+  }, 1000);
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("tunnel-form");
   const pagesContainer = document.getElementById("pages-container");
@@ -195,9 +248,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = auth.currentUser;
     if (!user) return;
     
-    // Anti double-clic
+   // Anti double-clic
 if (__isSubmitting) return;
 __isSubmitting = true;
+
+// 👉 AJOUT
+showOverlay(true);
+setPhase1();
 
     const name = e.target.name.value.trim();
     const redirectURL = (e.target.redirectURL.value.trim() || null);
@@ -392,13 +449,21 @@ if (hasGlobalProduct && !hasThankYouPage) {
     };
 
     try {
-      await fetch(MAKE_WEBHOOK_TUNNEL_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      alert("✅ Tunnel en cours de génération.");
-      window.location.href = "tunnels.html";
+     await fetch(MAKE_WEBHOOK_TUNNEL_URL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload)
+});
+
+// Phase 2 : assemblage / propagation GitHub Pages (90–120s conseillé)
+setPhase2AndCountdown(100); // tu peux mettre 90, 100 ou 120
+
+// Redirection automatique vers la première page à la fin (fallback 100s + 2s de marge)
+setTimeout(() => {
+  // on coupe l’overlay juste au moment de partir
+  showOverlay(false);
+  window.location.href = viewUrl; // ex: https://.../<slug>-p1.html
+}, 102000); // 100s + 2s
     } catch (err) {
   console.error("Make webhook error", err);
   alert("Erreur d’envoi au scénario Make");
