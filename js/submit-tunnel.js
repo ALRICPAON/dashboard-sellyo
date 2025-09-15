@@ -412,7 +412,8 @@ if (hasGlobalProduct && !hasThankYouPage) {
     } catch (err) {
   console.error("Firestore error", err);
   alert("Erreur lors de l’enregistrement du tunnel.");
-  __isSubmitting = false;   // ← AJOUTER ICI
+  __isSubmitting = false;
+  showOverlay(false); // ← AJOUT
   return;
 }
 
@@ -464,10 +465,12 @@ setTimeout(() => {
   showOverlay(false);
   window.location.href = viewUrl; // ex: https://.../<slug>-p1.html
 }, 102000); // 100s + 2s
+    
     } catch (err) {
   console.error("Make webhook error", err);
   alert("Erreur d’envoi au scénario Make");
-  __isSubmitting = false;   // ← AJOUTER ICI
+  __isSubmitting = false;
+  showOverlay(false); // ← AJOUT
 }
   });
 });
